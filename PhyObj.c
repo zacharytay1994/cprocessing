@@ -5,6 +5,10 @@
 // --------------------------------------------------------//
 // GLOBAL VARIABLE DEFINITIONS
 // --------------------------------------------------------//
+PhyObjBoundingShape** PhyObj_bounding_shapes;
+int PhyObj_bounding_shapes_size;
+int PhyObj_bounding_shapes_max_size;
+
 PhyObjBoundingCircle* PhyObj_bounding_circles;
 int PhyObj_bounding_circles_size;
 int PhyObj_bounding_circles_max_size;
@@ -26,6 +30,10 @@ CP_Image PhyObj_square_image;
 // --------------------------------------------------------//
 void PhyObj_Initialize()
 {
+	PhyObj_bounding_shapes = (PhyObjBoundingShape**)malloc(INITIAL_SIZE * sizeof(PhyObjBoundingShape*));
+	PhyObj_bounding_shapes_max_size = INITIAL_SIZE;
+	PhyObj_bounding_shapes_size = 0;
+
 	PhyObj_bounding_circles = (PhyObjBoundingCircle*)malloc(INITIAL_SIZE * sizeof(PhyObjBoundingCircle));
 	PhyObj_bounding_circles_max_size = INITIAL_SIZE;
 	PhyObj_bounding_circles_size = 0;
@@ -49,6 +57,10 @@ PhyObjBoundingCircle* PhyObj_AddCircle(const float x, const float y, const float
 		PhyObj_bounding_circles_max_size *= 2;
 		if (check != NULL) {
 			PhyObj_bounding_circles = check;
+			// update shapes array with new address
+			for (int i = 0; i < PhyObj_bounding_circles_size-1; i++) {
+				PhyObj_bounding_shapes[PhyObj_bounding_circles[i].super._id] = (PhyObjBoundingShape*)&PhyObj_bounding_circles[i];
+			}
 		}
 		else {
 			printf("Collision.c::PhyObj_AddCircle - realloc returned null");
@@ -56,8 +68,9 @@ PhyObjBoundingCircle* PhyObj_AddCircle(const float x, const float y, const float
 	}
 	// moment of inertia of a circle = m * r^2
 	float moment_of_inertia = m * r * r;
-	PhyObjBoundingCircle temp = { {x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia,r };
+	PhyObjBoundingCircle temp = { {PhyObj_bounding_shapes_size,{x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia},r };
 	PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1] = temp;
+	PhyObj_AddShape((PhyObjBoundingShape*)&PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1]);
 	return &PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1];
 }
 
@@ -68,6 +81,10 @@ PhyObjOBoundingBox* PhyObj_AddOBox(const float x, const float y, const float m, 
 		PhyObj_bounding_obox_max_size *= 2;
 		if (check != NULL) {
 			PhyObj_bounding_obox = check;
+			// update shapes array with new address
+			for (int i = 0; i < PhyObj_bounding_obox_size - 1; i++) {
+				PhyObj_bounding_shapes[PhyObj_bounding_obox[i].super._id] = (PhyObjBoundingShape*)&PhyObj_bounding_obox[i];
+			}
 		}
 		else {
 			printf("Collision.c::PhyObj_AddOBox - realloc returned null");
@@ -75,8 +92,9 @@ PhyObjOBoundingBox* PhyObj_AddOBox(const float x, const float y, const float m, 
 	}
 	// moment of inertia of a rectangle = (w * h^3)/12
 	float moment_of_inertia = (w * h * h * h) / 12;
-	PhyObjOBoundingBox temp = { {x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia,w,h };
+	PhyObjOBoundingBox temp = { {PhyObj_bounding_shapes_size,{x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia},w,h };
 	PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1] = temp;
+	PhyObj_AddShape((PhyObjBoundingShape*)&PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1]);
 	return &PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1];
 }
 
@@ -95,9 +113,9 @@ void PhyObj_AddManifold(PhyObjManifold m)
 	PhyObj_manifolds[PhyObj_manifolds_size - 1] = m;
 }
 
-void PhyObj_SetPosition(PhyObjBoundingCircle* c, CP_Vector p)
+void PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p)
 {
-	c->_position = p;
+	s->_position = p;
 }
 
 float PhyObj_2DCross(const CP_Vector v1, const CP_Vector v2)
@@ -113,57 +131,64 @@ CP_Vector PhyObj_2DPerpendicular(const CP_Vector v)
 void PhyObj_DrawCircles()
 {
 	for (int i = 0; i < PhyObj_bounding_circles_size; i++) {
-		CP_Image_DrawAdvanced(PhyObj_circle_image, PhyObj_bounding_circles[i]._position.x, PhyObj_bounding_circles[i]._position.y, PhyObj_bounding_circles[i]._radius * 2.0f, PhyObj_bounding_circles[i]._radius * 2.0f, 255, PhyObj_bounding_circles[i]._rotation);
+		CP_Image_DrawAdvanced(PhyObj_circle_image, PhyObj_bounding_circles[i].super._position.x, PhyObj_bounding_circles[i].super._position.y, PhyObj_bounding_circles[i]._radius * 2.0f, PhyObj_bounding_circles[i]._radius * 2.0f, 255, PhyObj_bounding_circles[i].super._rotation);
 	}
 }
 
 void PhyObj_DrawOBoxes()
 {
 	for (int i = 0; i < PhyObj_bounding_obox_size; i++) {
-		CP_Image_DrawAdvanced(PhyObj_square_image, PhyObj_bounding_obox[i]._position.x, PhyObj_bounding_obox[i]._position.y, PhyObj_bounding_obox[i]._horizontal_extent * 2.0f, PhyObj_bounding_obox[i]._vertical_extent * 2.0f, 255, PhyObj_bounding_obox[i]._rotation);
+		CP_Image_DrawAdvanced(PhyObj_square_image, PhyObj_bounding_obox[i].super._position.x, PhyObj_bounding_obox[i].super._position.y, PhyObj_bounding_obox[i]._horizontal_extent * 2.0f, PhyObj_bounding_obox[i]._vertical_extent * 2.0f, 255, PhyObj_bounding_obox[i].super._rotation);
 	}
+}
+
+void PhyObj_AddShape(PhyObjBoundingShape* shape)
+{
+	if (++PhyObj_bounding_shapes_size > PhyObj_bounding_shapes_max_size) {
+		PhyObjBoundingShape** check = (PhyObjBoundingShape**)realloc(PhyObj_bounding_shapes, sizeof(PhyObjBoundingShape*) * PhyObj_bounding_shapes_max_size * 2);
+		PhyObj_bounding_shapes_max_size *= 2;
+		if (check != NULL) {
+			PhyObj_bounding_shapes = check;
+		}
+		else {
+			printf("Collision.c::PhyObj_AddShape - realloc returned null");
+		}
+	}
+	PhyObj_bounding_shapes[PhyObj_bounding_shapes_size - 1] = shape;
 }
 
 // --------------------------------------------------------//
 // PHYSICS
 // - physics functions, e.g. gravity, force, acceleration 
 // --------------------------------------------------------//
-void PhyObj_AddVelocity(PhyObjBoundingCircle* c, const CP_Vector v)
+void PhyObj_AddVelocity(PhyObjBoundingShape* s, const CP_Vector v)
 {
-	c->_velocity = CP_Vector_Add(c->_velocity, v);
+	s->_velocity = CP_Vector_Add(s->_velocity, v);
 }
 
-void PhyObj_AddAngularVelocity(PhyObjBoundingCircle* c, const float v)
+void PhyObj_AddAngularVelocity(PhyObjBoundingShape* s, const float v)
 {
-	c->_angular_velocity += v;
+	s->_angular_velocity += v;
 }
 
-void PhyObj_ApplyImpulse(PhyObjBoundingCircle* c, const CP_Vector v)
+void PhyObj_ApplyImpulse(PhyObjBoundingShape* s, const CP_Vector v)
 {
-	PhyObj_AddVelocity(c, CP_Vector_Scale(v, c->_inv_mass));
+	PhyObj_AddVelocity(s, CP_Vector_Scale(v, s->_inv_mass));
 }
 
 void PhyObj_UpdatePosition(const float dt)
 {
-	for (int i = 0; i < PhyObj_bounding_circles_size; i++) {
-		PhyObj_bounding_circles[i]._position = CP_Vector_Add(PhyObj_bounding_circles[i]._position, CP_Vector_Scale(PhyObj_bounding_circles[i]._velocity, dt));
-	}
-	for (int i = 0; i < PhyObj_bounding_obox_size; i++) {
-		PhyObj_bounding_obox[i]._position = CP_Vector_Add(PhyObj_bounding_obox[i]._position, CP_Vector_Scale(PhyObj_bounding_obox[i]._velocity, dt));
+	for (int i = 0; i < PhyObj_bounding_shapes_size; i++) {
+		PhyObj_bounding_shapes[i]->_position = CP_Vector_Add(PhyObj_bounding_shapes[i]->_position, CP_Vector_Scale(PhyObj_bounding_shapes[i]->_velocity, dt));
 	}
 }
 
 void PhyObj_UpdateRotation(const float dt)
 {
-	for (int i = 0; i < PhyObj_bounding_circles_size; i++) {
+	for (int i = 0; i < PhyObj_bounding_shapes_size; i++) {
 		// angular velocity is radians per second, but rotation takes degrees
-		float angular_velocity_degrees = PhyObj_bounding_circles[i]._angular_velocity * 57.2957795130823f;
-		PhyObj_bounding_circles[i]._rotation -= angular_velocity_degrees * dt;
-	}
-	for (int i = 0; i < PhyObj_bounding_obox_size; i++) {
-		// angular velocity is radians per second, but rotation takes degrees
-		float angular_velocity_degrees = PhyObj_bounding_obox[i]._angular_velocity * 57.2957795130823f;
-		PhyObj_bounding_obox[i]._rotation -= angular_velocity_degrees * dt;
+		float angular_velocity_degrees = PhyObj_bounding_shapes[i]->_angular_velocity * 57.2957795130823f;
+		PhyObj_bounding_shapes[i]->_rotation -= angular_velocity_degrees * dt;
 	}
 }
 
@@ -171,24 +196,24 @@ void PhyObj_GlobalAcceleration()
 {
 	CP_Vector center = { 200.0f,200.0f };
 	float magnitude = 30.0f;
-	for (int i = 0; i < PhyObj_bounding_circles_size; i++) {
+	for (int i = 0; i < PhyObj_bounding_shapes_size; i++) {
 		// calculate vector to center
-		CP_Vector vector = CP_Vector_Normalize(CP_Vector_Subtract(center, PhyObj_bounding_circles[i]._position));
+		CP_Vector vector = CP_Vector_Normalize(CP_Vector_Subtract(center, PhyObj_bounding_shapes[i]->_position));
 		vector = CP_Vector_Scale(vector, magnitude);
 		vector = CP_Vector_Scale(vector, CP_System_GetDt());
-		PhyObj_AddVelocity(&PhyObj_bounding_circles[i], vector);
+		PhyObj_AddVelocity(PhyObj_bounding_shapes[i], vector);
 	}
 }
 
 CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundingBox* b)
 {
-	CP_Vector result = b->_position;
+	CP_Vector result = b->super._position;
 	// rotate basis vectors
-	CP_Matrix mat = CP_Matrix_Rotate(b->_rotation);
+	CP_Matrix mat = CP_Matrix_Rotate(b->super._rotation);
 	CP_Vector u1 = CP_Vector_MatrixMultiply(mat, (CP_Vector) { 1,0 });
 	CP_Vector u2 = CP_Vector_MatrixMultiply(mat, (CP_Vector) { 0,1 });
 	// project point-boxposition onto axes and add to result
-	CP_Vector box_to_point = CP_Vector_Subtract(p, b->_position);
+	CP_Vector box_to_point = CP_Vector_Subtract(p, b->super._position);
 	float x = CP_Vector_DotProduct(box_to_point, u1);
 	float y = CP_Vector_DotProduct(box_to_point, u2);
 	// check if point is in box, if so snap to nearest edge
@@ -224,30 +249,42 @@ CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundi
 // - collision detection functions
 // e.g. seperating axis test, shape test etc
 // --------------------------------------------------------//
-void PhyObj_CircleCircle(PhyObjBoundingCircle* c1, PhyObjBoundingCircle* c2)
+int PhyObj_CircleCircle(PhyObjBoundingCircle* c1, PhyObjBoundingCircle* c2, PhyObjManifold* m)
 {
 	// if colliding
-	CP_Vector vector_c1_to_c2 = CP_Vector_Subtract(c2->_position, c1->_position);
+	CP_Vector vector_c1_to_c2 = CP_Vector_Subtract(c2->super._position, c1->super._position);
 	float length = CP_Vector_Length(vector_c1_to_c2);
 	if (length < c1->_radius + c2->_radius) {
-		PhyObjManifold* manifoldPtr, manifold;
-		manifoldPtr = &manifold;
-		manifold.A = c1;
-		manifold.B = c2;
-		manifold._contact_normal = CP_Vector_Normalize(vector_c1_to_c2);
-		manifold._contact_position = CP_Vector_Add(c1->_position, CP_Vector_Scale(manifold._contact_normal, 0.5f * (c1->_radius - c2->_radius + length)));
-		//CP_Graphics_DrawCircle(manifold._contact_position.x, manifold._contact_position.y, 2);
+		//PhyObjManifold* manifoldPtr, manifold;
+		//manifoldPtr = &manifold;
+		//m.type = MANIFOLD_CIRCLE_CIRCLE;
+		m->A = (PhyObjBoundingShape*)c1;
+		m->B = (PhyObjBoundingShape*)c2;
+		m->_contact_normal = CP_Vector_Normalize(vector_c1_to_c2);
+		m->_contact_position = CP_Vector_Add(c1->super._position, CP_Vector_Scale(m->_contact_normal, 0.5f * (c1->_radius - c2->_radius + length)));
 		// sum of radius + distance between centers
-		manifold._penetration = (c1->_radius + c2->_radius) - length;
-		PhyObj_AddManifold(manifold);
+		m->_penetration = (c1->_radius + c2->_radius) - length;
+		return 1;
+		//PhyObj_AddManifoldCvC(manifold);
+		//PhyObj_AddManifold(manifold);
 	}
+	return 0;
 }
 
 int PhyObj_CircleOBox(PhyObjBoundingCircle* c, PhyObjOBoundingBox* b, PhyObjManifold* m)
 {
-	CP_Vector distance_pointonbox_to_circlecenter = PhyObj_NearestPointOnOBBToPoint(c->_position, b);
-	// dot a vector by itself is the same as magnitude square
-	return (CP_Vector_DotProduct(distance_pointonbox_to_circlecenter, distance_pointonbox_to_circlecenter) < c->_radius * c->_radius);
+	CP_Vector pointonbox_to_circlecenter = PhyObj_NearestPointOnOBBToPoint(c->super._position, b);
+	float penetration = c->_radius - CP_Vector_Length(CP_Vector_Subtract(pointonbox_to_circlecenter, c->super._position));
+	// if colliding
+	if (penetration > 0.0f) {
+		m->A = (PhyObjBoundingShape*)c;
+		m->B = (PhyObjBoundingShape*)b;
+		m->_contact_normal = CP_Vector_Normalize(CP_Vector_Subtract(pointonbox_to_circlecenter, c->super._position));
+		m->_contact_position = pointonbox_to_circlecenter;
+		m->_penetration = penetration;
+		return 1;
+	}
+	return 0;
 }
 
 void PhyObj_CheckForCollisions()
@@ -256,7 +293,27 @@ void PhyObj_CheckForCollisions()
 	PhyObj_manifolds_size = 0;
 	for (int i = 0; i < PhyObj_bounding_circles_size-1; i++) {
 		for (int j = i + 1; j < PhyObj_bounding_circles_size; j++) {
-			PhyObj_CircleCircle(&PhyObj_bounding_circles[i], &PhyObj_bounding_circles[j]);
+			PhyObjManifold* manifoldPtr, manifold;
+			manifoldPtr = &manifold;
+			if (PhyObj_CircleCircle(&PhyObj_bounding_circles[i], &PhyObj_bounding_circles[j], manifoldPtr)) {
+				PhyObj_AddManifold(manifold);
+			}
+		}
+		// test
+		if (PhyObj_bounding_obox_size > 0) {
+			PhyObjManifold* manifoldPtr2, manifold2;
+			manifoldPtr2 = &manifold2;
+			if (PhyObj_CircleOBox(&PhyObj_bounding_circles[i], &PhyObj_bounding_obox[0], manifoldPtr2)) {
+				PhyObj_AddManifold(manifold2);
+			}
+		}
+	}
+	// temp
+	if (PhyObj_bounding_obox_size > 0) {
+		PhyObjManifold* manifoldPtr2, manifold2;
+		manifoldPtr2 = &manifold2;
+		if (PhyObj_CircleOBox(&PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1], &PhyObj_bounding_obox[0], manifoldPtr2)) {
+			PhyObj_AddManifold(manifold2);
 		}
 	}
 }
@@ -306,8 +363,8 @@ void PhyObj_ResolveManifolds()
 			float normal_lambda = (velocity_along_normal - baumgarte) * (1.0f + restitution) * -effective_mass_normal;
 			float tangent_lambda = velocity_along_tangent * -effective_mass_tangent * friction_coefficient;
 			CP_Vector impulse_vector = CP_Vector_Add(CP_Vector_Scale(m._contact_normal, normal_lambda),CP_Vector_Scale(tangent, tangent_lambda));
-			PhyObj_ApplyImpulse(m.A, CP_Vector_Scale(impulse_vector,-1.0f));
-			PhyObj_ApplyImpulse(m.B, impulse_vector);
+			PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.A, CP_Vector_Scale(impulse_vector,-1.0f));
+			PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.B, impulse_vector);
 			m.A->_angular_velocity -= PhyObj_2DCross(impulse_vector, rA) * m.A->_inv_moment_of_inertia;
 			m.B->_angular_velocity += PhyObj_2DCross(impulse_vector, rB) * m.B->_inv_moment_of_inertia;
 		}
