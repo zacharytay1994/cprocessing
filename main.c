@@ -18,6 +18,7 @@
 
 PhyObjBoundingCircle* circle1;
 PhyObjOBoundingBox* box1;
+PhyObjOBoundingBox* box2;
 
 // use CP_Engine_SetNextGameState to specify this function as the initialization function
 // this function will be called once at the beginning of the program
@@ -32,6 +33,10 @@ void game_init(void)
 	//box1 = PhyObj_AddOBox(100.0f, 100.0f, 30.0f, 30.0f, 30.0f);
 	//box1->super._angular_velocity = 1.0f;
 	//PhyObj_AddCircle(100.0f, 100.0f, 30.0f, 30.0f);
+	/*box1 = PhyObj_AddOBox(300.0f, 300.0f, 30, 30, 30);
+	box2 = PhyObj_AddOBox(300.0f, 300.0f, 30, 30, 30);
+	box1->super._angular_velocity = 1.0f;
+	box2->super._angular_velocity = 1.0f;*/
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the update function
@@ -57,10 +62,12 @@ void game_update(void)
 		float random_mass = (float)CP_Random_RangeInt(5, 30);
 		PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), random_mass, random_mass);
 		//PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), random_mass, random_mass, random_mass);
+		
 	}
 	PhyObj_UpdatePosition(CP_System_GetDt());
 	PhyObj_UpdateRotation(CP_System_GetDt());
-	//CP_Vector mouse = (CP_Vector){ CP_Input_GetMouseX(),CP_Input_GetMouseY() };
+	/*CP_Vector mouse = (CP_Vector){ CP_Input_GetMouseX(),CP_Input_GetMouseY() };
+	box2->super._position = mouse;*/
 	//CP_Vector result = PhyObj_NearestPointOnOBBToPoint(mouse, box1);
 	//CP_Graphics_DrawCircle(result.x, result.y, 2);
 	//PhyObj_SetPosition(circle1, (CP_Vector) {CP_Input_GetMouseX(),CP_Input_GetMouseY()});

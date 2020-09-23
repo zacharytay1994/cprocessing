@@ -1,7 +1,7 @@
 #pragma once
 #include "CProcessing/inc/cprocessing.h"
 
-#define INITIAL_SIZE 10
+#define INITIAL_SIZE 3
 
 #define MANIFOLD_CIRCLE_CIRCLE 0
 #define MANIFOLD_CIRCLE_OBOX 1
@@ -11,6 +11,7 @@
 
 typedef struct PhyObjBoundingShape {
 	unsigned int _id; // position in shapes array
+	int			_type;
 	CP_Vector	_position;
 	float		_rotation;
 	CP_Vector	_velocity;
@@ -71,6 +72,7 @@ void PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p);
 // Math
 float PhyObj_2DCross(const CP_Vector v1, const CP_Vector v2);
 CP_Vector PhyObj_2DPerpendicular(const CP_Vector v);
+float PhyObj_Mod(const float in); // always returns a positive value
 // Physics
 void PhyObj_AddVelocity(PhyObjBoundingShape* s, const CP_Vector v);
 void PhyObj_AddAngularVelocity(PhyObjBoundingShape* s, const float v);
@@ -83,7 +85,7 @@ CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundi
 // Collision Detection
 int PhyObj_CircleCircle(PhyObjBoundingCircle* c1, PhyObjBoundingCircle* c2, PhyObjManifold* m);
 int PhyObj_CircleOBox(PhyObjBoundingCircle* c, PhyObjOBoundingBox* b, PhyObjManifold* m);
-int PhyObj_OboxObox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2);
+int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold* m);
 // Collision Resolution
 void PhyObj_CheckForCollisions();
 void PhyObj_ResolveManifolds();

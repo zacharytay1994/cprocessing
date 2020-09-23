@@ -68,7 +68,7 @@ PhyObjBoundingCircle* PhyObj_AddCircle(const float x, const float y, const float
 	}
 	// moment of inertia of a circle = m * r^2
 	float moment_of_inertia = m * r * r;
-	PhyObjBoundingCircle temp = { {PhyObj_bounding_shapes_size,{x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia},r };
+	PhyObjBoundingCircle temp = { {PhyObj_bounding_shapes_size,BOUNDING_CIRCLE,{x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia},r };
 	PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1] = temp;
 	PhyObj_AddShape((PhyObjBoundingShape*)&PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1]);
 	return &PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1];
@@ -92,7 +92,7 @@ PhyObjOBoundingBox* PhyObj_AddOBox(const float x, const float y, const float m, 
 	}
 	// moment of inertia of a rectangle = (w * h^3)/12
 	float moment_of_inertia = (w * h * h * h) / 12;
-	PhyObjOBoundingBox temp = { {PhyObj_bounding_shapes_size,{x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia},w,h };
+	PhyObjOBoundingBox temp = { {PhyObj_bounding_shapes_size,BOUNDING_OBOX,{x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia},w,h };
 	PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1] = temp;
 	PhyObj_AddShape((PhyObjBoundingShape*)&PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1]);
 	return &PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1];
@@ -126,6 +126,11 @@ float PhyObj_2DCross(const CP_Vector v1, const CP_Vector v2)
 CP_Vector PhyObj_2DPerpendicular(const CP_Vector v)
 {
 	return (CP_Vector){v.y,-v.x};
+}
+
+float PhyObj_Mod(const float in)
+{
+	return in < 0.0f ? -in : in;
 }
 
 void PhyObj_DrawCircles()
@@ -287,33 +292,96 @@ int PhyObj_CircleOBox(PhyObjBoundingCircle* c, PhyObjOBoundingBox* b, PhyObjMani
 	return 0;
 }
 
+int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold* m)
+{
+	// perform SAT
+	CP_Matrix rotation_b1 = CP_Matrix_Rotate(b1->super._rotation);
+	CP_Matrix rotation_b2 = CP_Matrix_Rotate(b2->super._rotation);
+
+	CP_Vector position_b1 = b1->super._position;
+	CP_Vector position_b2 = b2->super._position;
+
+	CP_Vector axis1_b1 = CP_Vector_MatrixMultiply(rotation_b1, (CP_Vector) { 1.0f, 0.0f });
+	CP_Vector axis2_b1 = CP_Vector_MatrixMultiply(rotation_b1, (CP_Vector) { 0.0f, 1.0f });
+	CP_Vector axis1_b2 = CP_Vector_MatrixMultiply(rotation_b2, (CP_Vector) { 1.0f, 0.0f });
+	CP_Vector axis2_b2 = CP_Vector_MatrixMultiply(rotation_b2, (CP_Vector) { 0.0f, 1.0f });
+
+	CP_Vector h_extent_b1 = CP_Vector_Scale(axis1_b1, b1->_horizontal_extent);
+	CP_Vector v_extent_b1 = CP_Vector_Scale(axis2_b1, b1->_vertical_extent);
+	CP_Vector h_extent_b2 = CP_Vector_Scale(axis1_b2, b2->_horizontal_extent);
+	CP_Vector v_extent_b2 = CP_Vector_Scale(axis2_b2, b2->_vertical_extent);
+
+	CP_Vector translation = CP_Vector_Subtract(position_b2, position_b1);
+
+	// check the 4 axes
+	// proj_axis(translation)^2 >
+	// (h_extent_b1 dot axis)^2 + (v_extent_b1 dot axis)^2 + (h_extent_b2 dot axis)^2 + (v_extent_b2 dot axis)^2
+	float translation_projected = -1;
+	//float penetration = 1000000.0f;
+	//CP_Vector axis_least_penetration = { -1, -1 };
+	int b1_b2_order = -1; // checks to see is a is before b or b is before a along the projected axis, 1 means b1 is before b2 on the projected axis, 0 otherwise
+	// case 1 - axis1_b1, if seperation found return 0
+	translation_projected = PhyObj_Mod(CP_Vector_DotProduct(translation, axis1_b1));
+	b1_b2_order = translation_projected > 0 ? 1 : 0;
+	if (translation_projected > PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis1_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis1_b1)) +
+		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis1_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis1_b1))) {
+		return 0;
+	}
+	// case 2 - axis2_b1
+	translation_projected = PhyObj_Mod(CP_Vector_DotProduct(translation, axis2_b1));
+	//b1_b2_order = translation_projected > 0 ? 1 : 0;
+	if (translation_projected > PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis2_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis2_b1)) +
+		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis2_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis2_b1))) {
+		return 0;
+	}
+	// case 3 - axis1_b2
+	translation_projected = PhyObj_Mod(CP_Vector_DotProduct(translation, axis1_b2));
+	//b1_b2_order = translation_projected > 0 ? 0 : 1;
+	if (translation_projected > PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis1_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis1_b2)) +
+		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis1_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis1_b2))) {
+		return 0;
+	}
+	// case 4 - axis2_b2
+	translation_projected = PhyObj_Mod(CP_Vector_DotProduct(translation, axis2_b2));
+	//b1_b2_order = translation_projected > 0 ? 0 : 1;
+	if (translation_projected > PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis2_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis2_b2)) +
+		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis2_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis2_b2))) {
+		return 0;
+	}
+	//CP_Graphics_DrawCircle(100, 100, 10);
+	return 1;
+}
+
 void PhyObj_CheckForCollisions()
 {
 	// reset manifolds
 	PhyObj_manifolds_size = 0;
-	for (int i = 0; i < PhyObj_bounding_circles_size-1; i++) {
-		for (int j = i + 1; j < PhyObj_bounding_circles_size; j++) {
+	for (int i = 0; i < PhyObj_bounding_shapes_size - 1; i++) {
+		for (int j = i + 1; j < PhyObj_bounding_shapes_size; j++) {
 			PhyObjManifold* manifoldPtr, manifold;
 			manifoldPtr = &manifold;
-			if (PhyObj_CircleCircle(&PhyObj_bounding_circles[i], &PhyObj_bounding_circles[j], manifoldPtr)) {
-				PhyObj_AddManifold(manifold);
+			if (PhyObj_bounding_shapes[i]->_type == BOUNDING_CIRCLE && PhyObj_bounding_shapes[j]->_type == BOUNDING_CIRCLE) {
+				if (PhyObj_CircleCircle((PhyObjBoundingCircle*)PhyObj_bounding_shapes[i], (PhyObjBoundingCircle*)PhyObj_bounding_shapes[j], manifoldPtr)) {
+					PhyObj_AddManifold(manifold);
+				}
 			}
-		}
-		// test
-		if (PhyObj_bounding_obox_size > 0) {
-			PhyObjManifold* manifoldPtr2, manifold2;
-			manifoldPtr2 = &manifold2;
-			if (PhyObj_CircleOBox(&PhyObj_bounding_circles[i], &PhyObj_bounding_obox[0], manifoldPtr2)) {
-				PhyObj_AddManifold(manifold2);
+			else if (PhyObj_bounding_shapes[i]->_type == BOUNDING_CIRCLE && PhyObj_bounding_shapes[j]->_type == BOUNDING_OBOX) {
+				/*PhyObjBoundingCircle* test = (PhyObjBoundingCircle*)PhyObj_bounding_shapes[i];
+				test = test;*/
+				if (PhyObj_CircleOBox((PhyObjBoundingCircle*)PhyObj_bounding_shapes[i], (PhyObjOBoundingBox*)PhyObj_bounding_shapes[j], manifoldPtr)) {
+					PhyObj_AddManifold(manifold);
+				}
 			}
-		}
-	}
-	// temp
-	if (PhyObj_bounding_obox_size > 0) {
-		PhyObjManifold* manifoldPtr2, manifold2;
-		manifoldPtr2 = &manifold2;
-		if (PhyObj_CircleOBox(&PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1], &PhyObj_bounding_obox[0], manifoldPtr2)) {
-			PhyObj_AddManifold(manifold2);
+			else if (PhyObj_bounding_shapes[i]->_type == BOUNDING_OBOX && PhyObj_bounding_shapes[j]->_type == BOUNDING_CIRCLE) {
+				if (PhyObj_CircleOBox((PhyObjBoundingCircle*)PhyObj_bounding_shapes[j], (PhyObjOBoundingBox*)PhyObj_bounding_shapes[i], manifoldPtr)) {
+					PhyObj_AddManifold(manifold);
+				}
+			}
+			else if (PhyObj_bounding_shapes[i]->_type == BOUNDING_OBOX && PhyObj_bounding_shapes[j]->_type == BOUNDING_OBOX) {
+				if (PhyObj_BoxBox((PhyObjOBoundingBox*)PhyObj_bounding_shapes[i], (PhyObjOBoundingBox*)PhyObj_bounding_shapes[j], manifoldPtr)) {
+					//PhyObj_AddManifold(manifold);
+				}
+			}
 		}
 	}
 }
