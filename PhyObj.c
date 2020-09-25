@@ -128,6 +128,11 @@ CP_Vector PhyObj_2DPerpendicular(const CP_Vector v)
 	return (CP_Vector){v.y,-v.x};
 }
 
+float PhyObj_VectorSquareMagnitude(const CP_Vector v)
+{
+	return CP_Math_Square(v.x) + CP_Math_Square(v.y);
+}
+
 float PhyObj_Mod(const float in)
 {
 	return in < 0.0f ? -in : in;
@@ -269,6 +274,8 @@ int PhyObj_CircleCircle(PhyObjBoundingCircle* c1, PhyObjBoundingCircle* c2, PhyO
 		m->_contact_position = CP_Vector_Add(c1->super._position, CP_Vector_Scale(m->_contact_normal, 0.5f * (c1->_radius - c2->_radius + length)));
 		// sum of radius + distance between centers
 		m->_penetration = (c1->_radius + c2->_radius) - length;
+		m->_contact_position_2 = (CP_Vector){ -100.0f,-100.0f };
+		m->_penetration_2 = -1.0f;
 		return 1;
 		//PhyObj_AddManifoldCvC(manifold);
 		//PhyObj_AddManifold(manifold);
@@ -287,11 +294,14 @@ int PhyObj_CircleOBox(PhyObjBoundingCircle* c, PhyObjOBoundingBox* b, PhyObjMani
 		m->_contact_normal = CP_Vector_Normalize(CP_Vector_Subtract(pointonbox_to_circlecenter, c->super._position));
 		m->_contact_position = pointonbox_to_circlecenter;
 		m->_penetration = penetration;
+		m->_contact_position_2 =	(CP_Vector){ -100.0f,-100.0f };
+		m->_penetration_2 = -1.0f;
 		return 1;
 	}
 	return 0;
 }
 
+// Probably need a more efficient SAT - TBC
 int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold* m)
 {
 	// perform SAT
@@ -317,38 +327,328 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 	// proj_axis(translation)^2 >
 	// (h_extent_b1 dot axis)^2 + (v_extent_b1 dot axis)^2 + (h_extent_b2 dot axis)^2 + (v_extent_b2 dot axis)^2
 	float translation_projected = -1;
-	//float penetration = 1000000.0f;
-	//CP_Vector axis_least_penetration = { -1, -1 };
-	int b1_b2_order = -1; // checks to see is a is before b or b is before a along the projected axis, 1 means b1 is before b2 on the projected axis, 0 otherwise
+	float penetration_check = 0;
+	float penetration = 1000000.0f;
+	CP_Vector axis_least_penetration = {0,0};
+	// checks to see if a flip is needed x1x2_b1 : <0 flip >0 !flip, x1x2_b2 : <0 !flip, >0 flip
+	int flip = -1; 
+	int isb1 = -1;
+	int is_horizontal = -1;
 	// case 1 - axis1_b1, if seperation found return 0
-	translation_projected = PhyObj_Mod(CP_Vector_DotProduct(translation, axis1_b1));
-	b1_b2_order = translation_projected > 0 ? 1 : 0;
-	if (translation_projected > PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis1_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis1_b1)) +
-		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis1_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis1_b1))) {
+	translation_projected = CP_Vector_DotProduct(translation, axis1_b1);
+	penetration_check = (PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis1_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis1_b1)) +
+		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis1_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis1_b1))) - PhyObj_Mod(translation_projected);
+	if (penetration_check < 0.0f) {
 		return 0;
+	}
+	if (penetration_check < penetration) {
+		penetration = penetration_check;
+		axis_least_penetration = axis1_b1;
+		isb1 = 1;
+		flip = translation_projected < 0 ? -1 : 1;
+		is_horizontal = 1;
 	}
 	// case 2 - axis2_b1
-	translation_projected = PhyObj_Mod(CP_Vector_DotProduct(translation, axis2_b1));
-	//b1_b2_order = translation_projected > 0 ? 1 : 0;
-	if (translation_projected > PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis2_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis2_b1)) +
-		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis2_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis2_b1))) {
+	translation_projected = CP_Vector_DotProduct(translation, axis2_b1);
+	penetration_check = (PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis2_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis2_b1)) +
+		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis2_b1)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis2_b1))) - PhyObj_Mod(translation_projected);
+	if (penetration_check < 0.0f) {
 		return 0;
+	}
+	if (penetration_check < penetration) {
+		penetration = penetration_check;
+		axis_least_penetration = axis2_b1;
+		isb1 = 1;
+		flip = translation_projected < 0 ? -1 : 1;
+		is_horizontal = 0;
 	}
 	// case 3 - axis1_b2
-	translation_projected = PhyObj_Mod(CP_Vector_DotProduct(translation, axis1_b2));
-	//b1_b2_order = translation_projected > 0 ? 0 : 1;
-	if (translation_projected > PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis1_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis1_b2)) +
-		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis1_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis1_b2))) {
+	translation_projected = CP_Vector_DotProduct(translation, axis1_b2);
+	penetration_check = (PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis1_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis1_b2)) +
+		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis1_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis1_b2))) - PhyObj_Mod(translation_projected);
+	if (penetration_check < 0.0f) {
 		return 0;
+	}
+	if (penetration_check < penetration) {
+		penetration = penetration_check;
+		axis_least_penetration = axis1_b2;
+		isb1 = 0;
+		flip = translation_projected > 0 ? -1 : 1;
+		is_horizontal = 1;
 	}
 	// case 4 - axis2_b2
-	translation_projected = PhyObj_Mod(CP_Vector_DotProduct(translation, axis2_b2));
-	//b1_b2_order = translation_projected > 0 ? 0 : 1;
-	if (translation_projected > PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis2_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis2_b2)) +
-		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis2_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis2_b2))) {
+	translation_projected = CP_Vector_DotProduct(translation, axis2_b2);
+	penetration_check = (PhyObj_Mod(CP_Vector_DotProduct(h_extent_b1, axis2_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b1, axis2_b2)) +
+		PhyObj_Mod(CP_Vector_DotProduct(h_extent_b2, axis2_b2)) + PhyObj_Mod(CP_Vector_DotProduct(v_extent_b2, axis2_b2))) - PhyObj_Mod(translation_projected);
+	if (penetration_check < 0.0f) {
 		return 0;
 	}
-	//CP_Graphics_DrawCircle(100, 100, 10);
+	if (penetration_check < penetration) {
+		penetration = penetration_check;
+		axis_least_penetration = axis2_b2;
+		isb1 = 0;
+		flip = translation_projected > 0 ? -1 : 1;
+		is_horizontal = 0;
+	}
+	// calculate corner of reference plane
+	CP_Vector ref_corner_1;
+	CP_Vector ref_corner_2;
+	//CP_Vector axis_horizontal = axis_least_penetration
+	if (isb1) {
+		if (is_horizontal) {
+			ref_corner_1 = CP_Vector_Add(b1->super._position, 
+				CP_Vector_Add(CP_Vector_Scale(axis_least_penetration, b1->_horizontal_extent * flip), v_extent_b1));
+			ref_corner_2 = CP_Vector_Add(b1->super._position,
+				CP_Vector_Add(CP_Vector_Scale(axis_least_penetration, b1->_horizontal_extent * flip), CP_Vector_Scale(v_extent_b1,-1)));
+		}
+		else {
+			ref_corner_1 = CP_Vector_Add(b1->super._position,
+				CP_Vector_Add(CP_Vector_Scale(axis_least_penetration, b1->_vertical_extent * flip), h_extent_b1));
+			ref_corner_2 = CP_Vector_Add(b1->super._position,
+				CP_Vector_Add(CP_Vector_Scale(axis_least_penetration, b1->_vertical_extent * flip), CP_Vector_Scale(h_extent_b1, -1)));
+		}
+	}
+	else {
+		if (is_horizontal) {
+			ref_corner_1 = CP_Vector_Add(b2->super._position,
+				CP_Vector_Add(CP_Vector_Scale(axis_least_penetration, b2->_horizontal_extent * flip), v_extent_b2));
+			ref_corner_2 = CP_Vector_Add(b2->super._position,
+				CP_Vector_Add(CP_Vector_Scale(axis_least_penetration, b2->_horizontal_extent * flip), CP_Vector_Scale(v_extent_b2, -1)));
+		}
+		else {
+			ref_corner_1 = CP_Vector_Add(b2->super._position,
+				CP_Vector_Add(CP_Vector_Scale(axis_least_penetration, b2->_vertical_extent * flip), h_extent_b2));
+			ref_corner_2 = CP_Vector_Add(b2->super._position,
+				CP_Vector_Add(CP_Vector_Scale(axis_least_penetration, b2->_vertical_extent * flip), CP_Vector_Scale(h_extent_b2, -1)));
+		}
+	}
+	// calculate point 2 potential incident edges
+	// corner of intersection is the corner of the incident box closest to the reference box center
+	int number_of_contacts = 0;
+	CP_Vector corner_of_intersection1 = { 0,0 };
+	CP_Vector corner_of_intersection2 = { 0,0 };
+	float contact_penetration1 = -1;
+	float contact_penetration2 = -1;
+	CP_Vector coi_check = { 0,0 };
+	float d_corner_to_center = 1000000.0f;
+	float d_ctc_check = -1;
+	if (isb1) { // if b1 has the reference edge
+		// top-right
+		coi_check = CP_Vector_Add(b2->super._position,CP_Vector_Add(h_extent_b2, v_extent_b2));
+		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check,b1->super._position));
+		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b1->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
+		// if corner is intersecting box
+		if (d_ctc_check < b1->_horizontal_extent) {
+			d_corner_to_center = d_ctc_check;
+			if (number_of_contacts) {
+				corner_of_intersection2 = coi_check;
+				number_of_contacts = 2;
+				contact_penetration2 = b1->_horizontal_extent - d_ctc_check;
+			}
+			else {
+				corner_of_intersection1 = coi_check;
+				number_of_contacts = 1;
+				contact_penetration1 = b1->_horizontal_extent - d_ctc_check;
+			}
+		}
+		// top-left
+		coi_check = CP_Vector_Add(b2->super._position, CP_Vector_Add(CP_Vector_Scale(h_extent_b2, -1), v_extent_b2));
+		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b1->super._position));
+		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b1->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
+		if (d_ctc_check < b1->_horizontal_extent) {
+			d_corner_to_center = d_ctc_check;
+			if (number_of_contacts) {
+				corner_of_intersection2 = coi_check;
+				number_of_contacts = 2;
+				contact_penetration2 = b1->_horizontal_extent - d_ctc_check;
+			}
+			else {
+				corner_of_intersection1 = coi_check;
+				number_of_contacts = 1;
+				contact_penetration1 = b1->_horizontal_extent - d_ctc_check;
+			}
+		}
+		// bottom-right
+		coi_check = CP_Vector_Add(b2->super._position,CP_Vector_Add(h_extent_b2, CP_Vector_Scale(v_extent_b2, -1)));
+		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b1->super._position));
+		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b1->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
+		if (d_ctc_check < b1->_horizontal_extent) {
+			d_corner_to_center = d_ctc_check;
+			if (number_of_contacts) {
+				corner_of_intersection2 = coi_check;
+				number_of_contacts = 2;
+				contact_penetration2 = b1->_horizontal_extent - d_ctc_check;
+			}
+			else {
+				corner_of_intersection1 = coi_check;
+				number_of_contacts = 1;
+				contact_penetration1 = b1->_horizontal_extent - d_ctc_check;
+			}
+		}
+		// bottom-left
+		coi_check = CP_Vector_Add(b2->super._position, CP_Vector_Add(CP_Vector_Scale(h_extent_b2, -1), CP_Vector_Scale(v_extent_b2, -1)));
+		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b1->super._position));
+		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b1->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
+		if (d_ctc_check < b1->_horizontal_extent) {
+			d_corner_to_center = d_ctc_check;
+			if (number_of_contacts) {
+				corner_of_intersection2 = coi_check;
+				number_of_contacts = 2;
+				contact_penetration2 = b1->_horizontal_extent - d_ctc_check;
+			}
+			else {
+				corner_of_intersection1 = coi_check;
+				number_of_contacts = 1;
+				contact_penetration1 = b1->_horizontal_extent - d_ctc_check;
+			}
+		}
+	}
+	else { // b2 has the reference edge
+		// top-right
+		coi_check = CP_Vector_Add(b1->super._position, CP_Vector_Add(h_extent_b1, v_extent_b1));
+		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b2->super._position));
+		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b2->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
+		if (d_ctc_check < b2->_horizontal_extent) {
+			d_corner_to_center = d_ctc_check;
+			if (number_of_contacts) {
+				corner_of_intersection2 = coi_check;
+				number_of_contacts = 2;
+				contact_penetration2 = b2->_horizontal_extent - d_ctc_check;
+			}
+			else {
+				corner_of_intersection1 = coi_check;
+				number_of_contacts = 1;
+				contact_penetration1 = b2->_horizontal_extent - d_ctc_check;
+			}
+		}
+		// top-left
+		coi_check = CP_Vector_Add(b1->super._position, CP_Vector_Add(CP_Vector_Scale(h_extent_b1, -1), v_extent_b1));
+		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b2->super._position));
+		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b2->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
+		if (d_ctc_check < b2->_horizontal_extent) {
+			d_corner_to_center = d_ctc_check;
+			if (number_of_contacts) {
+				corner_of_intersection2 = coi_check;
+				number_of_contacts = 2;
+				contact_penetration2 = b2->_horizontal_extent - d_ctc_check;
+			}
+			else {
+				corner_of_intersection1 = coi_check;
+				number_of_contacts = 1;
+				contact_penetration1 = b2->_horizontal_extent - d_ctc_check;
+			}
+		}
+		// bottom-right
+		coi_check = CP_Vector_Add(b1->super._position, CP_Vector_Add(h_extent_b1, CP_Vector_Scale(v_extent_b1, -1)));
+		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b2->super._position));
+		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b2->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
+		if (d_ctc_check < b2->_horizontal_extent) {
+			d_corner_to_center = d_ctc_check;
+			if (number_of_contacts) {
+				corner_of_intersection2 = coi_check;
+				number_of_contacts = 2;
+				contact_penetration2 = b2->_horizontal_extent - d_ctc_check;
+			}
+			else {
+				corner_of_intersection1 = coi_check;
+				number_of_contacts = 1;
+				contact_penetration1 = b2->_horizontal_extent - d_ctc_check;
+			}
+		}
+		// bottom-left
+		coi_check = CP_Vector_Add(b1->super._position, CP_Vector_Add(CP_Vector_Scale(h_extent_b1, -1), CP_Vector_Scale(v_extent_b1, -1)));
+		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b2->super._position));
+		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b2->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
+		if (d_ctc_check < b2->_horizontal_extent) {
+			d_corner_to_center = d_ctc_check;
+			if (number_of_contacts) {
+				corner_of_intersection2 = coi_check;
+				number_of_contacts = 2;
+				contact_penetration2 = b2->_horizontal_extent - d_ctc_check;
+			}
+			else {
+				corner_of_intersection1 = coi_check;
+				number_of_contacts = 1;
+				contact_penetration1 = b2->_horizontal_extent - d_ctc_check;
+			}
+		}
+	}
+	float coi_length;
+	if (number_of_contacts == 1) {
+		// check if contact is within reference plane
+		if (isb1) {
+			corner_of_intersection1 = CP_Vector_Add(b1->super._position, CP_Vector_Add(CP_Vector_Subtract(corner_of_intersection1, b1->super._position), CP_Vector_Scale(axis_least_penetration, contact_penetration1 * flip)));
+		}
+		else {
+			corner_of_intersection1 = CP_Vector_Add(b2->super._position, CP_Vector_Add(CP_Vector_Subtract(corner_of_intersection1, b2->super._position), CP_Vector_Scale(axis_least_penetration, contact_penetration1 * flip)));
+		}
+	}
+	else if (number_of_contacts == 2) {
+		if (isb1) {
+			float ref_corner_length = CP_Math_Square(b1->_horizontal_extent) + CP_Math_Square(b1->_vertical_extent);
+			corner_of_intersection1 = CP_Vector_Add(b1->super._position, CP_Vector_Add(CP_Vector_Subtract(corner_of_intersection1, b1->super._position), CP_Vector_Scale(axis_least_penetration, contact_penetration1 * flip)));
+			corner_of_intersection2 = CP_Vector_Add(b1->super._position, CP_Vector_Add(CP_Vector_Subtract(corner_of_intersection2, b1->super._position), CP_Vector_Scale(axis_least_penetration, contact_penetration2 * flip)));
+			// clip to reference plane - i.e check if within ref corner lengths
+			coi_length = PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(corner_of_intersection1,position_b1));
+			if (coi_length > ref_corner_length) {
+				corner_of_intersection1 = PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(ref_corner_1, corner_of_intersection1)) < PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(ref_corner_2, corner_of_intersection1)) ?
+					ref_corner_1 : ref_corner_2;
+			}
+			coi_length = PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(corner_of_intersection2, position_b1));
+			if (coi_length > ref_corner_length) {
+				corner_of_intersection2 = PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(ref_corner_1, corner_of_intersection2)) < PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(ref_corner_2, corner_of_intersection2)) ?
+					ref_corner_1 : ref_corner_2;
+			}
+		}
+		else {
+			float ref_corner_length = CP_Math_Square(b2->_horizontal_extent) + CP_Math_Square(b2->_vertical_extent);
+			corner_of_intersection1 = CP_Vector_Add(b2->super._position, CP_Vector_Add(CP_Vector_Subtract(corner_of_intersection1, b2->super._position), CP_Vector_Scale(axis_least_penetration, contact_penetration1 * flip)));
+			corner_of_intersection2 = CP_Vector_Add(b2->super._position, CP_Vector_Add(CP_Vector_Subtract(corner_of_intersection2, b2->super._position), CP_Vector_Scale(axis_least_penetration, contact_penetration2 * flip)));
+			// clip to reference plane - i.e check if within ref corner lengths
+			coi_length = PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(corner_of_intersection1, position_b2));
+			if (coi_length > ref_corner_length) {
+				corner_of_intersection1 = PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(ref_corner_1, corner_of_intersection1)) < PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(ref_corner_2, corner_of_intersection1)) ?
+					ref_corner_1 : ref_corner_2;
+			}
+			coi_length = PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(corner_of_intersection2, position_b2));
+			if (coi_length > ref_corner_length) {
+				corner_of_intersection2 = PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(ref_corner_1, corner_of_intersection2)) < PhyObj_VectorSquareMagnitude(CP_Vector_Subtract(ref_corner_2, corner_of_intersection2)) ?
+					ref_corner_1 : ref_corner_2;
+			}
+		}
+	}
+
+	CP_Graphics_DrawCircle(corner_of_intersection1.x, corner_of_intersection1.y, 2.0f);
+	CP_Graphics_DrawCircle(corner_of_intersection2.x, corner_of_intersection2.y, 2.0f);
+
+	// output manifold
+	if (isb1) {
+		m->A = (PhyObjBoundingShape*)b1;
+		m->B = (PhyObjBoundingShape*)b2;
+	}
+	else {
+		m->A = (PhyObjBoundingShape*)b2;
+		m->B = (PhyObjBoundingShape*)b1;
+	}
+	m->_contact_normal = CP_Vector_Scale(axis_least_penetration,(float)flip);
+	m->_contact_position = corner_of_intersection1;
+	m->_penetration = contact_penetration1;
+	if (number_of_contacts == 2) {
+		m->_contact_position_2 = corner_of_intersection2;
+		m->_penetration_2 = contact_penetration2;
+	}
+	else {
+		m->_contact_position_2 = (CP_Vector){ 0.0f,0.0f };
+		m->_penetration_2 = -1.0f;
+	}
+
+	// draw axis of least penetration
+	//float scale = flip == 1 ? -1.0f : 1.0f;
+	CP_Vector temp = CP_Vector_Scale(axis_least_penetration, 30.0f * flip);
+	CP_Vector temp_pos = isb1 == 1 ? b1->super._position : b2->super._position;
+	temp = CP_Vector_Add(temp_pos, temp);
+	CP_Graphics_DrawLine(temp_pos.x, temp_pos.y,temp.x,temp.y);
+	CP_Graphics_DrawCircle(100, 100, 10);
 	return 1;
 }
 
@@ -379,7 +679,7 @@ void PhyObj_CheckForCollisions()
 			}
 			else if (PhyObj_bounding_shapes[i]->_type == BOUNDING_OBOX && PhyObj_bounding_shapes[j]->_type == BOUNDING_OBOX) {
 				if (PhyObj_BoxBox((PhyObjOBoundingBox*)PhyObj_bounding_shapes[i], (PhyObjOBoundingBox*)PhyObj_bounding_shapes[j], manifoldPtr)) {
-					//PhyObj_AddManifold(manifold);
+					PhyObj_AddManifold(manifold);
 				}
 			}
 		}
@@ -390,51 +690,113 @@ void PhyObj_ResolveManifolds()
 {
 	for (int i = 0; i < PhyObj_manifolds_size; i++) {
 		PhyObjManifold m = PhyObj_manifolds[i];
-		CP_Vector tangent = PhyObj_2DPerpendicular(m._contact_normal);
-		/* ____________________________________________________________________________________________________________ */
-		// vector from center of mass to contact point
-		CP_Vector rA = CP_Vector_Subtract(m._contact_position, m.A->_position);
-		CP_Vector rB = CP_Vector_Subtract(m._contact_position, m.B->_position);
-		/* ____________________________________________________________________________________________________________ */
-		// relative velocity, linear velocity + angular velocity scaled to vector perpendicular to normal
-		CP_Vector vA = CP_Vector_Add(m.A->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rA), m.A->_angular_velocity));
-		CP_Vector vB = CP_Vector_Add(m.B->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rB), m.B->_angular_velocity));
-		CP_Vector relative_velocity = CP_Vector_Subtract(vB, vA);
-		/* ____________________________________________________________________________________________________________ */
-		// relative velocity along normal
-		float velocity_along_normal = CP_Vector_DotProduct(relative_velocity, m._contact_normal);
-		// relative velocity along tangent, for friction
-		float velocity_along_tangent = CP_Vector_DotProduct(relative_velocity, tangent);
-		/* ____________________________________________________________________________________________________________ */
-		// calculate effective mass - in 2d cross product is not well defined and returns a scalar x1y2-x2y1
-		// effective mass, 1/(inverse_mass + inverse_moment_of_inertia * (r x n)^2)
-		// from eric cattos GDC https://www.youtube.com/watch?v=SHinxAhv1ZE timestamp-14:05
-		// effective mass along the normal
-		float effective_mass_normal = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(m._contact_normal,rA)) * m.A->_inv_moment_of_inertia +
-			CP_Math_Square(PhyObj_2DCross(m._contact_normal,rB)) * m.B->_inv_moment_of_inertia);
-		// effective mass along the tangent, for friction
-		float effective_mass_tangent = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(tangent, rA)) * m.A->_inv_moment_of_inertia +
-			CP_Math_Square(PhyObj_2DCross(tangent, rB)) * m.B->_inv_moment_of_inertia);
-		/* ____________________________________________________________________________________________________________ */
-		// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
-		float bias_factor = 0.2f;
-		float allowed_penetration = 0.02f;
-		float penetration = m._penetration - allowed_penetration;
-		penetration = penetration < 0.0f ? 0.0f : penetration;
-		float baumgarte = penetration * bias_factor / CP_System_GetDt();
-		/* ____________________________________________________________________________________________________________ */
-		// if not seperating, do something
-		float friction_coefficient = 0.8f; // how slippery whoo~
-		if (velocity_along_normal < 0) {
-			// magnitude of impulse
-			float restitution = 0.1f;
-			float normal_lambda = (velocity_along_normal - baumgarte) * (1.0f + restitution) * -effective_mass_normal;
-			float tangent_lambda = velocity_along_tangent * -effective_mass_tangent * friction_coefficient;
-			CP_Vector impulse_vector = CP_Vector_Add(CP_Vector_Scale(m._contact_normal, normal_lambda),CP_Vector_Scale(tangent, tangent_lambda));
-			PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.A, CP_Vector_Scale(impulse_vector,-1.0f));
-			PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.B, impulse_vector);
-			m.A->_angular_velocity -= PhyObj_2DCross(impulse_vector, rA) * m.A->_inv_moment_of_inertia;
-			m.B->_angular_velocity += PhyObj_2DCross(impulse_vector, rB) * m.B->_inv_moment_of_inertia;
+		if (m._penetration_2 != -1.0f) {
+			for (int j = 0; j < 2; j++) {
+				CP_Vector contact_position;
+				float m_penetration;
+				if (j == 0) {
+					contact_position = m._contact_position;
+					m_penetration = m._penetration;
+				}
+				else {
+					contact_position = m._contact_position_2;
+					m_penetration = m._penetration_2;
+				}
+				CP_Vector tangent = PhyObj_2DPerpendicular(m._contact_normal);
+				/* ____________________________________________________________________________________________________________ */
+				// vector from center of mass to contact point
+				CP_Vector rA = CP_Vector_Subtract(contact_position, m.A->_position);
+				CP_Vector rB = CP_Vector_Subtract(contact_position, m.B->_position);
+				/* ____________________________________________________________________________________________________________ */
+				// relative velocity, linear velocity + angular velocity scaled to vector perpendicular to normal
+				CP_Vector vA = CP_Vector_Add(m.A->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rA), m.A->_angular_velocity));
+				CP_Vector vB = CP_Vector_Add(m.B->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rB), m.B->_angular_velocity));
+				CP_Vector relative_velocity = CP_Vector_Subtract(vB, vA);
+				/* ____________________________________________________________________________________________________________ */
+				// relative velocity along normal
+				float velocity_along_normal = CP_Vector_DotProduct(relative_velocity, m._contact_normal);
+				// relative velocity along tangent, for friction
+				float velocity_along_tangent = CP_Vector_DotProduct(relative_velocity, tangent);
+				/* ____________________________________________________________________________________________________________ */
+				// calculate effective mass - in 2d cross product is not well defined and returns a scalar x1y2-x2y1
+				// effective mass, 1/(inverse_mass + inverse_moment_of_inertia * (r x n)^2)
+				// from eric cattos GDC https://www.youtube.com/watch?v=SHinxAhv1ZE timestamp-14:05
+				// effective mass along the normal
+				float effective_mass_normal = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(m._contact_normal, rA)) * m.A->_inv_moment_of_inertia +
+					CP_Math_Square(PhyObj_2DCross(m._contact_normal, rB)) * m.B->_inv_moment_of_inertia);
+				// effective mass along the tangent, for friction
+				float effective_mass_tangent = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(tangent, rA)) * m.A->_inv_moment_of_inertia +
+					CP_Math_Square(PhyObj_2DCross(tangent, rB)) * m.B->_inv_moment_of_inertia);
+				/* ____________________________________________________________________________________________________________ */
+				// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
+				float bias_factor = 0.2f;
+				float allowed_penetration = 0.02f;
+				float penetration = m_penetration - allowed_penetration;
+				penetration = penetration < 0.0f ? 0.0f : penetration;
+				float baumgarte = penetration * bias_factor / CP_System_GetDt();
+				/* ____________________________________________________________________________________________________________ */
+				// if not seperating, do something
+				float friction_coefficient = 0.8f; // how slippery whoo~
+				if (velocity_along_normal < 0) {
+					// magnitude of impulse
+					float restitution = 0.0f;
+					float normal_lambda = (velocity_along_normal - baumgarte) * (1.0f + restitution) * -effective_mass_normal;
+					float tangent_lambda = velocity_along_tangent * -effective_mass_tangent * friction_coefficient;
+					CP_Vector impulse_vector = CP_Vector_Add(CP_Vector_Scale(m._contact_normal, normal_lambda), CP_Vector_Scale(tangent, tangent_lambda));
+					PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.A, CP_Vector_Scale(impulse_vector, -1.0f));
+					PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.B, impulse_vector);
+					m.A->_angular_velocity -= PhyObj_2DCross(impulse_vector, rA) * m.A->_inv_moment_of_inertia;
+					m.B->_angular_velocity += PhyObj_2DCross(impulse_vector, rB) * m.B->_inv_moment_of_inertia;
+				}
+			}
+		}
+		else {
+			CP_Vector tangent = PhyObj_2DPerpendicular(m._contact_normal);
+			/* ____________________________________________________________________________________________________________ */
+			// vector from center of mass to contact point
+			CP_Vector rA = CP_Vector_Subtract(m._contact_position, m.A->_position);
+			CP_Vector rB = CP_Vector_Subtract(m._contact_position, m.B->_position);
+			/* ____________________________________________________________________________________________________________ */
+			// relative velocity, linear velocity + angular velocity scaled to vector perpendicular to normal
+			CP_Vector vA = CP_Vector_Add(m.A->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rA), m.A->_angular_velocity));
+			CP_Vector vB = CP_Vector_Add(m.B->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rB), m.B->_angular_velocity));
+			CP_Vector relative_velocity = CP_Vector_Subtract(vB, vA);
+			/* ____________________________________________________________________________________________________________ */
+			// relative velocity along normal
+			float velocity_along_normal = CP_Vector_DotProduct(relative_velocity, m._contact_normal);
+			// relative velocity along tangent, for friction
+			float velocity_along_tangent = CP_Vector_DotProduct(relative_velocity, tangent);
+			/* ____________________________________________________________________________________________________________ */
+			// calculate effective mass - in 2d cross product is not well defined and returns a scalar x1y2-x2y1
+			// effective mass, 1/(inverse_mass + inverse_moment_of_inertia * (r x n)^2)
+			// from eric cattos GDC https://www.youtube.com/watch?v=SHinxAhv1ZE timestamp-14:05
+			// effective mass along the normal
+			float effective_mass_normal = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(m._contact_normal, rA)) * m.A->_inv_moment_of_inertia +
+				CP_Math_Square(PhyObj_2DCross(m._contact_normal, rB)) * m.B->_inv_moment_of_inertia);
+			// effective mass along the tangent, for friction
+			float effective_mass_tangent = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(tangent, rA)) * m.A->_inv_moment_of_inertia +
+				CP_Math_Square(PhyObj_2DCross(tangent, rB)) * m.B->_inv_moment_of_inertia);
+			/* ____________________________________________________________________________________________________________ */
+			// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
+			float bias_factor = 0.2f;
+			float allowed_penetration = 0.02f;
+			float penetration = m._penetration - allowed_penetration;
+			penetration = penetration < 0.0f ? 0.0f : penetration;
+			float baumgarte = penetration * bias_factor / CP_System_GetDt();
+			/* ____________________________________________________________________________________________________________ */
+			// if not seperating, do something
+			float friction_coefficient = 0.8f; // how slippery whoo~
+			if (velocity_along_normal < 0) {
+				// magnitude of impulse
+				float restitution = 0.0f;
+				float normal_lambda = (velocity_along_normal - baumgarte) * (1.0f + restitution) * -effective_mass_normal;
+				float tangent_lambda = velocity_along_tangent * -effective_mass_tangent * friction_coefficient;
+				CP_Vector impulse_vector = CP_Vector_Add(CP_Vector_Scale(m._contact_normal, normal_lambda), CP_Vector_Scale(tangent, tangent_lambda));
+				PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.A, CP_Vector_Scale(impulse_vector, -1.0f));
+				PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.B, impulse_vector);
+				m.A->_angular_velocity -= PhyObj_2DCross(impulse_vector, rA) * m.A->_inv_moment_of_inertia;
+				m.B->_angular_velocity += PhyObj_2DCross(impulse_vector, rB) * m.B->_inv_moment_of_inertia;
+			}
 		}
 	}
 }

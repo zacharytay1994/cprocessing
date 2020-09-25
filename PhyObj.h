@@ -38,7 +38,9 @@ typedef struct PhyObjManifold {
 	PhyObjBoundingShape* B;
 	CP_Vector _contact_normal;
 	CP_Vector _contact_position;
+	CP_Vector _contact_position_2;
 	float _penetration;
+	float _penetration_2;
 } PhyObjManifold;
 
 extern PhyObjBoundingShape** PhyObj_bounding_shapes;
@@ -72,6 +74,7 @@ void PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p);
 // Math
 float PhyObj_2DCross(const CP_Vector v1, const CP_Vector v2);
 CP_Vector PhyObj_2DPerpendicular(const CP_Vector v);
+float PhyObj_VectorSquareMagnitude(const CP_Vector v);
 float PhyObj_Mod(const float in); // always returns a positive value
 // Physics
 void PhyObj_AddVelocity(PhyObjBoundingShape* s, const CP_Vector v);
