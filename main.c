@@ -26,8 +26,8 @@ void game_init(void)
 {
 	PhyObj_Initialize();
 	// initialize variables and CProcessing settings for this gamestate
-	/*circle1 = PhyObj_AddCircle(100.0f, 100.0f, 30.0f, 30.0f);
-	circle2 = PhyObj_AddCircle(250.0f, 100.0f, 20.0f, 20.0f);
+	//circle1 = PhyObj_AddCircle(100.0f, 100.0f, 30.0f, 30.0f);
+	/*circle2 = PhyObj_AddCircle(250.0f, 100.0f, 20.0f, 20.0f);
 	PhyObj_AddCircle(100.0f, 250.0f, 20.0f, 20.0f);
 	PhyObj_AddCircle(250.0f, 250.0f, 30.0f, 30.0f);*/
 	//box1 = PhyObj_AddOBox(100.0f, 100.0f, 30.0f, 30.0f, 30.0f);
@@ -60,7 +60,7 @@ void game_update(void)
 	if (CP_Input_MouseClicked() && CP_Input_KeyDown(KEY_B)) {
 		float random_mass = (float)CP_Random_RangeInt(20, 30);
 		//PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), random_mass, random_mass);
-		PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), random_mass, random_mass, random_mass);
+		PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), random_mass, random_mass-10, random_mass);
 		/*CP_Vector mouse = (CP_Vector){ CP_Input_GetMouseX(),CP_Input_GetMouseY() };
 		box->super._position = mouse;
 		box->super._rotation = 45.0f;*/
@@ -76,8 +76,8 @@ void game_update(void)
 	if (CP_Input_KeyDown(KEY_O)) {
 		//PhyObj_ApplyImpulse(circle2, (CP_Vector) { 1.0f, 0.0f });
 	}
-	//CP_Vector mouse = (CP_Vector){ CP_Input_GetMouseX(),CP_Input_GetMouseY() };
-	//box2->super._position = mouse;
+	/*CP_Vector mouse = (CP_Vector){ CP_Input_GetMouseX(),CP_Input_GetMouseY() };
+	circle1->super._position = mouse;*/
 	//CP_Vector result = PhyObj_NearestPointOnOBBToPoint(mouse, box1);
 	//CP_Graphics_DrawCircle(result.x, result.y, 2);
 	//PhyObj_SetPosition(circle1, (CP_Vector) {CP_Input_GetMouseX(),CP_Input_GetMouseY()});

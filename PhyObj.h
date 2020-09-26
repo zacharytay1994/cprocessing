@@ -84,7 +84,7 @@ void PhyObj_UpdatePosition(const float dt);
 void PhyObj_UpdateRotation(const float dt);
 void PhyObj_GlobalAcceleration();
 // Primitive Tests
-CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundingBox* b);
+CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundingBox* b, int* point_in_box);
 // Collision Detection
 int PhyObj_CircleCircle(PhyObjBoundingCircle* c1, PhyObjBoundingCircle* c2, PhyObjManifold* m);
 int PhyObj_CircleOBox(PhyObjBoundingCircle* c, PhyObjOBoundingBox* b, PhyObjManifold* m);

@@ -215,7 +215,7 @@ void PhyObj_GlobalAcceleration()
 	}
 }
 
-CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundingBox* b)
+CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundingBox* b, int* point_in_box)
 {
 	CP_Vector result = b->super._position;
 	// rotate basis vectors
@@ -228,6 +228,7 @@ CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundi
 	float y = CP_Vector_DotProduct(box_to_point, u2);
 	// check if point is in box, if so snap to nearest edge
 	if (x * x < b->_horizontal_extent * b->_horizontal_extent && y * y < b->_vertical_extent * b->_vertical_extent) {
+		*point_in_box = 1;
 		if (x * x > y * y) {
 			x = x < 0 ? -b->_horizontal_extent : b->_horizontal_extent;
 		}
@@ -236,6 +237,7 @@ CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundi
 		}
 	}
 	else {
+		*point_in_box = 0;
 		if (x < 0) {
 			x = x < -b->_horizontal_extent ? -b->_horizontal_extent : x;
 		}
@@ -285,13 +287,23 @@ int PhyObj_CircleCircle(PhyObjBoundingCircle* c1, PhyObjBoundingCircle* c2, PhyO
 
 int PhyObj_CircleOBox(PhyObjBoundingCircle* c, PhyObjOBoundingBox* b, PhyObjManifold* m)
 {
-	CP_Vector pointonbox_to_circlecenter = PhyObj_NearestPointOnOBBToPoint(c->super._position, b);
-	float penetration = c->_radius - CP_Vector_Length(CP_Vector_Subtract(pointonbox_to_circlecenter, c->super._position));
+	int point_in_box = -1;
+	CP_Vector pointonbox_to_circlecenter = PhyObj_NearestPointOnOBBToPoint(c->super._position, b, &point_in_box);
+	// check if circle center is within box
+	CP_Graphics_DrawCircle(pointonbox_to_circlecenter.x, pointonbox_to_circlecenter.y, 2.0f);
+	float penetration;
+	if (point_in_box) {
+		penetration = c->_radius + CP_Vector_Length(CP_Vector_Subtract(pointonbox_to_circlecenter, c->super._position));
+		m->_contact_normal = CP_Vector_Normalize(CP_Vector_Subtract(c->super._position, pointonbox_to_circlecenter));
+	}
+	else {
+		penetration = c->_radius - CP_Vector_Length(CP_Vector_Subtract(pointonbox_to_circlecenter, c->super._position));
+		m->_contact_normal = CP_Vector_Normalize(CP_Vector_Subtract(pointonbox_to_circlecenter, c->super._position));
+	}
 	// if colliding
 	if (penetration > 0.0f) {
 		m->A = (PhyObjBoundingShape*)c;
 		m->B = (PhyObjBoundingShape*)b;
-		m->_contact_normal = CP_Vector_Normalize(CP_Vector_Subtract(pointonbox_to_circlecenter, c->super._position));
 		m->_contact_position = pointonbox_to_circlecenter;
 		m->_penetration = penetration;
 		m->_contact_position_2 =	(CP_Vector){ -100.0f,-100.0f };
@@ -433,143 +445,145 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 	float d_corner_to_center = 1000000.0f;
 	float d_ctc_check = -1;
 	if (isb1) { // if b1 has the reference edge
+		float check_extent = is_horizontal == 1 ? b1->_horizontal_extent : b1->_vertical_extent;
 		// top-right
 		coi_check = CP_Vector_Add(b2->super._position,CP_Vector_Add(h_extent_b2, v_extent_b2));
 		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check,b1->super._position));
 		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b1->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
 		// if corner is intersecting box
-		if (d_ctc_check < b1->_horizontal_extent) {
+		if (d_ctc_check < check_extent) {
 			d_corner_to_center = d_ctc_check;
 			if (number_of_contacts) {
 				corner_of_intersection2 = coi_check;
 				number_of_contacts = 2;
-				contact_penetration2 = b1->_horizontal_extent - d_ctc_check;
+				contact_penetration2 = check_extent - d_ctc_check;
 			}
 			else {
 				corner_of_intersection1 = coi_check;
 				number_of_contacts = 1;
-				contact_penetration1 = b1->_horizontal_extent - d_ctc_check;
+				contact_penetration1 = check_extent - d_ctc_check;
 			}
 		}
 		// top-left
 		coi_check = CP_Vector_Add(b2->super._position, CP_Vector_Add(CP_Vector_Scale(h_extent_b2, -1), v_extent_b2));
 		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b1->super._position));
 		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b1->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
-		if (d_ctc_check < b1->_horizontal_extent) {
+		if (d_ctc_check < check_extent) {
 			d_corner_to_center = d_ctc_check;
 			if (number_of_contacts) {
 				corner_of_intersection2 = coi_check;
 				number_of_contacts = 2;
-				contact_penetration2 = b1->_horizontal_extent - d_ctc_check;
+				contact_penetration2 = check_extent - d_ctc_check;
 			}
 			else {
 				corner_of_intersection1 = coi_check;
 				number_of_contacts = 1;
-				contact_penetration1 = b1->_horizontal_extent - d_ctc_check;
+				contact_penetration1 = check_extent - d_ctc_check;
 			}
 		}
 		// bottom-right
 		coi_check = CP_Vector_Add(b2->super._position,CP_Vector_Add(h_extent_b2, CP_Vector_Scale(v_extent_b2, -1)));
 		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b1->super._position));
 		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b1->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
-		if (d_ctc_check < b1->_horizontal_extent) {
+		if (d_ctc_check < check_extent) {
 			d_corner_to_center = d_ctc_check;
 			if (number_of_contacts) {
 				corner_of_intersection2 = coi_check;
 				number_of_contacts = 2;
-				contact_penetration2 = b1->_horizontal_extent - d_ctc_check;
+				contact_penetration2 = check_extent - d_ctc_check;
 			}
 			else {
 				corner_of_intersection1 = coi_check;
 				number_of_contacts = 1;
-				contact_penetration1 = b1->_horizontal_extent - d_ctc_check;
+				contact_penetration1 = check_extent - d_ctc_check;
 			}
 		}
 		// bottom-left
 		coi_check = CP_Vector_Add(b2->super._position, CP_Vector_Add(CP_Vector_Scale(h_extent_b2, -1), CP_Vector_Scale(v_extent_b2, -1)));
 		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b1->super._position));
 		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b1->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
-		if (d_ctc_check < b1->_horizontal_extent) {
+		if (d_ctc_check < check_extent) {
 			d_corner_to_center = d_ctc_check;
 			if (number_of_contacts) {
 				corner_of_intersection2 = coi_check;
 				number_of_contacts = 2;
-				contact_penetration2 = b1->_horizontal_extent - d_ctc_check;
+				contact_penetration2 = check_extent - d_ctc_check;
 			}
 			else {
 				corner_of_intersection1 = coi_check;
 				number_of_contacts = 1;
-				contact_penetration1 = b1->_horizontal_extent - d_ctc_check;
+				contact_penetration1 = check_extent - d_ctc_check;
 			}
 		}
 	}
 	else { // b2 has the reference edge
+		float check_extent = is_horizontal == 1 ? b2->_horizontal_extent : b2->_vertical_extent;
 		// top-right
 		coi_check = CP_Vector_Add(b1->super._position, CP_Vector_Add(h_extent_b1, v_extent_b1));
 		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b2->super._position));
 		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b2->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
-		if (d_ctc_check < b2->_horizontal_extent) {
+		if (d_ctc_check < check_extent) {
 			d_corner_to_center = d_ctc_check;
 			if (number_of_contacts) {
 				corner_of_intersection2 = coi_check;
 				number_of_contacts = 2;
-				contact_penetration2 = b2->_horizontal_extent - d_ctc_check;
+				contact_penetration2 = check_extent - d_ctc_check;
 			}
 			else {
 				corner_of_intersection1 = coi_check;
 				number_of_contacts = 1;
-				contact_penetration1 = b2->_horizontal_extent - d_ctc_check;
+				contact_penetration1 = check_extent - d_ctc_check;
 			}
 		}
 		// top-left
 		coi_check = CP_Vector_Add(b1->super._position, CP_Vector_Add(CP_Vector_Scale(h_extent_b1, -1), v_extent_b1));
 		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b2->super._position));
 		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b2->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
-		if (d_ctc_check < b2->_horizontal_extent) {
+		if (d_ctc_check < check_extent) {
 			d_corner_to_center = d_ctc_check;
 			if (number_of_contacts) {
 				corner_of_intersection2 = coi_check;
 				number_of_contacts = 2;
-				contact_penetration2 = b2->_horizontal_extent - d_ctc_check;
+				contact_penetration2 = check_extent - d_ctc_check;
 			}
 			else {
 				corner_of_intersection1 = coi_check;
 				number_of_contacts = 1;
-				contact_penetration1 = b2->_horizontal_extent - d_ctc_check;
+				contact_penetration1 = check_extent - d_ctc_check;
 			}
 		}
 		// bottom-right
 		coi_check = CP_Vector_Add(b1->super._position, CP_Vector_Add(h_extent_b1, CP_Vector_Scale(v_extent_b1, -1)));
 		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b2->super._position));
 		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b2->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
-		if (d_ctc_check < b2->_horizontal_extent) {
+		if (d_ctc_check < check_extent) {
 			d_corner_to_center = d_ctc_check;
 			if (number_of_contacts) {
 				corner_of_intersection2 = coi_check;
 				number_of_contacts = 2;
-				contact_penetration2 = b2->_horizontal_extent - d_ctc_check;
+				contact_penetration2 = check_extent - d_ctc_check;
 			}
 			else {
 				corner_of_intersection1 = coi_check;
 				number_of_contacts = 1;
-				contact_penetration1 = b2->_horizontal_extent - d_ctc_check;
+				contact_penetration1 = check_extent - d_ctc_check;
 			}
 		}
 		// bottom-left
 		coi_check = CP_Vector_Add(b1->super._position, CP_Vector_Add(CP_Vector_Scale(h_extent_b1, -1), CP_Vector_Scale(v_extent_b1, -1)));
 		//d_ctc_check = CP_Vector_Length(CP_Vector_Subtract(coi_check, b2->super._position));
 		d_ctc_check = CP_Vector_DotProduct(CP_Vector_Subtract(coi_check, b2->super._position), CP_Vector_Scale(axis_least_penetration, (float)flip));
-		if (d_ctc_check < b2->_horizontal_extent) {
+		if (d_ctc_check < check_extent) {
 			d_corner_to_center = d_ctc_check;
 			if (number_of_contacts) {
 				corner_of_intersection2 = coi_check;
 				number_of_contacts = 2;
-				contact_penetration2 = b2->_horizontal_extent - d_ctc_check;
+				contact_penetration2 = check_extent - d_ctc_check;
 			}
 			else {
 				corner_of_intersection1 = coi_check;
 				number_of_contacts = 1;
-				contact_penetration1 = b2->_horizontal_extent - d_ctc_check;
+				contact_penetration1 = check_extent - d_ctc_check;
 			}
 		}
 	}
@@ -618,8 +632,8 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 		}
 	}
 
-	CP_Graphics_DrawCircle(corner_of_intersection1.x, corner_of_intersection1.y, 2.0f);
-	CP_Graphics_DrawCircle(corner_of_intersection2.x, corner_of_intersection2.y, 2.0f);
+	/*CP_Graphics_DrawCircle(corner_of_intersection1.x, corner_of_intersection1.y, 2.0f);
+	CP_Graphics_DrawCircle(corner_of_intersection2.x, corner_of_intersection2.y, 2.0f);*/
 
 	// output manifold
 	if (isb1) {
@@ -644,11 +658,11 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 
 	// draw axis of least penetration
 	//float scale = flip == 1 ? -1.0f : 1.0f;
-	CP_Vector temp = CP_Vector_Scale(axis_least_penetration, 30.0f * flip);
+	/*CP_Vector temp = CP_Vector_Scale(axis_least_penetration, 30.0f * flip);
 	CP_Vector temp_pos = isb1 == 1 ? b1->super._position : b2->super._position;
 	temp = CP_Vector_Add(temp_pos, temp);
 	CP_Graphics_DrawLine(temp_pos.x, temp_pos.y,temp.x,temp.y);
-	CP_Graphics_DrawCircle(100, 100, 10);
+	CP_Graphics_DrawCircle(100, 100, 10);*/
 	return 1;
 }
 
