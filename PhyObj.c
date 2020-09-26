@@ -24,6 +24,8 @@ int PhyObj_manifolds_max_size;
 CP_Image PhyObj_circle_image;
 CP_Image PhyObj_square_image;
 
+float gravity = 98.1f;
+
 // --------------------------------------------------------//
 // MISCELLANEOUS
 // - functions that are not about physics or collision
@@ -113,31 +115,6 @@ void PhyObj_AddManifold(PhyObjManifold m)
 	PhyObj_manifolds[PhyObj_manifolds_size - 1] = m;
 }
 
-void PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p)
-{
-	s->_position = p;
-}
-
-float PhyObj_2DCross(const CP_Vector v1, const CP_Vector v2)
-{
-	return v1.x * v2.y - v1.y * v2.x;
-}
-
-CP_Vector PhyObj_2DPerpendicular(const CP_Vector v)
-{
-	return (CP_Vector){v.y,-v.x};
-}
-
-float PhyObj_VectorSquareMagnitude(const CP_Vector v)
-{
-	return CP_Math_Square(v.x) + CP_Math_Square(v.y);
-}
-
-float PhyObj_Mod(const float in)
-{
-	return in < 0.0f ? -in : in;
-}
-
 void PhyObj_DrawCircles()
 {
 	for (int i = 0; i < PhyObj_bounding_circles_size; i++) {
@@ -167,9 +144,38 @@ void PhyObj_AddShape(PhyObjBoundingShape* shape)
 	PhyObj_bounding_shapes[PhyObj_bounding_shapes_size - 1] = shape;
 }
 
+void PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p)
+{
+	s->_position = p;
+}
+
 // --------------------------------------------------------//
-// PHYSICS
-// - physics functions, e.g. gravity, force, acceleration 
+//	MATH HELPER FUNCTIONS
+// --------------------------------------------------------//
+
+float PhyObj_2DCross(const CP_Vector v1, const CP_Vector v2)
+{
+	return v1.x * v2.y - v1.y * v2.x;
+}
+
+CP_Vector PhyObj_2DPerpendicular(const CP_Vector v)
+{
+	return (CP_Vector){v.y,-v.x};
+}
+
+float PhyObj_VectorSquareMagnitude(const CP_Vector v)
+{
+	return CP_Math_Square(v.x) + CP_Math_Square(v.y);
+}
+
+float PhyObj_Mod(const float in)
+{
+	return in < 0.0f ? -in : in;
+}
+
+// --------------------------------------------------------//
+//	PHYSICS
+//	- physics functions, e.g. gravity, force, acceleration 
 // --------------------------------------------------------//
 void PhyObj_AddVelocity(PhyObjBoundingShape* s, const CP_Vector v)
 {
@@ -202,6 +208,7 @@ void PhyObj_UpdateRotation(const float dt)
 	}
 }
 
+//	Applies a global acceleration to all bounding shapes in the system, meant for Gravity
 void PhyObj_GlobalAcceleration()
 {
 	CP_Vector center = { 200.0f,200.0f };
@@ -215,6 +222,11 @@ void PhyObj_GlobalAcceleration()
 	}
 }
 
+// --------------------------------------------------------//
+//	PRIMITIVE TESTS
+//	e.g. point on line, point from line, etc.
+// --------------------------------------------------------//
+//	More info : Christer Ericson's Realtime Collision Detection (Page. 132)
 CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundingBox* b, int* point_in_box)
 {
 	CP_Vector result = b->super._position;
@@ -257,10 +269,12 @@ CP_Vector PhyObj_NearestPointOnOBBToPoint(const CP_Vector p, const PhyObjOBoundi
 }
 
 // --------------------------------------------------------//
-// COLLISION DETECTION
-// - collision detection functions
-// e.g. seperating axis test, shape test etc
+//	COLLISION DETECTION
+//	- collision detection functions
+//	e.g. seperating axis test, shape test etc
 // --------------------------------------------------------//
+//	Test to see if a Circle is intersecting a Circle
+//	More Info : Christer Ericson's Realtime Collision Detection (Page. 88)
 int PhyObj_CircleCircle(PhyObjBoundingCircle* c1, PhyObjBoundingCircle* c2, PhyObjManifold* m)
 {
 	// if colliding
@@ -285,12 +299,13 @@ int PhyObj_CircleCircle(PhyObjBoundingCircle* c1, PhyObjBoundingCircle* c2, PhyO
 	return 0;
 }
 
+//	Test to see if a Circle is intesecting an oriented box
+//	More Info : Christer Ericson's Realtime Collision Detection (Page. 166)
 int PhyObj_CircleOBox(PhyObjBoundingCircle* c, PhyObjOBoundingBox* b, PhyObjManifold* m)
 {
 	int point_in_box = -1;
 	CP_Vector pointonbox_to_circlecenter = PhyObj_NearestPointOnOBBToPoint(c->super._position, b, &point_in_box);
 	// check if circle center is within box
-	CP_Graphics_DrawCircle(pointonbox_to_circlecenter.x, pointonbox_to_circlecenter.y, 2.0f);
 	float penetration;
 	if (point_in_box) {
 		penetration = c->_radius + CP_Vector_Length(CP_Vector_Subtract(pointonbox_to_circlecenter, c->super._position));
@@ -313,7 +328,17 @@ int PhyObj_CircleOBox(PhyObjBoundingCircle* c, PhyObjOBoundingBox* b, PhyObjMani
 	return 0;
 }
 
-// Probably need a more efficient SAT - TBC
+//	Note : Probably need a more efficient SAT - TBC
+/*  _________________________________________________________________________________
+	 | Pre  : Box 1 and Box 2 initialized into world with relevant data
+	 | Post : Manifold Data filled if collision detected
+	 ________________________
+	 CURRENT IMPLEMENTATION : 
+	 Step 1 - Perform Seperating Axis Theorem (SAT), i.e. detection
+	 Step 2 - Find corners of the reference edge, i.e the face of least penetration
+	 Step 3 - Find corners of incident box that penetrate the reference edge
+	 Step 4 - Snap (step 3) corners onto the reference edge
+	_________________________________________________________________________________ */
 int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold* m)
 {
 	// perform SAT
@@ -335,6 +360,7 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 
 	CP_Vector translation = CP_Vector_Subtract(position_b2, position_b1);
 
+	// __________________________________ START - STEP 1 ___________________________________________________________________
 	// check the 4 axes
 	// proj_axis(translation)^2 >
 	// (h_extent_b1 dot axis)^2 + (v_extent_b1 dot axis)^2 + (h_extent_b2 dot axis)^2 + (v_extent_b2 dot axis)^2
@@ -402,6 +428,8 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 		flip = translation_projected > 0 ? -1 : 1;
 		is_horizontal = 0;
 	}
+	// __________________________________ END - STEP 1 ___________________________________________________________________
+	// __________________________________ START - STEP 2 _________________________________________________________________
 	// calculate corner of reference plane
 	CP_Vector ref_corner_1;
 	CP_Vector ref_corner_2;
@@ -434,6 +462,8 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 				CP_Vector_Add(CP_Vector_Scale(axis_least_penetration, b2->_vertical_extent * flip), CP_Vector_Scale(h_extent_b2, -1)));
 		}
 	}
+	// __________________________________ END - STEP 2 _________________________________________________________________
+	// __________________________________ Start - STEP 3 _______________________________________________________________
 	// calculate point 2 potential incident edges
 	// corner of intersection is the corner of the incident box closest to the reference box center
 	int number_of_contacts = 0;
@@ -587,9 +617,11 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 			}
 		}
 	}
+	// __________________________________ End - STEP 3 _______________________________________________________________
+	// __________________________________ Start - STEP 4 _____________________________________________________________
 	float coi_length;
 	if (number_of_contacts == 1) {
-		// check if contact is within reference plane
+		// check if contact is on reference plane
 		if (isb1) {
 			corner_of_intersection1 = CP_Vector_Add(b1->super._position, CP_Vector_Add(CP_Vector_Subtract(corner_of_intersection1, b1->super._position), CP_Vector_Scale(axis_least_penetration, contact_penetration1 * flip)));
 		}
@@ -632,9 +664,6 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 		}
 	}
 
-	/*CP_Graphics_DrawCircle(corner_of_intersection1.x, corner_of_intersection1.y, 2.0f);
-	CP_Graphics_DrawCircle(corner_of_intersection2.x, corner_of_intersection2.y, 2.0f);*/
-
 	// output manifold
 	if (isb1) {
 		m->A = (PhyObjBoundingShape*)b1;
@@ -656,6 +685,9 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 		m->_penetration_2 = -1.0f;
 	}
 
+	// -------------------- DEBUG CODE -----------------------------------------
+	/*CP_Graphics_DrawCircle(corner_of_intersection1.x, corner_of_intersection1.y, 2.0f);
+	CP_Graphics_DrawCircle(corner_of_intersection2.x, corner_of_intersection2.y, 2.0f);*/
 	// draw axis of least penetration
 	//float scale = flip == 1 ? -1.0f : 1.0f;
 	/*CP_Vector temp = CP_Vector_Scale(axis_least_penetration, 30.0f * flip);
@@ -663,9 +695,19 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 	temp = CP_Vector_Add(temp_pos, temp);
 	CP_Graphics_DrawLine(temp_pos.x, temp_pos.y,temp.x,temp.y);
 	CP_Graphics_DrawCircle(100, 100, 10);*/
+	// -------------------- DEBUG CODE -----------------------------------------
 	return 1;
 }
 
+/*  _________________________________________________________________________________
+	 | PRE  : PhyObj_manifolds empty, i.e. no manifolds to resolve
+	 | POST : PhyObj_manifolds filled, i.e. manifolds to resolve
+	 ________________________
+	 CURRENT IMPLEMENTATION :
+	 Step 1 - Loops through PhyObj_bounding_shapes, iteratively comparing with each other
+	 Step 2 - Check type of shape for both, and call the relevant functions
+	 e.g. PhyObj_CircleCircle(), PhyObj_CircleOBox(), PhyObj_BoxBox()
+	_________________________________________________________________________________ */
 void PhyObj_CheckForCollisions()
 {
 	// reset manifolds
@@ -680,8 +722,6 @@ void PhyObj_CheckForCollisions()
 				}
 			}
 			else if (PhyObj_bounding_shapes[i]->_type == BOUNDING_CIRCLE && PhyObj_bounding_shapes[j]->_type == BOUNDING_OBOX) {
-				/*PhyObjBoundingCircle* test = (PhyObjBoundingCircle*)PhyObj_bounding_shapes[i];
-				test = test;*/
 				if (PhyObj_CircleOBox((PhyObjBoundingCircle*)PhyObj_bounding_shapes[i], (PhyObjOBoundingBox*)PhyObj_bounding_shapes[j], manifoldPtr)) {
 					PhyObj_AddManifold(manifold);
 				}
@@ -700,10 +740,20 @@ void PhyObj_CheckForCollisions()
 	}
 }
 
+/*  _________________________________________________________________________________
+	 | PRE  : Unresolved manifolds
+	 | POST : Resolved manifolds, impulse resolution applied to shapes
+	 ________________________
+	 CURRENT IMPLEMENTATION :
+	 Step 1 - Loops through PhyObj_manifolds
+	 Step 2 - Check if manifold contains 1 or 2 contact points and resolve
+	 (2d convex polygons only generate max 2 contact points, e.g. circle circle overlap
+	_________________________________________________________________________________ */
 void PhyObj_ResolveManifolds()
 {
 	for (int i = 0; i < PhyObj_manifolds_size; i++) {
 		PhyObjManifold m = PhyObj_manifolds[i];
+		// meaning if the manifold has 2 contact points, resolve both
 		if (m._penetration_2 != -1.0f) {
 			for (int j = 0; j < 2; j++) {
 				CP_Vector contact_position;
@@ -716,105 +766,80 @@ void PhyObj_ResolveManifolds()
 					contact_position = m._contact_position_2;
 					m_penetration = m._penetration_2;
 				}
-				CP_Vector tangent = PhyObj_2DPerpendicular(m._contact_normal);
-				/* ____________________________________________________________________________________________________________ */
-				// vector from center of mass to contact point
-				CP_Vector rA = CP_Vector_Subtract(contact_position, m.A->_position);
-				CP_Vector rB = CP_Vector_Subtract(contact_position, m.B->_position);
-				/* ____________________________________________________________________________________________________________ */
-				// relative velocity, linear velocity + angular velocity scaled to vector perpendicular to normal
-				CP_Vector vA = CP_Vector_Add(m.A->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rA), m.A->_angular_velocity));
-				CP_Vector vB = CP_Vector_Add(m.B->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rB), m.B->_angular_velocity));
-				CP_Vector relative_velocity = CP_Vector_Subtract(vB, vA);
-				/* ____________________________________________________________________________________________________________ */
-				// relative velocity along normal
-				float velocity_along_normal = CP_Vector_DotProduct(relative_velocity, m._contact_normal);
-				// relative velocity along tangent, for friction
-				float velocity_along_tangent = CP_Vector_DotProduct(relative_velocity, tangent);
-				/* ____________________________________________________________________________________________________________ */
-				// calculate effective mass - in 2d cross product is not well defined and returns a scalar x1y2-x2y1
-				// effective mass, 1/(inverse_mass + inverse_moment_of_inertia * (r x n)^2)
-				// from eric cattos GDC https://www.youtube.com/watch?v=SHinxAhv1ZE timestamp-14:05
-				// effective mass along the normal
-				float effective_mass_normal = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(m._contact_normal, rA)) * m.A->_inv_moment_of_inertia +
-					CP_Math_Square(PhyObj_2DCross(m._contact_normal, rB)) * m.B->_inv_moment_of_inertia);
-				// effective mass along the tangent, for friction
-				float effective_mass_tangent = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(tangent, rA)) * m.A->_inv_moment_of_inertia +
-					CP_Math_Square(PhyObj_2DCross(tangent, rB)) * m.B->_inv_moment_of_inertia);
-				/* ____________________________________________________________________________________________________________ */
-				// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
-				float bias_factor = 0.2f;
-				float allowed_penetration = 0.02f;
-				float penetration = m_penetration - allowed_penetration;
-				penetration = penetration < 0.0f ? 0.0f : penetration;
-				float baumgarte = penetration * bias_factor / CP_System_GetDt();
-				/* ____________________________________________________________________________________________________________ */
-				// if not seperating, do something
-				float friction_coefficient = 0.8f; // how slippery whoo~
-				if (velocity_along_normal < 0) {
-					// magnitude of impulse
-					float restitution = 0.0f;
-					float normal_lambda = (velocity_along_normal - baumgarte) * (1.0f + restitution) * -effective_mass_normal;
-					float tangent_lambda = velocity_along_tangent * -effective_mass_tangent * friction_coefficient;
-					CP_Vector impulse_vector = CP_Vector_Add(CP_Vector_Scale(m._contact_normal, normal_lambda), CP_Vector_Scale(tangent, tangent_lambda));
-					PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.A, CP_Vector_Scale(impulse_vector, -1.0f));
-					PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.B, impulse_vector);
-					m.A->_angular_velocity -= PhyObj_2DCross(impulse_vector, rA) * m.A->_inv_moment_of_inertia;
-					m.B->_angular_velocity += PhyObj_2DCross(impulse_vector, rB) * m.B->_inv_moment_of_inertia;
-				}
+				PhyObj_ResolveContact(contact_position, m_penetration, m);
 			}
 		}
+		// if one contact point only resolve the one
 		else {
-			CP_Vector tangent = PhyObj_2DPerpendicular(m._contact_normal);
-			/* ____________________________________________________________________________________________________________ */
-			// vector from center of mass to contact point
-			CP_Vector rA = CP_Vector_Subtract(m._contact_position, m.A->_position);
-			CP_Vector rB = CP_Vector_Subtract(m._contact_position, m.B->_position);
-			/* ____________________________________________________________________________________________________________ */
-			// relative velocity, linear velocity + angular velocity scaled to vector perpendicular to normal
-			CP_Vector vA = CP_Vector_Add(m.A->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rA), m.A->_angular_velocity));
-			CP_Vector vB = CP_Vector_Add(m.B->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rB), m.B->_angular_velocity));
-			CP_Vector relative_velocity = CP_Vector_Subtract(vB, vA);
-			/* ____________________________________________________________________________________________________________ */
-			// relative velocity along normal
-			float velocity_along_normal = CP_Vector_DotProduct(relative_velocity, m._contact_normal);
-			// relative velocity along tangent, for friction
-			float velocity_along_tangent = CP_Vector_DotProduct(relative_velocity, tangent);
-			/* ____________________________________________________________________________________________________________ */
-			// calculate effective mass - in 2d cross product is not well defined and returns a scalar x1y2-x2y1
-			// effective mass, 1/(inverse_mass + inverse_moment_of_inertia * (r x n)^2)
-			// from eric cattos GDC https://www.youtube.com/watch?v=SHinxAhv1ZE timestamp-14:05
-			// effective mass along the normal
-			float effective_mass_normal = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(m._contact_normal, rA)) * m.A->_inv_moment_of_inertia +
-				CP_Math_Square(PhyObj_2DCross(m._contact_normal, rB)) * m.B->_inv_moment_of_inertia);
-			// effective mass along the tangent, for friction
-			float effective_mass_tangent = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(tangent, rA)) * m.A->_inv_moment_of_inertia +
-				CP_Math_Square(PhyObj_2DCross(tangent, rB)) * m.B->_inv_moment_of_inertia);
-			/* ____________________________________________________________________________________________________________ */
-			// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
-			float bias_factor = 0.2f;
-			float allowed_penetration = 0.02f;
-			float penetration = m._penetration - allowed_penetration;
-			penetration = penetration < 0.0f ? 0.0f : penetration;
-			float baumgarte = penetration * bias_factor / CP_System_GetDt();
-			/* ____________________________________________________________________________________________________________ */
-			// if not seperating, do something
-			float friction_coefficient = 0.8f; // how slippery whoo~
-			if (velocity_along_normal < 0) {
-				// magnitude of impulse
-				float restitution = 0.0f;
-				float normal_lambda = (velocity_along_normal - baumgarte) * (1.0f + restitution) * -effective_mass_normal;
-				float tangent_lambda = velocity_along_tangent * -effective_mass_tangent * friction_coefficient;
-				CP_Vector impulse_vector = CP_Vector_Add(CP_Vector_Scale(m._contact_normal, normal_lambda), CP_Vector_Scale(tangent, tangent_lambda));
-				PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.A, CP_Vector_Scale(impulse_vector, -1.0f));
-				PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.B, impulse_vector);
-				m.A->_angular_velocity -= PhyObj_2DCross(impulse_vector, rA) * m.A->_inv_moment_of_inertia;
-				m.B->_angular_velocity += PhyObj_2DCross(impulse_vector, rB) * m.B->_inv_moment_of_inertia;
-			}
+			PhyObj_ResolveContact(m._contact_position, m._penetration, m);
 		}
 	}
 }
 
+/*  _________________________________________________________________________________
+	 | PRE  : Unresolved contact
+	 | POST : Resolved contact, impulse resolution applied to shapes
+	 ________________________
+	 CURRENT IMPLEMENTATION :
+	 Step 1 - Calculate relative velocity along the normal and tangent
+	 Step 2 - Calculate relative mass along the normal and tangent
+	 Step 3 - Calculate Lambda, i.e. impulse scalar
+	 Step 4 - Apply to shapes
+	 More Info : Physics for Game Programmers - Understanding Constraints (Erin Catto)
+	 https://www.youtube.com/watch?v=SHinxAhv1ZE&t=3018s
+	_________________________________________________________________________________ */
+void PhyObj_ResolveContact(const CP_Vector contact_position, const float contact_penetration, PhyObjManifold m)
+{
+	CP_Vector tangent = PhyObj_2DPerpendicular(m._contact_normal);
+	/* ____________________________________________________________________________________________________________ */
+	// vector from center of mass to contact point
+	CP_Vector rA = CP_Vector_Subtract(contact_position, m.A->_position);
+	CP_Vector rB = CP_Vector_Subtract(contact_position, m.B->_position);
+	/* ____________________________________________________________________________________________________________ */
+	// relative velocity, linear velocity + angular velocity scaled to vector perpendicular to normal
+	CP_Vector vA = CP_Vector_Add(m.A->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rA), m.A->_angular_velocity));
+	CP_Vector vB = CP_Vector_Add(m.B->_velocity, CP_Vector_Scale(PhyObj_2DPerpendicular(rB), m.B->_angular_velocity));
+	CP_Vector relative_velocity = CP_Vector_Subtract(vB, vA);
+	/* ____________________________________________________________________________________________________________ */
+	// relative velocity along normal
+	float velocity_along_normal = CP_Vector_DotProduct(relative_velocity, m._contact_normal);
+	// relative velocity along tangent, for friction
+	float velocity_along_tangent = CP_Vector_DotProduct(relative_velocity, tangent);
+	/* ____________________________________________________________________________________________________________ */
+	// calculate effective mass - in 2d cross product is not well defined and returns a scalar x1y2-x2y1
+	// effective mass, 1/(inverse_mass + inverse_moment_of_inertia * (r x n)^2)
+	// from eric cattos GDC https://www.youtube.com/watch?v=SHinxAhv1ZE timestamp-14:05
+	// effective mass along the normal
+	float effective_mass_normal = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(m._contact_normal, rA)) * m.A->_inv_moment_of_inertia +
+		CP_Math_Square(PhyObj_2DCross(m._contact_normal, rB)) * m.B->_inv_moment_of_inertia);
+	// effective mass along the tangent, for friction
+	float effective_mass_tangent = 1.0f / (m.B->_inv_mass + m.A->_inv_mass + CP_Math_Square(PhyObj_2DCross(tangent, rA)) * m.A->_inv_moment_of_inertia +
+		CP_Math_Square(PhyObj_2DCross(tangent, rB)) * m.B->_inv_moment_of_inertia);
+	/* ____________________________________________________________________________________________________________ */
+	// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
+	float bias_factor = 0.2f;
+	float allowed_penetration = 0.02f;
+	float penetration = contact_penetration - allowed_penetration;
+	penetration = penetration < 0.0f ? 0.0f : penetration;
+	float baumgarte = penetration * bias_factor / CP_System_GetDt();
+	/* ____________________________________________________________________________________________________________ */
+	// if not seperating, do something
+	float friction_coefficient = 0.8f; // how slippery whoo~
+	if (velocity_along_normal < 0) {
+		// magnitude of impulse
+		float restitution = 0.0f;
+		float normal_lambda = (velocity_along_normal - baumgarte) * (1.0f + restitution) * -effective_mass_normal;
+		float tangent_lambda = velocity_along_tangent * -effective_mass_tangent * friction_coefficient;
+		CP_Vector impulse_vector = CP_Vector_Add(CP_Vector_Scale(m._contact_normal, normal_lambda), CP_Vector_Scale(tangent, tangent_lambda));
+		PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.A, CP_Vector_Scale(impulse_vector, -1.0f));
+		PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.B, impulse_vector);
+		m.A->_angular_velocity -= PhyObj_2DCross(impulse_vector, rA) * m.A->_inv_moment_of_inertia;
+		m.B->_angular_velocity += PhyObj_2DCross(impulse_vector, rB) * m.B->_inv_moment_of_inertia;
+	}
+}
+
+//	Iteratively solve in order to converge onto a stable simulation
+//	i.e. running the solver multiple times while applying the impulse every iteration
 void PhyObj_IterativeSolveManifolds(const int count)
 {
 	for (int i = 0; i < count; i++) {

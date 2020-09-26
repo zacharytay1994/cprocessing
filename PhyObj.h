@@ -62,6 +62,8 @@ extern int PhyObj_manifolds_max_size;
 extern CP_Image PhyObj_circle_image;
 extern CP_Image PhyObj_square_image;
 
+extern float gravity;
+
 // Miscellaneous
 void PhyObj_Initialize();
 void PhyObj_DrawCircles();
@@ -92,6 +94,7 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 // Collision Resolution
 void PhyObj_CheckForCollisions();
 void PhyObj_ResolveManifolds();
+void PhyObj_ResolveContact(const CP_Vector contact_position, const float contact_penetration, PhyObjManifold m);
 void PhyObj_IterativeSolveManifolds(const int count);
 
 // --------------------------------------------------------//
