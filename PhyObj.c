@@ -100,6 +100,21 @@ PhyObjOBoundingBox* PhyObj_AddOBox(const float x, const float y, const float m, 
 	return &PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1];
 }
 
+void PhyObj_Update(const float dt)
+{
+	PhyObj_GlobalAcceleration();
+	PhyObj_UpdatePosition(dt);
+	PhyObj_UpdateRotation(dt);
+	PhyObj_CheckForCollisions();
+	PhyObj_IterativeSolveManifolds(RESOLUTION_ITERATIONS);
+}
+
+void PhyObj_Render()
+{
+	PhyObj_DrawCircles();
+	PhyObj_DrawOBoxes();
+}
+
 void PhyObj_AddManifold(PhyObjManifold m)
 {
 	if (++PhyObj_manifolds_size > PhyObj_manifolds_max_size) {
