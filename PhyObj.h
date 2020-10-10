@@ -79,6 +79,7 @@ PhyObjOBoundingBox*		PhyObj_AddOBox(const float x, const float y, const float m,
 
 void	PhyObj_Update(const float dt);
 void	PhyObj_Render();
+void	PhyObj_Free();
 
 /*____________________________________________________________________________________________________________________________________*/
 // MATH

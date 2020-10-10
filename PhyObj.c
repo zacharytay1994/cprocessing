@@ -115,6 +115,15 @@ void PhyObj_Render()
 	PhyObj_DrawOBoxes();
 }
 
+void PhyObj_Free()
+{
+	// free arrays
+	free(PhyObj_bounding_circles);
+	free(PhyObj_bounding_obox);
+	free(PhyObj_manifolds);
+	free(PhyObj_bounding_shapes);
+}
+
 void PhyObj_AddManifold(PhyObjManifold m)
 {
 	if (++PhyObj_manifolds_size > PhyObj_manifolds_max_size) {
