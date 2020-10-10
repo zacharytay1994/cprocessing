@@ -42,7 +42,10 @@ void game_init(void)
 	
 	Tilemap_Initialize();
 	tilemap = Tilemap_AddTilemap(32, 32, 32, 32);
-
+	Tilemap_SetTile(tilemap, 0, 0, Tilemap_Solid);
+	Tilemap_SetTile(tilemap, 0, 1, Tilemap_Solid);
+	Tilemap_SetTile(tilemap, 1, 0, Tilemap_Solid);
+	Tilemap_SetTile(tilemap, 1, 1, Tilemap_Ground);
 	CP_System_ShowConsole();
 }
 
@@ -63,6 +66,7 @@ void game_update(void)
 		CP_Vector tile = Tilemap_WorldToGrid(tilemap, world.x, world.y);
 		printf("%.1f,%.1f\n", tile.x, tile.y);
 	}
+	Tilemap_RenderTileGrid(tilemap, Camera_GetCameraTransform());
 	/*Demo_Render();
 	Demo_Update(CP_System_GetDt());
 	Demo_EnemiesUpdate(CP_System_GetDt());

@@ -32,6 +32,7 @@ void Camera_SetCameraY(const float y)
 
 void Camera_SetRotation(const float deg)
 {
+	_rotation = deg;
 	_inverse_rotation = -deg;
 }
 
