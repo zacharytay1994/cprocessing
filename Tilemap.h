@@ -18,23 +18,20 @@ typedef struct Tilemap {
 	int _tile_height;
 	int _width;
 	int _height;
-	int* _tiles;
+	int* _tiles; // contains all tiles on the grid
 
 } Tilemap;
 
-extern Tilemap* tilemaps;
-extern int tilemaps_size;
-extern CP_Image tilesets[Tilemap_Tile_Size];
+extern Tilemap*		tilemaps;
+extern int			tilemaps_size;
+extern CP_Image		tilesets[Tilemap_Tile_Size];
+extern int			tilemap_debug;
 
-void Tilemap_Initialize();
-void Tilemap_Update(const float dt);
-void Tilemap_Render();
-// renders debug info, e.g. grid-lines etc
-void Tilemap_Debug_Render(const int id, const CP_Matrix cam);
-
-int Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int width, const int height);
-void Tilemap_AddTileset(const int tile, const char* path);
-int Tilemap_GetTile(const int id, const int x, const int y);
-void Tilemap_SetTile(const int id, const int x, const int y, const int tile);
-CP_Vector Tilemap_WorldToGrid(const int id, const float x, const float y);
-void Tilemap_RenderTileGrid(const int id, const CP_Matrix cam);
+void		Tilemap_Initialize();
+void		Tilemap_Debug_Render(const int id, const CP_Matrix cam);
+int			Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int width, const int height);
+void		Tilemap_AddTileset(const int tile, const char* path);
+int			Tilemap_GetTile(const int id, const int x, const int y);
+void		Tilemap_SetTile(const int id, const int x, const int y, const int tile);
+CP_Vector	Tilemap_WorldToGrid(const int id, const float x, const float y);
+void		Tilemap_RenderGrid(const int id, const CP_Matrix cam);

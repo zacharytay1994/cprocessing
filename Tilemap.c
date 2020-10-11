@@ -5,6 +5,7 @@
 Tilemap* tilemaps;
 int tilemaps_size = 0;
 CP_Image tilesets[Tilemap_Tile_Size] = { 0 };
+int tilemap_debug = 0;
 
 
 void Tilemap_Initialize()
@@ -116,7 +117,7 @@ CP_Vector Tilemap_WorldToGrid(const int id, const float x, const float y)
 	return CP_Vector_Set(-1.0f, -1.0f);
 }
 
-void Tilemap_RenderTileGrid(const int id, const CP_Matrix cam)
+void Tilemap_RenderGrid(const int id, const CP_Matrix cam)
 {
 	float half_tile_width = (float)tilemaps[id]._tile_width / 2.0f;
 	float half_tile_height = (float)tilemaps[id]._tile_height / 2.0f;

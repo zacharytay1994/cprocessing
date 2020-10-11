@@ -15,7 +15,7 @@
 #include "PhyObj.h"
 #include "Tilemap.h"
 #include "Camera.h"
-#include "Demo.h"
+#include "Sprite.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,8 +26,15 @@ PhyObjOBoundingBox* box2;
 CP_Vector box_pos = { 100.0f, 100.0f };
 float cam_x = 0.0f;
 float cam_y = 0.0f;
+CP_Image test;
+float s0 = 1.0f;
+float t0 = 1.0f;
+float s1 = 1.0f;
+float t1 = 1.0f;
 
 int tilemap;
+//int sprite_test;
+CP_Image test_image;
 
 // use CP_Engine_SetNextGameState to specify this function as the initialization function
 // this function will be called once at the beginning of the program
@@ -35,17 +42,20 @@ void game_init(void)
 {
 	CP_System_SetWindowSize(1600, 900);
 	CP_Settings_AntiAlias(0);
+
 	PhyObj_Initialize();
-	/*Demo_Initialize();
-	Demo_AddEnemy(0.0f);
-	Demo_AddEnemy((float)CP_System_GetWindowWidth());*/
-	
 	Tilemap_Initialize();
+	Sprite_Initialize();
+
+	Sprite_AddSprite((CP_Vector){ 100.0f, 100.0f }, 100.0f, 100.0f, "demo_player.png", 8, 1, 8, 10);
+	Sprite_AddSprite((CP_Vector) { 200.0f, 150.0f }, 50.0f, 50.0f, "demo_player2.png", 8, 2, 16, 20);
+	//test_image = CP_Image_Load("demo_test.png");
+	//Sprite_AddSpriteFrame(sprite_test, 1, Sprite_GenerateSubImages(0.0f,0.0f,0.75f,0.75f,0,test_image));
+	//Sprite_AddSpriteFrame(sprite_test, 2, Sprite_GenerateSubImages(0.25f, 0.25f, 0.75f, 0.75f, 0, test_image));
+	// adding a tilemap to the scene
 	tilemap = Tilemap_AddTilemap(32, 32, 32, 32);
-	Tilemap_SetTile(tilemap, 0, 0, Tilemap_Solid);
-	Tilemap_SetTile(tilemap, 0, 1, Tilemap_Solid);
-	Tilemap_SetTile(tilemap, 1, 0, Tilemap_Solid);
-	Tilemap_SetTile(tilemap, 1, 1, Tilemap_Ground);
+	test = CP_Image_Load("demo_player.png");
+	// system settings
 	CP_System_ShowConsole();
 }
 
@@ -56,28 +66,37 @@ void game_update(void)
 	// check input, update simulation, render etc.
 	CP_Settings_Background(CP_Color_Create(100, 100, 100, 255));
 	// process physics system
-	PhyObj_Render();
-	PhyObj_Update(CP_System_GetDt());
 	
+	// UPDATES
+	PhyObj_Update(CP_System_GetDt());
 	Camera_Update(CP_System_GetDt());
-	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
+	
+	// RENDERS
+	PhyObj_Render();
+	//Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
+	Tilemap_RenderGrid(tilemap, Camera_GetCameraTransform());
+	Sprite_Render(CP_System_GetDt());
+	if (CP_Input_KeyDown(KEY_RIGHT)) {
+		s0+= CP_System_GetDt();
+	}
+	if (CP_Input_KeyDown(KEY_LEFT)) {
+		t0+= CP_System_GetDt();
+	}
+	if (CP_Input_KeyDown(KEY_UP)) {
+		s1+= CP_System_GetDt();
+	}
+	if (CP_Input_KeyDown(KEY_DOWN)) {
+		t1+= CP_System_GetDt();
+	}
+	//CP_Image_DrawSubImage(test, 100.0f, 100.0f, 100.0f, 100.0f, s0, t0, s1, t1, 255);
+
+	// INPUT
 	if (CP_Input_MouseClicked()) {
 		CP_Vector world = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 		CP_Vector tile = Tilemap_WorldToGrid(tilemap, world.x, world.y);
 		printf("%.1f,%.1f\n", tile.x, tile.y);
 	}
-	Tilemap_RenderTileGrid(tilemap, Camera_GetCameraTransform());
-	/*Demo_Render();
-	Demo_Update(CP_System_GetDt());
-	Demo_EnemiesUpdate(CP_System_GetDt());
-
-	if (CP_Input_KeyReleased(KEY_S)) {
-		Demo_SpawnWave(2.0f, 4);
-	}
-	if (CP_Input_MouseClicked()) {
-		Demo_AddDamageNumbers(100.0f, 100.0f);
-	}*/
-
+	// moving the camera
 	if (CP_Input_KeyDown(KEY_W)) {
 		cam_y -= 100.0f * CP_System_GetDt();
 	}
@@ -92,8 +111,8 @@ void game_update(void)
 	}
 	Camera_SetCameraX(cam_x);
 	Camera_SetCameraY(cam_y);
-	CP_Vector camera_transformed_box_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), box_pos);
-	CP_Graphics_DrawRect(camera_transformed_box_pos.x, camera_transformed_box_pos.y, 30.0f, 30.0f);
+	/*CP_Vector camera_transformed_box_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), box_pos);
+	CP_Graphics_DrawRect(camera_transformed_box_pos.x, camera_transformed_box_pos.y, 30.0f, 30.0f);*/
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the exit function
