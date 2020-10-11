@@ -33,7 +33,7 @@ float s1 = 1.0f;
 float t1 = 1.0f;
 
 int tilemap;
-//int sprite_test;
+int sprite_test;
 CP_Image test_image;
 
 // use CP_Engine_SetNextGameState to specify this function as the initialization function
@@ -47,7 +47,8 @@ void game_init(void)
 	Tilemap_Initialize();
 	Sprite_Initialize();
 
-	Sprite_AddSprite((CP_Vector){ 100.0f, 100.0f }, 100.0f, 100.0f, "demo_player.png", 8, 1, 8, 10);
+	
+	sprite_test = Sprite_AddSprite((CP_Vector){ 100.0f, 100.0f }, 100.0f, 100.0f, "demo_player.png", 8, 1, 8, 10);
 	Sprite_AddSprite((CP_Vector) { 200.0f, 150.0f }, 50.0f, 50.0f, "demo_player2.png", 8, 2, 16, 20);
 	//test_image = CP_Image_Load("demo_test.png");
 	//Sprite_AddSpriteFrame(sprite_test, 1, Sprite_GenerateSubImages(0.0f,0.0f,0.75f,0.75f,0,test_image));
@@ -108,6 +109,10 @@ void game_update(void)
 	}
 	if (CP_Input_KeyDown(KEY_D)) {
 		cam_x += 100.0f * CP_System_GetDt();
+	}
+	// arrow keys
+	if (CP_Input_KeyDown(KEY_RIGHT)) {
+		Sprite_SetScaleX(sprite_test,Sprite_GetScaleX(sprite_test) + CP_System_GetDt());
 	}
 	Camera_SetCameraX(cam_x);
 	Camera_SetCameraY(cam_y);

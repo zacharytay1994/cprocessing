@@ -41,7 +41,7 @@ int Sprite_AddSprite(const CP_Vector position, const float width, const float he
 				}
 			}
 		}
-		sprites[sprites_size++] = (Sprite){ position,0.0f,255,width,height,col,row,1.0f/(float)col,1.0f/(float)row,1,frame,1.0f/(float)fps,0.0f,sheet,image_array };
+		sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f/(float)col,1.0f/(float)row,1,frame,1.0f/(float)fps,0.0f,sheet,image_array };
 		return sprites_size - 1;
 	}
 	return -1;
@@ -67,7 +67,6 @@ void Sprite_RenderSpriteSub(const float dt, const int id)
 	float y, x;
 	// if frame up
 	if ((sprites[id]._frame_count += dt) > sprites[id]._frame_second) {
-		printf("Switching frame");
 		// else switch frame
 		sprites[id]._frame_count = 0.0f;
 		sprites[id]._current_frame = sprites[id]._current_frame < sprites[id]._number_of_frames ? ++sprites[id]._current_frame : 1;
@@ -77,8 +76,9 @@ void Sprite_RenderSpriteSub(const float dt, const int id)
 
 	// SUBIMAGE RENDERING IS BROKEN FOR NOW?? NO DOCUMENTATION NO NOTHING?? USE Sprite_SpriteRenderWhole FOR NOW
 	// its ok hacked a solution
+	float width = sprites[id]._flip ? -sprites[id]._width : sprites[id]._width;
 	CP_Image_DrawAdvanced(sprites[id]._sprites[sprites[id]._current_frame - 1], sprites[id]._position.x, sprites[id]._position.y,
-		sprites[id]._width, sprites[id]._height, sprites[id]._alpha, sprites[id]._rotation);
+		width, sprites[id]._height, sprites[id]._alpha, sprites[id]._rotation);
 }
 
 void Sprite_RenderSpriteWhole(const float dt, const int id)
@@ -132,4 +132,139 @@ CP_Image Sprite_GenerateSubImage(const float u0, const float v0, const float u1,
 	CP_Image image = CP_Image_CreateFromData(sub_width, sub_height, sub_buffer);
 	free(sub_buffer);
 	return image;
+}
+
+void Sprite_SetFlip(const int id, const int flip)
+{
+	if (id < sprites_size) {
+		sprites[id]._flip = flip;
+	}
+}
+
+void Sprite_SetWidth(const int id, const float width)
+{
+	if (id < sprites_size) {
+		sprites[id]._width = width;
+	}
+}
+
+void Sprite_SetHeight(const int id, const float height)
+{
+	if (id < sprites_size) {
+		sprites[id]._height = height;
+	}
+}
+
+void Sprite_SetFPS(const int id, const int fps)
+{
+	if (id < sprites_size) {
+		sprites[id]._frame_second = 1.0f / (float)fps;
+	}
+}
+
+CP_Vector Sprite_GetPosition(const int id)
+{
+	if (id < sprites_size) {
+		return sprites[id]._position;
+	}
+	return CP_Vector_Set(-1.0f, -1.0f);
+}
+
+float Sprite_GetRotation(const int id)
+{
+	if (id < sprites_size) {
+		return sprites[id]._rotation;
+	}
+	return -1.0f;
+}
+
+float Sprite_GetScaleX(const int id)
+{
+	if (id < sprites_size) {
+		return sprites[id]._scale_x;
+	}
+	return -1.0f;
+}
+
+float Sprite_GetScaleY(const int id)
+{
+	if (id < sprites_size) {
+		return sprites[id]._scale_y;
+	}
+	return -1.0f;
+}
+
+int Sprite_GetAlpha(const int id)
+{
+	if (id < sprites_size) {
+		return sprites[id]._alpha;
+	}
+	return -1;
+}
+
+int Sprite_GetFlip(const int id)
+{
+	if (id < sprites_size) {
+		return sprites[id]._flip;
+	}
+	return -1;
+}
+
+float Sprite_GetWidth(const int id)
+{
+	if (id < sprites_size) {
+		sprites[id]._width;
+	}
+	return -1.0f;
+}
+
+float Sprite_GetHeight(const int id)
+{
+	if (id < sprites_size) {
+		sprites[id]._height;
+	}
+	return -1.0f;
+}
+
+int Sprite_GetFPS(const int id)
+{
+	if (id < sprites_size) {
+		return (int)(1.0f / sprites[id]._current_frame);
+	}
+	return -1;
+}
+
+void Sprite_SetPosition(const int id, const CP_Vector pos)
+{
+	if (id < sprites_size) {
+		sprites[id]._position = pos;
+	}
+}
+
+void Sprite_SetRotation(const int id, const float rot)
+{
+	if (id < sprites_size) {
+		sprites[id]._rotation = rot;
+	}
+}
+
+void Sprite_SetScaleX(const int id, const float scalex)
+{
+	if (id < sprites_size) {
+		sprites[id]._scale_x = scalex;
+	}
+}
+
+void Sprite_SetScaleY(const int id, const float scaley)
+{
+	if (id < sprites_size) {
+		sprites[id]._scale_y = scaley;
+	}
+}
+
+void Sprite_SetAlpha(const int id, const int alpha)
+{
+	if (id < sprites_size) {
+		sprites[id]._alpha;
+	}
 }
