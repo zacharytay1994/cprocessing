@@ -54,7 +54,7 @@ void game_init(void)
 	//Sprite_AddSpriteFrame(sprite_test, 1, Sprite_GenerateSubImages(0.0f,0.0f,0.75f,0.75f,0,test_image));
 	//Sprite_AddSpriteFrame(sprite_test, 2, Sprite_GenerateSubImages(0.25f, 0.25f, 0.75f, 0.75f, 0, test_image));
 	// adding a tilemap to the scene
-	tilemap = Tilemap_AddTilemap(32, 32, 32, 32);
+	tilemap = Tilemap_AddTilemap(32, 32, 100, 100);
 	test = CP_Image_Load("demo_player.png");
 	// system settings
 	CP_System_ShowConsole();
@@ -74,7 +74,7 @@ void game_update(void)
 	
 	// RENDERS
 	PhyObj_Render();
-	//Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
+	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
 	Tilemap_RenderGrid(tilemap, Camera_GetCameraTransform());
 	Sprite_Render(CP_System_GetDt());
 	if (CP_Input_KeyDown(KEY_RIGHT)) {
@@ -96,6 +96,7 @@ void game_update(void)
 		CP_Vector world = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 		CP_Vector tile = Tilemap_WorldToGrid(tilemap, world.x, world.y);
 		printf("%.1f,%.1f\n", tile.x, tile.y);
+		Tilemap_SetTile(tilemap, (int)tile.x, (int)tile.y, Tilemap_Solid);
 	}
 	// moving the camera
 	if (CP_Input_KeyDown(KEY_W)) {
@@ -112,7 +113,16 @@ void game_update(void)
 	}
 	// arrow keys
 	if (CP_Input_KeyDown(KEY_RIGHT)) {
-		Sprite_SetScaleX(sprite_test,Sprite_GetScaleX(sprite_test) + CP_System_GetDt());
+		Sprite_SetPosition(sprite_test, CP_Vector_Add(Sprite_GetPosition(sprite_test), (CP_Vector){1.0f,0.0f}));
+	}
+	if (CP_Input_KeyDown(KEY_LEFT)) {
+		Sprite_SetPosition(sprite_test, CP_Vector_Add(Sprite_GetPosition(sprite_test), (CP_Vector) { -1.0f, 0.0f }));
+	}
+	if (CP_Input_KeyDown(KEY_UP)) {
+		Sprite_SetPosition(sprite_test, CP_Vector_Add(Sprite_GetPosition(sprite_test), (CP_Vector) { 0.0f, -1.0f }));
+	}
+	if (CP_Input_KeyDown(KEY_DOWN)) {
+		Sprite_SetPosition(sprite_test, CP_Vector_Add(Sprite_GetPosition(sprite_test), (CP_Vector) { 0.0f, 1.0f }));
 	}
 	Camera_SetCameraX(cam_x);
 	Camera_SetCameraY(cam_y);
@@ -126,6 +136,7 @@ void game_exit(void)
 {
 	// shut down the gamestate and cleanup any dynamic memory
 	PhyObj_Free();
+	Sprite_Free();
 }
 
 // main() the starting point for the program

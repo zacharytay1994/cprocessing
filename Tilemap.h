@@ -22,7 +22,7 @@ typedef struct Tilemap {
 
 } Tilemap;
 
-extern Tilemap*		tilemaps;
+extern Tilemap		tilemaps[MAX_TILEMAPS];
 extern int			tilemaps_size;
 extern CP_Image		tilesets[Tilemap_Tile_Size];
 extern int			tilemap_debug;
@@ -35,3 +35,4 @@ int			Tilemap_GetTile(const int id, const int x, const int y);
 void		Tilemap_SetTile(const int id, const int x, const int y, const int tile);
 CP_Vector	Tilemap_WorldToGrid(const int id, const float x, const float y);
 void		Tilemap_RenderGrid(const int id, const CP_Matrix cam);
+void		Tilemap_Free();

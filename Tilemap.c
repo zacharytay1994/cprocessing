@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Tilemap* tilemaps;
+Tilemap tilemaps[MAX_TILEMAPS] = { 0 };
 int tilemaps_size = 0;
 CP_Image tilesets[Tilemap_Tile_Size] = { 0 };
 int tilemap_debug = 0;
@@ -10,7 +10,6 @@ int tilemap_debug = 0;
 
 void Tilemap_Initialize()
 {
-	tilemaps = malloc(MAX_TILEMAPS * sizeof(Tilemap));
 	Tilemap_AddTileset(Tilemap_Solid, "dirt_block.png");
 	Tilemap_AddTileset(Tilemap_Ground, "ground_block.png");
 }
@@ -134,6 +133,15 @@ void Tilemap_RenderGrid(const int id, const CP_Matrix cam)
 						(float)tilemaps[id]._tile_width, (float)tilemaps[id]._tile_height, 255, 0.0f);
 				}
 			}
+		}
+	}
+}
+
+void Tilemap_Free()
+{
+	for (int i = 0; i < tilemaps_size; i++) {
+		if (tilemaps[i]._tiles != NULL) {
+			free(tilemaps[i]._tiles); // ??
 		}
 	}
 }
