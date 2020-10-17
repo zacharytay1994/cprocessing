@@ -49,7 +49,10 @@ void game_init(void)
 	Sprite_Initialize();
 
 	PhyObj_AddCircle((float)(CP_System_GetWindowWidth() / 2), (float)(CP_System_GetWindowHeight() / 2), 0.0f, 30.0f);
-	PhyObj_AddOBox((float)(CP_System_GetWindowWidth() / 2), (float)(CP_System_GetWindowHeight() / 2) + 300.0f, 0.0f, 1200.0f, 20.0f);
+	PhyObj_AddOBox((float)(CP_System_GetWindowWidth() / 2) + 200.0f, (float)(CP_System_GetWindowHeight() / 2), 0.0f, 30.0f, 30.0f);
+	PhyObj_AddOBox((float)(CP_System_GetWindowWidth() / 2), (float)(CP_System_GetWindowHeight() / 2) + 380.0f, 0.0f, 1200.0f, 100.0f);
+	PhyObjOBoundingBox* b = PhyObj_AddOBox((float)(CP_System_GetWindowWidth() / 2)-600.0f, (float)(CP_System_GetWindowHeight() / 2)-200.0f, 0.0f, 300.0f, 10.0f);
+	b->super._rotation = 30.0f;
 	sprite_test = Sprite_AddSprite((CP_Vector){ 100.0f, 100.0f }, 100.0f, 100.0f, "demo_player.png", 8, 1, 8, 10);
 	Sprite_AddSprite((CP_Vector) { 200.0f, 150.0f }, 50.0f, 50.0f, "demo_player2.png", 8, 2, 16, 20);
 
@@ -84,10 +87,19 @@ void game_update(void)
 		CP_Vector tile = Tilemap_WorldToGrid(tilemap, world.x, world.y);
 		printf("%.1f,%.1f\n", tile.x, tile.y);
 		Tilemap_SetTile(tilemap, (int)tile.x, (int)tile.y, Tilemap_Solid);*/
-		int i = CP_Random_RangeInt(1, 10);
-		int r = CP_Random_RangeInt(1, 10);
+		int i = CP_Random_RangeInt(1, 6);
+		int r = CP_Random_RangeInt(1, 6);
 		int j = i * r;
-		PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 1.0f * j, 10.0f * i, 10.0f * r);
+		if (CP_Input_KeyDown(KEY_B)) {
+			PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 1.0f * j, 10.0f * i, 10.0f * r);
+			//PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
+		}
+		else if (CP_Input_KeyDown(KEY_N)) {
+			PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
+		}
+		else {
+			PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), i * 10.0f, i * 10.0f);
+		}
 	}
 	if (CP_Input_KeyDown(KEY_S)) {
 		if (CP_Input_MouseClicked()) {

@@ -23,6 +23,8 @@ typedef struct PhyObjBoundingShape {
 	float		_inv_mass;
 	float		_moment_of_inertia;
 	float		_inv_moment_of_inertia;
+	CP_Vector	_accumulated_impulse;
+	int			_sleeping; // not necessary to warm start sleeping objects i.e. objects not colliding
 } PhyObjBoundingShape;
 
 typedef struct PhyObjBoundingCircle {
@@ -100,6 +102,7 @@ void	PhyObj_ApplyImpulse(PhyObjBoundingShape* s, const CP_Vector v);
 void	PhyObj_UpdatePosition(const float dt);
 void	PhyObj_UpdateRotation(const float dt);
 void	PhyObj_GlobalAcceleration();
+void	PhyObj_WarmStarting();
 
 /*____________________________________________________________________________________________________________________________________*/
 // PRIMITIVE TESTS
