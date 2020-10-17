@@ -116,7 +116,7 @@ CP_Vector Tilemap_WorldToGrid(const int id, const float x, const float y)
 	return CP_Vector_Set(-1.0f, -1.0f);
 }
 
-void Tilemap_RenderGrid(const int id, const CP_Matrix cam)
+void Tilemap_Render(const int id, const CP_Matrix cam)
 {
 	float half_tile_width = (float)tilemaps[id]._tile_width / 2.0f;
 	float half_tile_height = (float)tilemaps[id]._tile_height / 2.0f;
@@ -142,6 +142,19 @@ void Tilemap_Free()
 	for (int i = 0; i < tilemaps_size; i++) {
 		if (tilemaps[i]._tiles != NULL) {
 			free(tilemaps[i]._tiles); // ??
+		}
+	}
+}
+
+void Tilemap_Save(const int id, const char* file)
+{
+	if (id < tilemaps_size) {
+		FILE* f;
+		fopen_s(&f, file, "w");
+		int size = tilemaps[id]._height * tilemaps[id]._width;
+		if (f) {
+			fwrite(tilemaps[id]._tiles, size, 1, f);
+			fclose(f);
 		}
 	}
 }

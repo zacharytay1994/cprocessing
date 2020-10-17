@@ -69,8 +69,8 @@ PhyObjBoundingCircle* PhyObj_AddCircle(const float x, const float y, const float
 		}
 	}
 	// moment of inertia of a circle = m * r^2
-	float moment_of_inertia = m * r * r;
-	PhyObjBoundingCircle temp = { {PhyObj_bounding_shapes_size,BOUNDING_CIRCLE,{x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia},r };
+	float moment_of_inertia = (m>0.0f?m:0.0f) * r * r;
+	PhyObjBoundingCircle temp = { {PhyObj_bounding_shapes_size,BOUNDING_CIRCLE,{x,y},0.0f,{0.0f,0.0f},0.0f,m,m>0.0f?1.0f/m:0,moment_of_inertia,moment_of_inertia>0.0f?1.0f/moment_of_inertia:0.0f},r };
 	PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1] = temp;
 	PhyObj_AddShape((PhyObjBoundingShape*)&PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1]);
 	return &PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1];
@@ -94,7 +94,7 @@ PhyObjOBoundingBox* PhyObj_AddOBox(const float x, const float y, const float m, 
 	}
 	// moment of inertia of a rectangle = (w * h^3)/12
 	float moment_of_inertia = (w * h * h * h) / 12;
-	PhyObjOBoundingBox temp = { {PhyObj_bounding_shapes_size,BOUNDING_OBOX,{x,y},0.0f,{0.0f,0.0f},0.0f,m,1.0f / m,moment_of_inertia,1 / moment_of_inertia},w,h };
+	PhyObjOBoundingBox temp = { {PhyObj_bounding_shapes_size,BOUNDING_OBOX,{x,y},0.0f,{0.0f,0.0f},0.0f,m,m>0.0f?1.0f/m:0,moment_of_inertia,m>0.0f?1.0f/moment_of_inertia:0.0f},w,h };
 	PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1] = temp;
 	PhyObj_AddShape((PhyObjBoundingShape*)&PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1]);
 	return &PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1];
@@ -235,14 +235,18 @@ void PhyObj_UpdateRotation(const float dt)
 //	Applies a global acceleration to all bounding shapes in the system, meant for Gravity
 void PhyObj_GlobalAcceleration()
 {
-	CP_Vector center = { 200.0f,200.0f };
-	float magnitude = 30.0f;
+	//CP_Vector center = { (float)(CP_System_GetWindowWidth()/2),(float)(CP_System_GetWindowHeight()/2) };
+	CP_Vector direction = CP_Vector_Set(0.0f, 1.0f);
+	float magnitude = 200.0f;
 	for (int i = 0; i < PhyObj_bounding_shapes_size; i++) {
+		if (PhyObj_bounding_shapes[i]->_mass <= 0.01f) {
+			continue;
+		}
 		// calculate vector to center
-		CP_Vector vector = CP_Vector_Normalize(CP_Vector_Subtract(center, PhyObj_bounding_shapes[i]->_position));
-		vector = CP_Vector_Scale(vector, magnitude);
-		vector = CP_Vector_Scale(vector, CP_System_GetDt());
-		PhyObj_AddVelocity(PhyObj_bounding_shapes[i], vector);
+		//CP_Vector vector = CP_Vector_Normalize(CP_Vector_Subtract(direction, PhyObj_bounding_shapes[i]->_position));
+		//vector = CP_Vector_Scale(vector, magnitude);
+		//vector = CP_Vector_Scale(vector, CP_System_GetDt());
+		PhyObj_AddVelocity(PhyObj_bounding_shapes[i], CP_Vector_Scale(direction,magnitude*CP_System_GetDt()));
 	}
 }
 
@@ -710,8 +714,8 @@ int PhyObj_BoxBox(PhyObjOBoundingBox* b1, PhyObjOBoundingBox* b2, PhyObjManifold
 	}
 
 	// -------------------- DEBUG CODE -----------------------------------------
-	/*CP_Graphics_DrawCircle(corner_of_intersection1.x, corner_of_intersection1.y, 2.0f);
-	CP_Graphics_DrawCircle(corner_of_intersection2.x, corner_of_intersection2.y, 2.0f);*/
+	CP_Graphics_DrawCircle(corner_of_intersection1.x, corner_of_intersection1.y, 20.0f);
+	CP_Graphics_DrawCircle(corner_of_intersection2.x, corner_of_intersection2.y, 20.0f);
 	// draw axis of least penetration
 	//float scale = flip == 1 ? -1.0f : 1.0f;
 	/*CP_Vector temp = CP_Vector_Scale(axis_least_penetration, 30.0f * flip);
@@ -842,7 +846,7 @@ void PhyObj_ResolveContact(const CP_Vector contact_position, const float contact
 	/* ____________________________________________________________________________________________________________ */
 	// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
 	float bias_factor = 0.2f;
-	float allowed_penetration = 0.02f;
+	float allowed_penetration = 0.1f;
 	float penetration = contact_penetration - allowed_penetration;
 	penetration = penetration < 0.0f ? 0.0f : penetration;
 	float baumgarte = penetration * bias_factor / CP_System_GetDt();

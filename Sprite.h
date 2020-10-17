@@ -40,7 +40,7 @@ void	Sprite_Initialize();
 int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps);
 void	Sprite_RenderSprite(const float dt, const int id);
 void	Sprite_Render(const float dt);
-CP_Image Sprite_GenerateSubImage(const float u0, const float v0, const float u1, const float v1, const CP_Image img);
+CP_Image Sprite_GenerateSubImage(const float u0, const float v0, const float u1, const float v1, const CP_Image img); // generate subimages to allow individual processing of frames
 void	Sprite_Free();
 
 /*____________________________________________________________________________________________________________________________________*/

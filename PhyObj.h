@@ -2,13 +2,15 @@
 #include "CProcessing/inc/cprocessing.h"
 
 #define INITIAL_SIZE 3
-#define RESOLUTION_ITERATIONS 5
+#define RESOLUTION_ITERATIONS 10
 
 #define MANIFOLD_CIRCLE_CIRCLE 0
 #define MANIFOLD_CIRCLE_OBOX 1
 
 #define BOUNDING_CIRCLE 11
 #define BOUNDING_OBOX 12
+
+#define INFINITE_MASS 1000000000
 
 typedef struct PhyObjBoundingShape {
 	unsigned int _id; // position in shapes array
@@ -17,7 +19,7 @@ typedef struct PhyObjBoundingShape {
 	float		_rotation;
 	CP_Vector	_velocity;
 	float		_angular_velocity;	// is in radians per seconds
-	float		_mass;
+	float		_mass; // if 0 mass means static
 	float		_inv_mass;
 	float		_moment_of_inertia;
 	float		_inv_moment_of_inertia;
