@@ -79,7 +79,7 @@ void game_update(void)
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
 	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform()); // renders tilemap grid lines, comment out if not wanted
 	PhyObj_Render();
-	Sprite_Render(CP_System_GetDt());
+	//Sprite_Render(CP_System_GetDt());
 
 	// INPUT
 	if (CP_Input_MouseClicked()) {
@@ -91,14 +91,14 @@ void game_update(void)
 		int r = CP_Random_RangeInt(1, 6);
 		int j = i * r;
 		if (CP_Input_KeyDown(KEY_B)) {
-			PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 1.0f * j, 10.0f * i, 10.0f * r);
+			PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 1.0f * j, 10.0f * 3.0f, 10.0f * 6.0f);
 			//PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
 		}
 		else if (CP_Input_KeyDown(KEY_N)) {
 			PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
 		}
 		else {
-			PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), i * 10.0f, i * 10.0f);
+			PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 3 * 10.0f, 3 * 10.0f);
 		}
 	}
 	if (CP_Input_KeyDown(KEY_S)) {

@@ -11,6 +11,7 @@
 #define BOUNDING_OBOX 12
 
 #define INFINITE_MASS 1000000000
+#define GRAVITY 600
 
 typedef struct PhyObjBoundingShape {
 	unsigned int _id; // position in shapes array
