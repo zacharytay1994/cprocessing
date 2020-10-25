@@ -2,7 +2,7 @@
 #include "CProcessing/inc/cprocessing.h"
 
 #define INITIAL_SIZE 3
-#define RESOLUTION_ITERATIONS 10
+#define RESOLUTION_ITERATIONS 5
 
 #define MANIFOLD_CIRCLE_CIRCLE 0
 #define MANIFOLD_CIRCLE_OBOX 1
@@ -12,6 +12,8 @@
 
 #define INFINITE_MASS 1000000000
 #define GRAVITY 600
+
+#define SHAPE_MAX_NUM_CONTACTS 10
 
 typedef struct PhyObjBoundingShape {
 	unsigned int _id; // position in shapes array
@@ -26,6 +28,10 @@ typedef struct PhyObjBoundingShape {
 	float		_inv_moment_of_inertia;
 	CP_Vector	_accumulated_impulse;
 	int			_sleeping; // not necessary to warm start sleeping objects i.e. objects not colliding
+	float		_friction;
+	CP_Vector	_contact_data[SHAPE_MAX_NUM_CONTACTS]; // 10 contact data points per frame
+	int			_grounded;
+	int			_num_contacts;
 } PhyObjBoundingShape;
 
 typedef struct PhyObjBoundingCircle {
@@ -79,8 +85,10 @@ void	PhyObj_DrawOBoxes();
 void	PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p);
 void	PhyObj_AddShape(PhyObjBoundingShape* s);
 void	PhyObj_AddManifold(PhyObjManifold m);
-PhyObjBoundingCircle*	PhyObj_AddCircle(const float x, const float y, const float m, const float r);
-PhyObjOBoundingBox*		PhyObj_AddOBox(const float x, const float y, const float m, const float w, const float h);
+PhyObjBoundingCircle*	PhyObj_AddCircle(const float x, const float y, const float m, const float r, const float f);
+PhyObjOBoundingBox*		PhyObj_AddOBox(const float x, const float y, const float m, const float w, const float h, const float f);
+PhyObjBoundingCircle*	PhyObj_AddAACircle(const float x, const float y, const float m, const float r, const float f);
+PhyObjOBoundingBox*		PhyObj_AddAABox(const float x, const float y, const float m, const float w, const float h, const float f);
 
 void	PhyObj_Update(const float dt);
 void	PhyObj_Render();
@@ -93,6 +101,8 @@ float	PhyObj_2DCross(const CP_Vector v1, const CP_Vector v2);
 float	PhyObj_VectorSquareMagnitude(const CP_Vector v);
 float	PhyObj_Mod(const float in); // always returns a positive value
 CP_Vector	PhyObj_2DPerpendicular(const CP_Vector v);
+
+PhyObjBoundingShape* PhyObj_GetShape(const int id);
 
 /*____________________________________________________________________________________________________________________________________*/
 // PHYSICS
