@@ -54,6 +54,7 @@ void game_init(void)
 	PhyObj_AddOBox((float)(CP_System_GetWindowWidth() / 2), (float)(CP_System_GetWindowHeight() / 2) + 380.0f, 0.0f, 1200.0f, 100.0f, 0.8f);
 	PhyObjOBoundingBox* b = PhyObj_AddOBox((float)(CP_System_GetWindowWidth() / 2)-600.0f, (float)(CP_System_GetWindowHeight() / 2)-200.0f, 0.0f, 300.0f, 10.0f, 0.0f);
 	b->super._rotation = 30.0f;
+	PhyObj_SetAllVisible(1);
 	/*sprite_test = Sprite_AddSprite((CP_Vector){ 100.0f, 100.0f }, 100.0f, 100.0f, "demo_player.png", 8, 1, 8, 10);
 	Sprite_AddSprite((CP_Vector) { 200.0f, 150.0f }, 50.0f, 50.0f, "demo_player2.png", 8, 2, 16, 20);*/
 
@@ -98,16 +99,16 @@ void game_update(void)
 			//PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
 		}
 		else if (CP_Input_KeyDown(KEY_N)) {
-			PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f, 0.8f);
+			PhyObj_SetVisible(PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f, 0.8f)->super._id,1);
 		}
 		else if (CP_Input_KeyDown(KEY_M)) {
-			PhyObj_AddAABox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 40.0f, 0.8f);
+			PhyObj_SetVisible(PhyObj_AddAABox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 100.0f, 30.0f, 40.0f, 0.8f)->super._id,1);
 		}
 		else if (CP_Input_KeyDown(KEY_P)) {
-			PhyObj_AddAABox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 100.0f, 10.0f, 0.8f);
+			PhyObj_SetVisible(PhyObj_AddAABox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 50.0f, 100.0f, 15.0f, 0.8f)->super._id,1);
 		}
 		else {
-			PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 3 * 10.0f, 3 * 10.0f, 0.8f);
+			PhyObj_SetVisible(PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 3 * 10.0f, 3 * 10.0f, 0.8f)->super._id,1);
 		}
 	}
 	if (CP_Input_KeyDown(KEY_S)) {

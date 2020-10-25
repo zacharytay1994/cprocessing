@@ -32,6 +32,7 @@ typedef struct PhyObjBoundingShape {
 	CP_Vector	_contact_data[SHAPE_MAX_NUM_CONTACTS]; // 10 contact data points per frame
 	int			_grounded;
 	int			_num_contacts;
+	int			_visible;
 } PhyObjBoundingShape;
 
 typedef struct PhyObjBoundingCircle {
@@ -82,6 +83,8 @@ extern float					gravity;
 void	PhyObj_Initialize();
 void	PhyObj_DrawCircles();
 void	PhyObj_DrawOBoxes();
+void	PhyObj_SetVisible(const int id, const int visible);
+void	PhyObj_SetAllVisible(const int visible);
 void	PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p);
 void	PhyObj_AddShape(PhyObjBoundingShape* s);
 void	PhyObj_AddManifold(PhyObjManifold m);

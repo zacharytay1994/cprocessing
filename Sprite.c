@@ -47,7 +47,7 @@ int Sprite_AddSprite(const CP_Vector position, const float width, const float he
 				}
 			}
 		}
-		sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f/(float)col,1.0f/(float)row,1,frame,1.0f/(float)fps,0.0f,images_size };
+		sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f/(float)col,1.0f/(float)row,1,frame,1.0f/(float)fps,0.0f,images_size,1,1 };
 		++images_size;
 		return sprites_size - 1;
 	}
@@ -61,12 +61,18 @@ void Sprite_RenderSprite(const float dt, const int id)
 	if ((sprites[id]._frame_count += dt) > sprites[id]._frame_second) {
 		// else switch frame
 		sprites[id]._frame_count = 0.0f;
-		sprites[id]._current_frame = sprites[id]._current_frame < sprites[id]._number_of_frames ? ++sprites[id]._current_frame : 1;
+		if (sprites[id]._repeat) {
+			sprites[id]._current_frame = sprites[id]._current_frame < sprites[id]._number_of_frames ? ++sprites[id]._current_frame : 1;
+		}
+		else {
+			if (sprites[id]._current_frame < sprites[id]._number_of_frames) {
+				++sprites[id]._current_frame;
+			}
+		}
 	}
 	y = (float)((sprites[id]._current_frame - 1) / sprites[id]._columns) * sprites[id]._subheight;
 	x = (float)((sprites[id]._current_frame - 1) % sprites[id]._rows) * sprites[id]._subwidth;
 
-	// SUBIMAGE RENDERING IS BROKEN FOR NOW?? NO DOCUMENTATION NO NOTHING?? USE Sprite_SpriteRenderWhole FOR NOW
 	// its ok hacked a solution
 	float width = sprites[id]._flip ? -sprites[id]._width : sprites[id]._width;
 	width *= sprites[id]._scale * sprites[id]._scale_x;
@@ -78,7 +84,9 @@ void Sprite_RenderSprite(const float dt, const int id)
 void Sprite_Render(const float dt)
 {
 	for (int i = 0; i < sprites_size; i++) {
-		Sprite_RenderSprite(dt, i);
+		if (sprites[i]._visible) {
+			Sprite_RenderSprite(dt, i);
+		}
 	}
 }
 
@@ -142,6 +150,28 @@ void Sprite_SetFPS(const int id, const int fps)
 {
 	if (id < sprites_size) {
 		sprites[id]._frame_second = 1.0f / (float)fps;
+	}
+}
+
+void Sprite_SetVisible(const int id, const int visible)
+{
+	if (id < sprites_size) {
+		sprites[id]._visible = visible;
+	}
+}
+
+void Sprite_SetRepeat(const int id, const int repeat)
+{
+	if (id < sprites_size) {
+		sprites[id]._repeat = repeat;
+	}
+}
+
+void Sprite_Reset(const int id)
+{
+	if (id < sprites_size) {
+		sprites[id]._current_frame = 1;
+		sprites[id]._frame_count = 0.0f;
 	}
 }
 
@@ -221,6 +251,14 @@ int Sprite_GetFPS(const int id)
 {
 	if (id < sprites_size) {
 		return (int)(1.0f / sprites[id]._frame_second);
+	}
+	return -1;
+}
+
+int Sprite_GetVisible(const int id)
+{
+	if (id < sprites_size) {
+		return sprites[id]._visible;
 	}
 	return -1;
 }
