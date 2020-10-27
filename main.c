@@ -77,7 +77,7 @@ void game_update(void)
 	
 	// UPDATES
 	PhyObj_Update(CP_System_GetDt());
-	Camera_Update(CP_System_GetDt());
+	//Camera_Update(CP_System_GetDt());
 	
 	// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
@@ -105,7 +105,7 @@ void game_update(void)
 			PhyObj_SetVisible(PhyObj_AddAABox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 100.0f, 30.0f, 40.0f, 0.8f)->super._id,1);
 		}
 		else if (CP_Input_KeyDown(KEY_P)) {
-			PhyObj_SetVisible(PhyObj_AddAABox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 50.0f, 100.0f, 15.0f, 0.8f)->super._id,1);
+			PhyObj_SetVisible(PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 50.0f, 20.0f, 30.0f, 0.8f)->super._id,1);
 		}
 		else {
 			PhyObj_SetVisible(PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 3 * 10.0f, 3 * 10.0f, 0.8f)->super._id,1);
