@@ -194,6 +194,7 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
   <ItemGroup>
     <ClCompile Include="Camera.c" />
     <ClCompile Include="Demo.c" />
+    <ClCompile Include="MainMenu.c" />
     <ClCompile Include="PhyObj.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Sprite.c" />
@@ -202,6 +203,8 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Demo.h" />
+    <ClInclude Include="GameState.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="PhyObj.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Tilemap.h" />

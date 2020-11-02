@@ -16,6 +16,8 @@
 #include "Tilemap.h"
 #include "Camera.h"
 #include "Sprite.h"
+#include "MainMenu.h"
+#include "GameState.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,6 +38,7 @@ float t1 = 1.0f;
 int tilemap;
 int sprite_test;
 CP_Image test_image;
+enum GameState game_state = 1;
 
 // use CP_Engine_SetNextGameState to specify this function as the initialization function
 // this function will be called once at the beginning of the program
@@ -44,6 +47,8 @@ void game_init(void)
 	CP_System_SetWindowSize(1600, 900);
 	CP_Settings_AntiAlias(0);
 
+	MainMenu_Initialize();
+#if 0
 	PhyObj_Initialize();
 	Tilemap_Initialize();
 	Sprite_Initialize();
@@ -59,6 +64,7 @@ void game_init(void)
 	// adding a tilemap to the scene
 	tilemap = Tilemap_AddTilemap(32, 32, 100, 100);
 	test = CP_Image_Load("demo_player.png");
+#endif
 	// system settings
 	CP_System_ShowConsole();
 }
@@ -67,6 +73,7 @@ void game_init(void)
 // this function will be called repeatedly every frame
 void game_update(void)
 {
+#if 0
 	// check input, update simulation, render etc.
 	CP_Settings_Background(CP_Color_Create(100, 100, 100, 255));
 	// process physics system
@@ -134,6 +141,10 @@ void game_update(void)
 	if (CP_Input_KeyDown(KEY_DOWN)) {
 		Sprite_SetPosition(sprite_test, CP_Vector_Add(Sprite_GetPosition(sprite_test), (CP_Vector) { 0.0f, 1.0f }));
 	}
+#endif
+
+	MainMenu_Update(CP_System_GetDt());
+	MainMenu_Render();
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the exit function
