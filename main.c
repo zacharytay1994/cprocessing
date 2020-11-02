@@ -29,7 +29,7 @@ int test_bed;
 // this function will be called once at the beginning of the program
 void game_init(void)
 {
-	CP_System_SetWindowSize(1600, 900);
+	CP_System_SetWindowSize(1650, 900);
 	CP_Settings_AntiAlias(0);
 	// system settings
 	CP_System_ShowConsole();

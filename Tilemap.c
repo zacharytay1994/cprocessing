@@ -30,31 +30,31 @@ void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
 	float screen_width = (float)CP_System_GetWindowWidth();
 	float screen_height = (float)CP_System_GetWindowHeight();
 	// render horizontal lines
-	for (int x = 0; x < grid_width; x++) {
+	for (int x = 0; x < grid_width+1; x++) {
 		CP_Vector start = { (float)(x * tile_width), 0.0f };
 		// transform based on camera
 		start = CP_Vector_MatrixMultiply(cam, start);
 		// wrap around
 		if (start.x > screen_width) {
-			start.x -= screen_width;
+			start.x -= (grid_width + 1) * tile_width;
 		}
 		else if (start.x < 0.0f) {
-			start.x += screen_width;
+			start.x += (grid_width + 1) * tile_width;
 		}
 		// render lines
 		CP_Graphics_DrawLine(start.x, 0.0f, start.x, screen_height);
 	}
 	// render vertical lines
-	for (int y = 0; y < grid_height; y++) {
+	for (int y = 0; y < grid_height+1; y++) {
 		CP_Vector start = { 0.0f, (float)(y * tile_height) };
 		// transform based on camera
 		start = CP_Vector_MatrixMultiply(cam, start);
 		// wrap around
 		if (start.y > screen_height) {
-			start.y -= screen_height;
+			start.y -= (grid_height + 1) * tile_height;
 		}
 		else if (start.y < 0.0f) {
-			start.y += screen_height;
+			start.y += (grid_height + 1) * tile_height;
 		}
 		// render lines
 		CP_Graphics_DrawLine(0.0f, start.y, screen_width, start.y);
