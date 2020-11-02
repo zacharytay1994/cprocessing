@@ -203,6 +203,7 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Demo.h" />
     <ClInclude Include="PhyObj.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Tilemap.h" />
   </ItemGroup>

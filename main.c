@@ -79,7 +79,7 @@ void game_update(void)
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
 	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform()); // renders tilemap grid lines, comment out if not wanted
 	PhyObj_Render();
-	//Sprite_Render(CP_System_GetDt());
+	Sprite_Render(CP_System_GetDt());
 
 	// INPUT
 	if (CP_Input_MouseClicked()) {
