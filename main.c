@@ -77,7 +77,8 @@ void game_update(void)
 	
 	// UPDATES
 	PhyObj_Update(CP_System_GetDt());
-	//Camera_Update(CP_System_GetDt());
+	Camera_Update(CP_System_GetDt());
+	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
 	
 	// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
