@@ -52,7 +52,7 @@ void PhyObj_Initialize()
 	PhyObj_square_image = CP_Image_Load("./square.png");
 }
 
-PhyObjBoundingCircle* PhyObj_AddCircle(const float x, const float y, const float m, const float r)
+PhyObjBoundingCircle* PhyObj_AddCircle(const float x, const float y, const float m, const float r, const float f)
 {
 	if (++PhyObj_bounding_circles_size > PhyObj_bounding_circles_max_size) {
 		PhyObjBoundingCircle* check = (PhyObjBoundingCircle*)realloc(PhyObj_bounding_circles, sizeof(PhyObjBoundingCircle) * PhyObj_bounding_circles_max_size * 2);
@@ -80,13 +80,13 @@ PhyObjBoundingCircle* PhyObj_AddCircle(const float x, const float y, const float
 		inv_moment_of_inertia = 0.0f;
 	}
 	//float moment_of_inertia = (m>0.0f?m:INFINITE_MASS) * r * r;
-	PhyObjBoundingCircle temp = { {PhyObj_bounding_shapes_size,BOUNDING_CIRCLE,{x,y},0.0f,{0.0f,0.0f},0.0f,m,m>0.0f?1.0f/m:0,moment_of_inertia,inv_moment_of_inertia,CP_Vector_Set(0.0f,0.0f),1},r };
+	PhyObjBoundingCircle temp = { {PhyObj_bounding_shapes_size,BOUNDING_CIRCLE,{x,y},0.0f,{0.0f,0.0f},0.0f,m,m>0.0f?1.0f/m:0,moment_of_inertia,inv_moment_of_inertia,CP_Vector_Set(0.0f,0.0f),1,f,0},r };
 	PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1] = temp;
 	PhyObj_AddShape((PhyObjBoundingShape*)&PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1]);
 	return &PhyObj_bounding_circles[PhyObj_bounding_circles_size - 1];
 }
 
-PhyObjOBoundingBox* PhyObj_AddOBox(const float x, const float y, const float m, const float w, const float h)
+PhyObjOBoundingBox* PhyObj_AddOBox(const float x, const float y, const float m, const float w, const float h, const float f)
 {
 	if (++PhyObj_bounding_obox_size > PhyObj_bounding_obox_max_size) {
 		PhyObjOBoundingBox* check = (PhyObjOBoundingBox*)realloc(PhyObj_bounding_obox, sizeof(PhyObjOBoundingBox) * PhyObj_bounding_obox_max_size * 2);
@@ -104,10 +104,26 @@ PhyObjOBoundingBox* PhyObj_AddOBox(const float x, const float y, const float m, 
 	}
 	// moment of inertia of a rectangle = (w * h^3)/12
 	float moment_of_inertia = (w * h * h * h) / 12;
-	PhyObjOBoundingBox temp = { {PhyObj_bounding_shapes_size,BOUNDING_OBOX,{x,y},0.0f,{0.0f,0.0f},0.0f,m,m>0.0f?1.0f/m:0,moment_of_inertia,m>0.0f?1.0f/moment_of_inertia:0.0f,CP_Vector_Set(0.0f,0.0f),1},w,h };
+	PhyObjOBoundingBox temp = { {PhyObj_bounding_shapes_size,BOUNDING_OBOX,{x,y},0.0f,{0.0f,0.0f},0.0f,m,m>0.0f?1.0f/m:0,moment_of_inertia,m>0.0f?1.0f/moment_of_inertia:0.0f,CP_Vector_Set(0.0f,0.0f),1,f,0},w,h };
 	PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1] = temp;
 	PhyObj_AddShape((PhyObjBoundingShape*)&PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1]);
 	return &PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1];
+}
+
+PhyObjBoundingCircle* PhyObj_AddAACircle(const float x, const float y, const float m, const float r, const float f)
+{
+	PhyObjBoundingCircle* circle = PhyObj_AddCircle(x, y, m, r, f);
+	circle->super._moment_of_inertia = INFINITE_MASS;
+	circle->super._inv_moment_of_inertia = 0.0f;
+	return circle;
+}
+
+PhyObjOBoundingBox* PhyObj_AddAABox(const float x, const float y, const float m, const float w, const float h, const float f)
+{
+	PhyObjOBoundingBox* box = PhyObj_AddOBox(x, y, m, w, h, f);
+	box->super._moment_of_inertia = INFINITE_MASS;
+	box->super._inv_moment_of_inertia = 0.0f;
+	return box;
 }
 
 void PhyObj_Update(const float dt)
@@ -153,14 +169,18 @@ void PhyObj_AddManifold(PhyObjManifold m)
 void PhyObj_DrawCircles()
 {
 	for (int i = 0; i < PhyObj_bounding_circles_size; i++) {
-		CP_Image_DrawAdvanced(PhyObj_circle_image, PhyObj_bounding_circles[i].super._position.x, PhyObj_bounding_circles[i].super._position.y, PhyObj_bounding_circles[i]._radius * 2.0f, PhyObj_bounding_circles[i]._radius * 2.0f, 255, PhyObj_bounding_circles[i].super._rotation);
+		if (PhyObj_bounding_circles[i].super._visible) {
+			CP_Image_DrawAdvanced(PhyObj_circle_image, PhyObj_bounding_circles[i].super._position.x, PhyObj_bounding_circles[i].super._position.y, PhyObj_bounding_circles[i]._radius * 2.0f, PhyObj_bounding_circles[i]._radius * 2.0f, 255, PhyObj_bounding_circles[i].super._rotation);
+		}
 	}
 }
 
 void PhyObj_DrawOBoxes()
 {
 	for (int i = 0; i < PhyObj_bounding_obox_size; i++) {
-		CP_Image_DrawAdvanced(PhyObj_square_image, PhyObj_bounding_obox[i].super._position.x, PhyObj_bounding_obox[i].super._position.y, PhyObj_bounding_obox[i]._horizontal_extent * 2.0f, PhyObj_bounding_obox[i]._vertical_extent * 2.0f, 255, PhyObj_bounding_obox[i].super._rotation);
+		if (PhyObj_bounding_obox[i].super._visible) {
+			CP_Image_DrawAdvanced(PhyObj_square_image, PhyObj_bounding_obox[i].super._position.x, PhyObj_bounding_obox[i].super._position.y, PhyObj_bounding_obox[i]._horizontal_extent * 2.0f, PhyObj_bounding_obox[i]._vertical_extent * 2.0f, 255, PhyObj_bounding_obox[i].super._rotation);
+		}
 	}
 }
 
@@ -196,6 +216,28 @@ float PhyObj_2DCross(const CP_Vector v1, const CP_Vector v2)
 CP_Vector PhyObj_2DPerpendicular(const CP_Vector v)
 {
 	return (CP_Vector){v.y,-v.x};
+}
+
+PhyObjBoundingShape* PhyObj_GetShape(const int id)
+{
+	if (id < PhyObj_bounding_shapes_size) {
+		return PhyObj_bounding_shapes[id];
+	}
+	return NULL;
+}
+
+void PhyObj_SetVisible(const int id, const int visible)
+{
+	if (id < PhyObj_bounding_shapes_size) {
+		PhyObj_bounding_shapes[id]->_visible = visible;
+	}
+}
+
+void PhyObj_SetAllVisible(const int visible)
+{
+	for (int i = 0; i < PhyObj_bounding_shapes_size; i++) {
+		PhyObj_bounding_shapes[i]->_visible = visible;
+	}
 }
 
 float PhyObj_VectorSquareMagnitude(const CP_Vector v)
@@ -774,6 +816,9 @@ void PhyObj_CheckForCollisions()
 	// reset sleep
 	for (int i = 0; i < PhyObj_bounding_shapes_size; i++) {
 		PhyObj_bounding_shapes[i]->_sleeping = 1;
+		// reset num contacts of shapes
+		PhyObj_bounding_shapes[i]->_num_contacts = 0;
+		PhyObj_bounding_shapes[i]->_grounded = 0;
 	}
 	for (int i = 0; i < PhyObj_bounding_shapes_size - 1; i++) {
 		for (int j = i + 1; j < PhyObj_bounding_shapes_size; j++) {
@@ -881,13 +926,13 @@ void PhyObj_ResolveContact(const CP_Vector contact_position, const float contact
 	/* ____________________________________________________________________________________________________________ */
 	// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
 	float bias_factor = 0.2f;
-	float allowed_penetration = 0.06f;
+	float allowed_penetration = 0.1f;
 	float penetration = contact_penetration - allowed_penetration;
 	penetration = penetration < 0.0f ? 0.0f : penetration;
 	float baumgarte = penetration * bias_factor / CP_System_GetDt();
 	/* ____________________________________________________________________________________________________________ */
 	// if not seperating, do something
-	float friction_coefficient = 1.0f; // how slippery whoo~
+	float friction_coefficient = m.A->_friction < m.B->_friction ? m.A->_friction : m.B->_friction; // how slippery whoo~
 	if (velocity_along_normal < baumgarte+1.0f) { // +1 here is a hack sry, i.e. stickiness
 		// magnitude of impulse
 		float restitution = 0.0f;
@@ -904,10 +949,27 @@ void PhyObj_ResolveContact(const CP_Vector contact_position, const float contact
 		// apply current step impulse
 		CP_Vector AImpulse = CP_Vector_Scale(impulse_vector, -1.0f);
 		CP_Vector BImpulse = impulse_vector;
+		//printf("%f, %f", m._contact_normal.x, m._contact_normal.y);
 		PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.A, AImpulse);
 		PhyObj_ApplyImpulse((PhyObjBoundingShape*)m.B, BImpulse);
 		m.A->_angular_velocity -= PhyObj_2DCross(impulse_vector, rA) * m.A->_inv_moment_of_inertia;
 		m.B->_angular_velocity += PhyObj_2DCross(impulse_vector, rB) * m.B->_inv_moment_of_inertia;
+
+		// if the contact normal is above a certain vertical threshold and is going upward, 
+		// flag the box it is applied to as being grounded
+		if (m._contact_normal.y > 0.9f) {
+			m.A->_grounded = 1;
+		}
+		else if (m._contact_normal.y < -0.9f) {
+			m.B->_grounded = 1;
+		}
+
+		if (m.A->_num_contacts < SHAPE_MAX_NUM_CONTACTS) {
+			m.A->_contact_data[m.A->_num_contacts++] = contact_position;
+		}
+		if (m.B->_num_contacts < SHAPE_MAX_NUM_CONTACTS) {
+			m.B->_contact_data[m.B->_num_contacts++] = contact_position;
+		}
 		// DEBUG CODE
 		/*if (CP_Input_KeyDown(KEY_R)) {
 			if (m.A->_mass > 0.0f && m.B->_mass > 0.0f) {

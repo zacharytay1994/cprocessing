@@ -14,3 +14,5 @@ void MainMenu_Initialize();
 void MainMenu_Update(const float dt);
 
 void MainMenu_Render();
+
+void MainMenu_Exit();

@@ -23,6 +23,7 @@ void MainMenu_Update(const float dt)
 	CP_Settings_Background(CP_Color_Create(255, 255, 255, 255));
 	
 	Button_Update();
+	MainMenu_Render();
 	return;
 }
 
@@ -30,4 +31,9 @@ void MainMenu_Render()
 {
 	Button_Render_All();
 	return;
+}
+
+void MainMenu_Exit()
+{
+
 }
