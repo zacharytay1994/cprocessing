@@ -192,18 +192,33 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.c" />
     <ClCompile Include="Camera.c" />
     <ClCompile Include="Demo.c" />
+    <ClCompile Include="MainMenu.c" />
     <ClCompile Include="PhyObj.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Player.c" />
+    <ClCompile Include="Scene.c" />
     <ClCompile Include="Sprite.c" />
+    <ClCompile Include="TestBed.c" />
+    <ClCompile Include="TestScene1.c" />
+    <ClCompile Include="TestScene2.c" />
     <ClCompile Include="Tilemap.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Demo.h" />
+    <ClInclude Include="GameState.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="PhyObj.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="Sprite.h" />
+    <ClInclude Include="TestBed.h" />
+    <ClInclude Include="TestScene1.h" />
+    <ClInclude Include="TestScene2.h" />
     <ClInclude Include="Tilemap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
