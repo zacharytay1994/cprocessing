@@ -15,7 +15,6 @@ void Scene_Initialize()
 void Scene_Update()
 {
 	if (Scene_has_scene) {
-		printf("Updating scene");
 		current_scene.update(CP_System_GetDt());
 	}
 }
