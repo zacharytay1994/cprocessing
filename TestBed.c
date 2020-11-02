@@ -47,35 +47,35 @@ void TestBed_Init()
 void TestBed_Update(const float dt)
 {
 	// UPDATES
-	PhyObj_Update(CP_System_GetDt());
+	//PhyObj_Update(CP_System_GetDt());
 	Camera_Update(CP_System_GetDt());
 
 	// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
 	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform()); // renders tilemap grid lines, comment out if not wanted
-	PhyObj_Render();
+	//PhyObj_Render();
 	Sprite_Render(CP_System_GetDt());
 
 	// INPUT
-	if (CP_Input_MouseClicked()) {
-		/*CP_Vector world = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
-		CP_Vector tile = Tilemap_WorldToGrid(tilemap, world.x, world.y);
-		printf("%.1f,%.1f\n", tile.x, tile.y);
-		Tilemap_SetTile(tilemap, (int)tile.x, (int)tile.y, Tilemap_Solid);*/
-		int i = CP_Random_RangeInt(1, 6);
-		int r = CP_Random_RangeInt(1, 6);
-		int j = i * r;
-		if (CP_Input_KeyDown(KEY_B)) {
-			PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 1.0f * j, 10.0f * 3.0f, 10.0f * 6.0f);
-			//PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
-		}
-		else if (CP_Input_KeyDown(KEY_N)) {
-			PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
-		}
-		else {
-			PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 3 * 10.0f, 3 * 10.0f);
-		}
-	}
+	//if (CP_Input_MouseClicked()) {
+	//	/*CP_Vector world = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+	//	CP_Vector tile = Tilemap_WorldToGrid(tilemap, world.x, world.y);
+	//	printf("%.1f,%.1f\n", tile.x, tile.y);
+	//	Tilemap_SetTile(tilemap, (int)tile.x, (int)tile.y, Tilemap_Solid);*/
+	//	int i = CP_Random_RangeInt(1, 6);
+	//	int r = CP_Random_RangeInt(1, 6);
+	//	int j = i * r;
+	//	if (CP_Input_KeyDown(KEY_B)) {
+	//		PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 1.0f * j, 10.0f * 3.0f, 10.0f * 6.0f);
+	//		//PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
+	//	}
+	//	else if (CP_Input_KeyDown(KEY_N)) {
+	//		PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
+	//	}
+	//	else {
+	//		PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 3 * 10.0f, 3 * 10.0f);
+	//	}
+	//}
 	if (CP_Input_KeyDown(KEY_S)) {
 		if (CP_Input_MouseClicked()) {
 			Tilemap_Save(tilemap, "test.bin");
