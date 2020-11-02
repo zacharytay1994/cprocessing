@@ -25,6 +25,8 @@ typedef struct Sprite {
 	float		_frame_second;			// 1/fps, Sprite_SetFPS() assigns 1/ the input fps to this value
 	float		_frame_count;
 	int			_image_resource;		// the sub images generated from the sprite sheet
+	int			_visible;
+	int			_repeat;
 } Sprite;
 
 extern Sprite sprites[MAX_SPRITES];
@@ -56,6 +58,9 @@ void Sprite_SetFlip(const int id, const int flip);
 void Sprite_SetWidth(const int id, const float width);
 void Sprite_SetHeight(const int id, const float height);
 void Sprite_SetFPS(const int id, const int fps);
+void Sprite_SetVisible(const int id, const int visible);
+void Sprite_SetRepeat(const int id, const int repeat);
+void Sprite_Reset(const int id); // resets all counter based variables of sprite, i.e. as if just initialized
 
 CP_Vector	Sprite_GetPosition(const int id);
 float		Sprite_GetRotation(const int id);
@@ -67,3 +72,4 @@ int			Sprite_GetFlip(const int id);
 float		Sprite_GetWidth(const int id);
 float		Sprite_GetHeight(const int id);
 int			Sprite_GetFPS(const int id);
+int			Sprite_GetVisible(const int id);
