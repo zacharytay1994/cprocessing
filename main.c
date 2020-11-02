@@ -37,6 +37,20 @@ int tilemap;
 int sprite_test;
 CP_Image test_image;
 
+//Button Shortcut Test
+struct tempBtn {
+	float b_widthPos;
+	float b_heightPos;
+	float b_widthSize;
+	float b_heightSize;
+}tempBtn;
+
+struct tempBtn MainBtnArr[2];
+/*
+* 1 - Main popup Btn
+* 2 - Close main popup
+*/
+
 // use CP_Engine_SetNextGameState to specify this function as the initialization function
 // this function will be called once at the beginning of the program
 void game_init(void)
@@ -55,6 +69,19 @@ void game_init(void)
 	b->super._rotation = 30.0f;
 	sprite_test = Sprite_AddSprite((CP_Vector){ 100.0f, 100.0f }, 100.0f, 100.0f, "demo_player.png", 8, 1, 8, 10);
 	Sprite_AddSprite((CP_Vector) { 200.0f, 150.0f }, 50.0f, 50.0f, "demo_player2.png", 8, 2, 16, 20);
+
+	//Button Shortcut init
+	MainBtnArr[0].b_widthPos = (float)(CP_System_GetWindowWidth() / 1.1f);
+	MainBtnArr[0].b_heightPos = (float)(CP_System_GetWindowHeight() / 9);
+	MainBtnArr[0].b_widthSize = (float)(CP_System_GetWindowWidth() / 9);
+	MainBtnArr[0].b_heightSize = (float)(CP_System_GetWindowHeight() / 11);
+	Sprite_AddSprite((CP_Vector) { MainBtnArr[0].b_widthPos, MainBtnArr[0].b_heightPos},
+		MainBtnArr[0].b_widthSize, MainBtnArr[0].b_heightSize, "Assets/demo_mShortcut.png", 1, 1, 1, 1);
+
+	MainBtnArr[1].b_widthPos = (float)(CP_System_GetWindowWidth() / 1.25f);
+	MainBtnArr[1].b_heightPos = (float)(CP_System_GetWindowHeight() / 2);
+	MainBtnArr[1].b_widthSize = (float)(CP_System_GetWindowWidth() / 9);
+	MainBtnArr[1].b_heightSize = (float)(CP_System_GetWindowHeight() / 1.2);
 
 	// adding a tilemap to the scene
 	tilemap = Tilemap_AddTilemap(32, 32, 100, 100);
@@ -79,7 +106,22 @@ void game_update(void)
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
 	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform()); // renders tilemap grid lines, comment out if not wanted
 	PhyObj_Render();
-	//Sprite_Render(CP_System_GetDt());
+	Sprite_Render(CP_System_GetDt());
+
+	//DEBUG MOUSE POSITION DISPLAY
+	char mouseX[100];
+	char mouseY[100];
+	//char tempDebugX[100];
+	//char tempDebugY[100];
+	CP_Settings_TextSize(30.f);
+	sprintf_s(mouseX, 100, "Mouse X Pos: %.2f", CP_Input_GetMouseX());
+	CP_Font_DrawText(mouseX, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 5));
+	sprintf_s(mouseY, 100, "Mouse Y Pos: %.2f", CP_Input_GetMouseY());
+	CP_Font_DrawText(mouseY, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 6));
+	//sprintf_s(tempDebugX, 100, "btnWPos : %.2f", bm_widthPos);
+	//CP_Font_DrawText(tempDebugX, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 7));
+	//sprintf_s(tempDebugY, 100, "btnWSize : %.2f", bm_widthSize);
+	//CP_Font_DrawText(tempDebugY, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 8));
 
 	// INPUT
 	if (CP_Input_MouseClicked()) {
@@ -98,7 +140,17 @@ void game_update(void)
 			PhyObj_AddOBox(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 30.0f);
 		}
 		else {
-			PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 3 * 10.0f, 3 * 10.0f);
+			if (!(CP_Input_GetMouseX() > MainBtnArr[0].b_widthPos + MainBtnArr[0].b_widthSize/2 ||
+				CP_Input_GetMouseX() < MainBtnArr[0].b_widthPos - MainBtnArr[0].b_widthSize /2 ||
+				CP_Input_GetMouseY() > MainBtnArr[0].b_heightPos + MainBtnArr[0].b_heightSize /2 ||
+				CP_Input_GetMouseY() < MainBtnArr[0].b_heightPos - MainBtnArr[0].b_heightSize /2))
+			{
+				Sprite_AddSprite((CP_Vector) {
+					MainBtnArr[1].b_widthPos, MainBtnArr[1].b_heightPos},
+					MainBtnArr[1].b_widthSize, MainBtnArr[1].b_heightSize, "dirt_block.png", 1, 1, 1, 1);
+			}
+			else
+				PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 3 * 10.0f, 3 * 10.0f);
 		}
 	}
 	if (CP_Input_KeyDown(KEY_S)) {
