@@ -52,7 +52,7 @@ void game_init(void)
 
 
 	//Button Shortcut init
-	MainBtnArr[0].b_widthPos = (float)(CP_System_GetWindowWidth() / 1.1f);
+	/*MainBtnArr[0].b_widthPos = (float)(CP_System_GetWindowWidth() / 1.1f);
 	MainBtnArr[0].b_heightPos = (float)(CP_System_GetWindowHeight() / 9);
 	MainBtnArr[0].b_widthSize = (float)(CP_System_GetWindowWidth() / 9);
 	MainBtnArr[0].b_heightSize = (float)(CP_System_GetWindowHeight() / 11);
@@ -62,7 +62,7 @@ void game_init(void)
 	MainBtnArr[1].b_widthPos = (float)(CP_System_GetWindowWidth() / 1.25f);
 	MainBtnArr[1].b_heightPos = (float)(CP_System_GetWindowHeight() / 2);
 	MainBtnArr[1].b_widthSize = (float)(CP_System_GetWindowWidth() / 9);
-	MainBtnArr[1].b_heightSize = (float)(CP_System_GetWindowHeight() / 1.2);
+	MainBtnArr[1].b_heightSize = (float)(CP_System_GetWindowHeight() / 1.2);*/
 
 	
 	// system settings
