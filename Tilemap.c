@@ -1,4 +1,5 @@
 #include "Tilemap.h"
+#include "PhyObj.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -93,7 +94,7 @@ void Tilemap_AddTileset(const int tile, const char* path)
 
 int Tilemap_GetTile(const int id, const int x, const int y)
 {
-	if (id < MAX_TILEMAPS) {
+	if (id < MAX_TILEMAPS && x < tilemaps[id]._width && y < tilemaps[id]._height) {
 		if (x < tilemaps[id]._width && y < tilemaps[id]._height) {
 			return tilemaps[id]._tiles[y * tilemaps[id]._width + x];
 		}
@@ -103,7 +104,7 @@ int Tilemap_GetTile(const int id, const int x, const int y)
 
 void Tilemap_SetTile(const int id, const int x, const int y, const int tile)
 {
-	if (id < MAX_TILEMAPS) {
+	if (id < MAX_TILEMAPS && x < tilemaps[id]._width && y < tilemaps[id]._height) {
 		tilemaps[id]._tiles[y * tilemaps[id]._width + x] = tile;
 	}
 }
@@ -142,6 +143,53 @@ void Tilemap_Free()
 	for (int i = 0; i < tilemaps_size; i++) {
 		if (tilemaps[i]._tiles != NULL) {
 			free(tilemaps[i]._tiles); // ??
+		}
+	}
+}
+
+void Tilemap_GeneratePhyObjs(const int id)
+{
+	if (!(id < tilemaps_size)) {
+		return;
+	}
+	int width = tilemaps[id]._width;
+	int height = tilemaps[id]._height;
+	int tile_width = tilemaps[id]._tile_width;
+	int tile_height = tilemaps[id]._tile_height;
+
+	int new_row = 0;
+	int row_count = 0;
+	float center_x = (float)tile_width / 2.0f;
+	float center_y = (float)tile_height / 2.0f;
+	float box_width = (float)tile_width;
+	float box_height = (float)tile_height;
+
+	for (int y = 0; y < height; ++y) {
+		center_y = (float)(y * tile_height) + (float)(tile_height / 2.0f);
+		for (int x = 0; x < width; ++x) { // if tile in tilemap is solid
+			if (tilemaps[id]._tiles[y * width + x] == 1) {
+				if (!new_row) {
+					new_row = 1; 
+				}
+				++row_count;
+				// calculate new center_x and new width
+				center_x = (float)((x+1) * tile_width) - (float)(row_count * tile_width) / 2.0f;
+				box_width = (float)(row_count * tile_width);
+			}
+			else {
+				if (new_row) {
+					new_row = 0;
+					row_count = 0;
+					// create new static box
+					PhyObj_AddAABox(center_x, center_y, 0.0f, box_width/2.0f, box_height/2.0f, 0.6f);
+				}
+			}
+			if (x == width - 1 && new_row) {
+				new_row = 0;
+				row_count = 0;
+				// create new static box
+				PhyObj_AddAABox(center_x, center_y, 0.0f, box_width / 2.0f, box_height / 2.0f, 0.6f);
+			}
 		}
 	}
 }

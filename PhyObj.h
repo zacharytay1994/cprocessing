@@ -11,7 +11,7 @@
 #define BOUNDING_OBOX 12
 
 #define INFINITE_MASS 1000000000
-#define GRAVITY 600
+#define GRAVITY 1200
 
 #define SHAPE_MAX_NUM_CONTACTS 10
 
@@ -89,9 +89,9 @@ void	PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p);
 void	PhyObj_AddShape(PhyObjBoundingShape* s);
 void	PhyObj_AddManifold(PhyObjManifold m);
 PhyObjBoundingCircle*	PhyObj_AddCircle(const float x, const float y, const float m, const float r, const float f);
-PhyObjOBoundingBox*		PhyObj_AddOBox(const float x, const float y, const float m, const float w, const float h, const float f);
+PhyObjOBoundingBox*		PhyObj_AddOBox(const float x, const float y, const float m, const float he, const float ve, const float f);
 PhyObjBoundingCircle*	PhyObj_AddAACircle(const float x, const float y, const float m, const float r, const float f);
-PhyObjOBoundingBox*		PhyObj_AddAABox(const float x, const float y, const float m, const float w, const float h, const float f);
+PhyObjOBoundingBox*		PhyObj_AddAABox(const float x, const float y, const float m, const float he, const float ve, const float f);
 
 void	PhyObj_Update(const float dt);
 void	PhyObj_Render();

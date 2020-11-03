@@ -27,7 +27,7 @@ int tilemap;
 void TestBed_Init()
 {
 	printf("Switched to testbed");
-	//PhyObj_Initialize();
+	PhyObj_Initialize();
 	Tilemap_Initialize();
 	Sprite_Initialize();
 
@@ -40,7 +40,7 @@ void TestBed_Init()
 	Sprite_AddSprite((CP_Vector) { 200.0f, 150.0f }, 50.0f, 50.0f, "demo_player2.png", 8, 2, 16, 20);*/
 
 	// adding a tilemap to the scene
-	tilemap = Tilemap_AddTilemap(32, 32, 100, 100);
+	tilemap = Tilemap_AddTilemap(64, 64, 10, 10);
 	//test = CP_Image_Load("demo_player.png");
 
 	//PhyObj_SetAllVisible(1);
@@ -49,13 +49,13 @@ void TestBed_Init()
 void TestBed_Update(const float dt)
 {
 	// UPDATES
-	//PhyObj_Update(CP_System_GetDt());
+	PhyObj_Update(CP_System_GetDt());
 	Camera_Update(CP_System_GetDt());
 
 	// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
 	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform()); // renders tilemap grid lines, comment out if not wanted
-	//PhyObj_Render();
+	PhyObj_Render();
 	Sprite_Render(CP_System_GetDt());
 
 	if (CP_Input_MouseClicked()) {
@@ -63,6 +63,15 @@ void TestBed_Update(const float dt)
 		CP_Vector tile = Tilemap_WorldToGrid(tilemap, world.x, world.y);
 		printf("%.1f,%.1f\n", tile.x, tile.y);
 		Tilemap_SetTile(tilemap, (int)tile.x, (int)tile.y, Tilemap_Solid);
+	}
+
+	if (CP_Input_KeyReleased(KEY_P)) {
+		Tilemap_GeneratePhyObjs(tilemap);
+		PhyObj_SetAllVisible(1);
+	}
+	if (CP_Input_KeyReleased(KEY_O)) {
+		CP_Vector world = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+		PhyObj_AddOBox(world.x, world.y, 30.0f, 60.0f, 60.0f, 0.6f)->super._visible = 1;
 	}
 	// INPUT
 	//if (CP_Input_MouseClicked()) {

@@ -36,6 +36,7 @@ void		Tilemap_SetTile(const int id, const int x, const int y, const int tile);
 CP_Vector	Tilemap_WorldToGrid(const int id, const float x, const float y);
 void		Tilemap_Render(const int id, const CP_Matrix cam);
 void		Tilemap_Free();
+void		Tilemap_GeneratePhyObjs(const int id);
 
 void		Tilemap_Save(const int id, const char* file);
 void		Tilemap_Load(const char* file);
