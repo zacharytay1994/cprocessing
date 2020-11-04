@@ -18,7 +18,7 @@ void Tilemap_Initialize()
 void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
 {
 	// check if id is valid 
-	if (id >= MAX_TILEMAPS) {
+	if (id >= tilemaps_size) {
 		return;
 	}
 	// find how many horizontal grid lines needed
@@ -94,7 +94,7 @@ void Tilemap_AddTileset(const int tile, const char* path)
 
 int Tilemap_GetTile(const int id, const int x, const int y)
 {
-	if (id < MAX_TILEMAPS && x < tilemaps[id]._width && y < tilemaps[id]._height) {
+	if (id < tilemaps_size && x < tilemaps[id]._width && y < tilemaps[id]._height) {
 		if (x < tilemaps[id]._width && y < tilemaps[id]._height) {
 			return tilemaps[id]._tiles[y * tilemaps[id]._width + x];
 		}
@@ -104,14 +104,14 @@ int Tilemap_GetTile(const int id, const int x, const int y)
 
 void Tilemap_SetTile(const int id, const int x, const int y, const int tile)
 {
-	if (id < MAX_TILEMAPS && x < tilemaps[id]._width && y < tilemaps[id]._height) {
+	if (id < tilemaps_size && x < tilemaps[id]._width && y < tilemaps[id]._height) {
 		tilemaps[id]._tiles[y * tilemaps[id]._width + x] = tile;
 	}
 }
 
 CP_Vector Tilemap_WorldToGrid(const int id, const float x, const float y)
 {
-	if (tilemaps_size < MAX_TILEMAPS && x >= 0.0f && y >= 0.0f) {
+	if (id < tilemaps_size && x >= 0.0f && y >= 0.0f) {
 		return (CP_Vector){ (float)((int)(x / tilemaps[id]._tile_width)), (float)((int)(y / tilemaps[id]._tile_height)) };
 	}
 	return CP_Vector_Set(-1.0f, -1.0f);
@@ -119,6 +119,9 @@ CP_Vector Tilemap_WorldToGrid(const int id, const float x, const float y)
 
 void Tilemap_Render(const int id, const CP_Matrix cam)
 {
+	if (id >= tilemaps_size) {
+		return;
+	}
 	float half_tile_width = (float)tilemaps[id]._tile_width / 2.0f;
 	float half_tile_height = (float)tilemaps[id]._tile_height / 2.0f;
 	CP_Vector tile_position = CP_Vector_Set(-1.0f, -1.0f);
@@ -194,15 +197,73 @@ void Tilemap_GeneratePhyObjs(const int id)
 	}
 }
 
-void Tilemap_Save(const int id, const char* file)
+void Tilemap_TxtSave256(const int id, const char* file)
 {
 	if (id < tilemaps_size) {
 		FILE* f;
 		fopen_s(&f, file, "w");
-		int size = tilemaps[id]._height * tilemaps[id]._width;
 		if (f) {
-			fwrite(tilemaps[id]._tiles, size, 1, f);
+			int width = tilemaps[id]._width;
+			int height = tilemaps[id]._height;
+			fputc((char)width, f);
+			fputc('\n', f);
+			fputc((char)height, f);
+			fputc('\n', f);
+			// write width and height at top of file
+			for (int y = 0; y < height; ++y) {
+				for (int x = 0; x < width; ++x) {
+					fputc((char)(tilemaps[id]._tiles[y * width + x] + 'a'), f);
+				}
+				fputc('\n', f);
+			}
 			fclose(f);
 		}
+		else {
+			printf("Tilemap_TxtSave :: File not saved successfully!\n");
+		}
+	}
+}
+
+void Tilemap_TxtLoad256(const char* file)
+{
+	FILE* f;
+	fopen_s(&f, file, "r");
+	int start_reading = 0;
+	int read = 0;
+	char c;
+	int width = 0;
+	int height = 0;
+	int tilemap = -1;
+	int x = 0;
+	int y = 0;
+	if (f) {
+		while ((c=(char)fgetc(f)) != EOF) {
+			if (read && tilemap) {
+				if (c != '\n') {
+					Tilemap_SetTile(tilemap, x++, y, (int)(c - 'a'));
+					if (x >= width) {
+						x = 0;
+						y++;
+					}
+				}
+			}
+			else if (start_reading == 0) {
+				width = (int)c;
+				start_reading++;
+			}
+			else if (start_reading == 1) {
+				if (c != '\n') {
+					height = (int)c;
+					start_reading++;
+					read = 1;
+					// create new tilemap
+					tilemap = Tilemap_AddTilemap(64, 64, width, height);
+				}
+			}
+		}
+		fclose(f);
+	}
+	else {
+		printf("Tilemap_TxtLoad :: Could not open file to load!\n");
 	}
 }

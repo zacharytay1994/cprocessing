@@ -104,7 +104,7 @@ PhyObjOBoundingBox* PhyObj_AddOBox(const float x, const float y, const float m, 
 		}
 	}
 	// moment of inertia of a rectangle = (w * h^3)/12
-	float moment_of_inertia = (he * ve * ve * ve) / 12.0f;
+	float moment_of_inertia = (he * ve * ve * ve) / (12.0f*2.0f);
 	PhyObjOBoundingBox temp = { {PhyObj_bounding_shapes_size,BOUNDING_OBOX,{x,y},0.0f,{0.0f,0.0f},0.0f,m,m>0.0f?1.0f/m:0,moment_of_inertia,m>0.0f?1.0f/moment_of_inertia:0.0f,CP_Vector_Set(0.0f,0.0f),1,f,0},he,ve };
 	PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1] = temp;
 	PhyObj_AddShape((PhyObjBoundingShape*)&PhyObj_bounding_obox[PhyObj_bounding_obox_size - 1]);
@@ -934,7 +934,7 @@ void PhyObj_ResolveContact(const CP_Vector contact_position, const float contact
 	/* ____________________________________________________________________________________________________________ */
 	// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
 	float bias_factor = 0.2f;
-	float allowed_penetration = 0.1f;
+	float allowed_penetration = 0.02f;
 	float penetration = contact_penetration - allowed_penetration;
 	penetration = penetration < 0.0f ? 0.0f : penetration;
 	float baumgarte = penetration * bias_factor / CP_System_GetDt();

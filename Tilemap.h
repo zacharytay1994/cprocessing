@@ -38,5 +38,5 @@ void		Tilemap_Render(const int id, const CP_Matrix cam);
 void		Tilemap_Free();
 void		Tilemap_GeneratePhyObjs(const int id);
 
-void		Tilemap_Save(const int id, const char* file);
-void		Tilemap_Load(const char* file);
+void		Tilemap_TxtSave256(const int id, const char* file);		// only saves tilemaps of <= 256 per dimensions
+void		Tilemap_TxtLoad256(const char* file);					// only saves tilemaps of <= 256 per dimensions
