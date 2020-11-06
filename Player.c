@@ -210,3 +210,19 @@ void Player_Deccelerate(const float dt)
 		}
 	}
 }
+
+CP_Vector Player_GetPosition(const int id)
+{
+	if (id < Player_players_size) {
+		return Player_players[id]._position;
+	}
+	return CP_Vector_Set(0.0f, 0.0f);
+}
+
+CP_Vector* Player_GetPosition_P(const int id)
+{
+	if (id < Player_players_size) {
+		return &(Player_players[id]._position);
+	}
+	return NULL;
+}

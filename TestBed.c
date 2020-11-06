@@ -24,6 +24,8 @@ void TestBed_Init()
 	tilemap = Tilemap_TxtLoad256("prototype_map.txt");
 	Tilemap_GeneratePhyObjs(tilemap);
 	Player_Initialize();
+
+	Camera_BindToPosition(Player_GetPosition_P(0)); // magic number 0 here means player 1, index 0 in players array
 }
 
 void TestBed_Update(const float dt)
@@ -38,23 +40,6 @@ void TestBed_Update(const float dt)
 	PhyObj_Render();
 	Sprite_Render(CP_System_GetDt());
 	Player_Render();
-
-	// moving the camera
-	if (CP_Input_KeyDown(KEY_W)) {
-		cam_y -= 100.0f * CP_System_GetDt();
-	}
-	if (CP_Input_KeyDown(KEY_S)) {
-		cam_y += 100.0f * CP_System_GetDt();
-	}
-	if (CP_Input_KeyDown(KEY_A)) {
-		cam_x -= 100.0f * CP_System_GetDt();
-	}
-	if (CP_Input_KeyDown(KEY_D)) {
-		cam_x += 100.0f * CP_System_GetDt();
-	}
-
-	Camera_SetCameraX(cam_x);
-	Camera_SetCameraY(cam_y);
 }
 
 void TestBed_Exit()
