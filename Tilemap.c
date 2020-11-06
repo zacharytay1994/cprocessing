@@ -7,7 +7,6 @@
 
 Tilemap tilemaps[MAX_TILEMAPS] = { 0 };
 int tilemaps_size = 0;
-CP_Image tilesets[Tilemap_Tile_Size] = { 0 };
 int tilemap_debug = 0;
 Tilemap_TileSheet tilesheets[MAX_TILESHEETS] = { 0 };
 int tilesheets_size = 0;
@@ -17,9 +16,6 @@ int tilemap_active_tilesheet_cell = 0;
 
 void Tilemap_Initialize()
 {
-	Tilemap_AddTileset(Tilemap_Solid, "dirt_block.png");
-	Tilemap_AddTileset(Tilemap_Ground, "ground_block.png");
-
 	// loading tilesheets
 	Tilemap_SetActiveTileSheet(Tilemap_LoadTileSheet("mossy_image.png", 6, 6, 36));
 }
@@ -115,13 +111,6 @@ int Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int widt
 		return tilemaps_size - 1;
 	}
 	return -1;
-}
-
-void Tilemap_AddTileset(const int tile, const char* path)
-{
-	if (tile < MAX_TILESET) {
-		tilesets[tile] = CP_Image_Load(path);
-	}
 }
 
 int Tilemap_LoadTileSheet(const char* path, const int row, const int col, const int frames)
