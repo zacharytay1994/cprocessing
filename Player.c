@@ -8,7 +8,7 @@ int Player_players_size = 0;
 void Player_Initialize()
 {
 	// initialize player at the center of the screen
-	CP_Vector position = CP_Vector_Set((float)CP_System_GetWindowWidth()/2.0f, (float)CP_System_GetWindowHeight() / 2.0f);
+	CP_Vector position = CP_Vector_Set(200.0f, 20.0f);
 
 	// Adding a player into the scene
 	Player_AddPlayer(position,
@@ -19,11 +19,11 @@ void Player_Initialize()
 		KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT);
 
 	// Adding player 2 into the scene
-	Player_AddPlayer(position, 10.0f, 22.5f, 55.0f, 0.0f, 60.0f, 60.0f,
+	/*Player_AddPlayer(position, 10.0f, 22.5f, 55.0f, 0.0f, 60.0f, 60.0f,
 		"player_idle.png", 3, 4, 10, 10,
 		"player_run.png", 3, 3, 8, 15,
 		"player_jump.png", 3, 4, 10, 30,
-		KEY_W,KEY_S,KEY_A,KEY_D);
+		KEY_W,KEY_S,KEY_A,KEY_D);*/
 }
 
 void Player_AddPlayer(const CP_Vector pos, const float mass, const float bwidth, const float bheight, const float friction,
@@ -89,7 +89,7 @@ void Player_Input(const float dt)
 	for (int i = 0; i < Player_players_size; ++i) {
 		PhyObjBoundingShape* shape = PhyObj_GetShape(Player_players[i]._box);
 		if (CP_Input_KeyDown(KEY_O)) {
-			shape->_position = CP_Vector_Set(100.0f, 100.0f);
+			shape->_position = CP_Vector_Set(200.0f, 20.0f);
 		}
 		int some_input = 0;
 		// detect key press
@@ -209,4 +209,20 @@ void Player_Deccelerate(const float dt)
 			shape->_velocity.x = 0.0f;
 		}
 	}
+}
+
+CP_Vector Player_GetPosition(const int id)
+{
+	if (id < Player_players_size) {
+		return Player_players[id]._position;
+	}
+	return CP_Vector_Set(0.0f, 0.0f);
+}
+
+CP_Vector* Player_GetPosition_P(const int id)
+{
+	if (id < Player_players_size) {
+		return &(Player_players[id]._position);
+	}
+	return NULL;
 }

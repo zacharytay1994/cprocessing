@@ -2,7 +2,7 @@
 #include "CProcessing/inc/cprocessing.h"
 
 #define INITIAL_SIZE 3
-#define RESOLUTION_ITERATIONS 5
+#define RESOLUTION_ITERATIONS 10
 
 #define MANIFOLD_CIRCLE_CIRCLE 0
 #define MANIFOLD_CIRCLE_OBOX 1
@@ -11,7 +11,7 @@
 #define BOUNDING_OBOX 12
 
 #define INFINITE_MASS 1000000000
-#define GRAVITY 600
+#define GRAVITY 1200
 
 #define SHAPE_MAX_NUM_CONTACTS 10
 
@@ -83,15 +83,15 @@ extern float					gravity;
 void	PhyObj_Initialize();
 void	PhyObj_DrawCircles();
 void	PhyObj_DrawOBoxes();
-void	PhyObj_SetVisible(const int id, const int visible);
-void	PhyObj_SetAllVisible(const int visible);
+void	PhyObj_SetVisible(const int id, const int visible);	// IMPORTANT* All physics objects are instantiated invisible since they are a bounding box
+void	PhyObj_SetAllVisible(const int visible);			// Rendering only for debugging, USE ^ and this function to see them
 void	PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p);
 void	PhyObj_AddShape(PhyObjBoundingShape* s);
 void	PhyObj_AddManifold(PhyObjManifold m);
 PhyObjBoundingCircle*	PhyObj_AddCircle(const float x, const float y, const float m, const float r, const float f);
-PhyObjOBoundingBox*		PhyObj_AddOBox(const float x, const float y, const float m, const float w, const float h, const float f);
+PhyObjOBoundingBox*		PhyObj_AddOBox(const float x, const float y, const float m, const float he, const float ve, const float f);
 PhyObjBoundingCircle*	PhyObj_AddAACircle(const float x, const float y, const float m, const float r, const float f);
-PhyObjOBoundingBox*		PhyObj_AddAABox(const float x, const float y, const float m, const float w, const float h, const float f);
+PhyObjOBoundingBox*		PhyObj_AddAABox(const float x, const float y, const float m, const float he, const float ve, const float f);
 
 void	PhyObj_Update(const float dt);
 void	PhyObj_Render();

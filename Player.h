@@ -14,9 +14,9 @@
 #define PLAYER1_FRICTION			0.0f	// increase in friction prohibits vertical movement when touching a vertical surface
 
 #define PLAYER_MAX_HVELOCITY		150.0f	// maximum velocity after which the player will no longer be able to exert velocity onto itself
-#define PLAYER_MAX_VVELOCITY		300.0f	// maximum velocity vertical ...
+#define PLAYER_MAX_VVELOCITY		600.0f	// maximum velocity vertical ...
 #define PLAYER_APPLIED_HVELOCITY	3000.0f	// velocity applied for horizontal movement
-#define PLAYER_APPLIED_VVELOCITY	3300.0f	// impulse applied for vertical movement
+#define PLAYER_APPLIED_VVELOCITY	6300.0f	// impulse applied for vertical movement
 
 #define PLAYER_DECCELERATION		900.0f	// horizontal decceleration applied
 #define PLAYER_DECCELERATION_THRES	20.0f
@@ -58,3 +58,5 @@ void Player_SyncPositionWithBoundingShape();
 void Player_SwitchAnimationState(const int id, PlayerAnimationState state);
 void Player_FlipAnimationsH(const int id, const int flip);
 void Player_Deccelerate(const float dt);
+CP_Vector Player_GetPosition(const int id);
+CP_Vector* Player_GetPosition_P(const int id);
