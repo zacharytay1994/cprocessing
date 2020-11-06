@@ -103,6 +103,13 @@ char Button_Text_Translate(int id, float displacement_x, float displacement_y)
 	return 1;
 }
 
+char Button_Text_SetPosition(int id, float new_x, float new_y)
+{
+	button_list[scene_id][id].Text_Position.x = new_x;
+	button_list[scene_id][id].Text_Position.y = new_y;
+	return 1;
+}
+
 char Button_Text_Set(int id, char* new_text)
 {
 	sprintf_s(button_list[scene_id][id].Text, 127, new_text);

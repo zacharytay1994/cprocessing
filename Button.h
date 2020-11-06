@@ -31,6 +31,7 @@ void Button_Mouse_Collision_Click_ByText(char* text);
 void Button_Mouse_Collision_Click_ById(int id);
 char Button_Translate(int id, float displacement_x, float displacement_y);
 char Button_Text_Translate(int id, float displacement_x, float displacement_y);
+char Button_Text_SetPosition(int id, float new_x, float new_y);
 char Button_Text_Set(int id, char* new_text);
 int Button_GetID_By_Name(char* text);
 
