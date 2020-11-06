@@ -2,7 +2,6 @@
 
 #include <cprocessing.h>
 
-#include "GameState.h"
 #include "Button.h"
 
 struct Button button_start;

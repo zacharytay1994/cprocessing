@@ -18,3 +18,4 @@ void Scene_Exit();
 
 int Scene_AddScene(void (*init)(), void (*update)(const float), void (*exit)());
 void Scene_ChangeScene(const int id);
+int Scene_GetCurrentID();

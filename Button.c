@@ -1,4 +1,5 @@
 #include "Button.h"
+#include "Scene.h"
 #include <stdio.h>
 
 struct Button Button_Initialize_Default()
@@ -204,21 +205,27 @@ int Button_GetID_By_Name(char* text)
 
 void Button_Mouse_Collision_Click_ById(int id)
 {
-	switch (id)
+	switch (Scene_GetCurrentID())
 	{
-	case 0:		// Start
-	{
-		break;
-	}
-	case 1:		// Credits
-	{
-		break;
-	}
-	case 2:		// Exit
-	{
-		CP_Engine_Terminate();
-		break;
-	}
+		case 3:
+		{
+			switch (id)
+			{
+			case 0:		// Start
+			{
+				break;
+			}
+			case 1:		// Credits
+			{
+				break;
+			}
+			case 2:		// Exit
+			{
+				CP_Engine_Terminate();
+				break;
+			}
+			}
+		}
 	}
 }
 
