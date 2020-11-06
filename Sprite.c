@@ -55,6 +55,11 @@ int Sprite_AddSprite(const CP_Vector position, const float width, const float he
 	return -1;
 }
 
+int Sprite_AddSpriteInitData(const Sprite_InitData data)
+{
+	return Sprite_AddSprite(data._position, data._width, data._height, data._path, data._col, data._row, data._frames, data._fps);
+}
+
 void Sprite_RenderSprite(const float dt, const int id)
 {
 	float y, x;

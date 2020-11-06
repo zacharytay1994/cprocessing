@@ -29,6 +29,17 @@ typedef struct Sprite {
 	int			_repeat;
 } Sprite;
 
+typedef struct Sprite_InitData {
+	CP_Vector	_position;
+	float		_width;
+	float		_height;
+	char*		_path;
+	int			_col;
+	int			_row;
+	int			_frames;
+	int			_fps;
+} Sprite_InitData;
+
 extern Sprite sprites[MAX_SPRITES];
 extern int sprites_size;
 
@@ -40,6 +51,7 @@ extern int images_size;
 /*____________________________________________________________________________________________________________________________________*/
 void	Sprite_Initialize();
 int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps);
+int		Sprite_AddSpriteInitData(const Sprite_InitData data);
 void	Sprite_RenderSprite(const float dt, const int id);
 void	Sprite_Render(const float dt);
 CP_Image Sprite_GenerateSubImage(const float u0, const float v0, const float u1, const float v1, const CP_Image img); // generate subimages to allow individual processing of frames

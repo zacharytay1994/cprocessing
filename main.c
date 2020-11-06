@@ -43,7 +43,7 @@ void game_init(void)
 	test_scene_2 = Scene_AddScene(TestScene2_Init, TestScene2_Update, TestScene2_Exit);
 	test_bed = Scene_AddScene(TestBed_Init, TestBed_Update, TestBed_Exit);
 	main_menu = Scene_AddScene(MainMenu_Initialize, MainMenu_Update, MainMenu_Exit);
-	Scene_ChangeScene(main_menu);
+	Scene_ChangeScene(test_bed);
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the update function
