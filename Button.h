@@ -5,7 +5,6 @@ struct Button
 {
 	CP_Vector	Position;
 	CP_Vector	Size;
-	CP_Vector	Image_Size;
 	CP_Vector	Text_Position;
 	CP_Color	Button_Color;
 	CP_Color	Text_Color;
@@ -20,6 +19,7 @@ struct Button
 	char		Visible;
 	char		Hover;
 	char		Darken;
+	char		Enable_SpecialEffects;
 };
 
 int scene_id;
@@ -38,6 +38,7 @@ char Button_Text_Set(int id, char* new_text);
 char Button_Image_Set(int id, char* img);
 char Button_Image_Set_Override(int id, char* img);
 int Button_GetID_By_Name(char* text);
+void Button_SpecialEffects_Set(int id,char x);
 
 struct Button Button_Initialize_Default();
 struct Button Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_position, CP_Color button_color, CP_Color text_color, float text_size, char* text, char visible);

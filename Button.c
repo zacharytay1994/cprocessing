@@ -60,7 +60,7 @@ struct Button Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector te
 	r = (button_color.r - 100 < 0) ? 0 : button_color.r - 100;
 	g = (button_color.g - 100 < 0) ? 0 : button_color.g - 100;
 	b = (button_color.b - 100 < 0) ? 0 : button_color.b - 100;
-	new_button.Hover_Color = CP_Color_Create(r, g, b, button_color.a);
+	new_button.Darken_Color = CP_Color_Create(r, g, b, button_color.a);
 
 	// Set Text Size
 	new_button.Text_Size = text_size;
@@ -83,10 +83,11 @@ struct Button Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector te
 	// Initialize darken state
 	new_button.Darken = 0;
 
-	// Sets image to NULL
+	// Initialize image to NULL
 	new_button.Image = NULL;
-	new_button.Image_Size.x = 0;
-	new_button.Image_Size.y = 0;
+
+	// Initialize special effect boolean to off
+	new_button.Enable_SpecialEffects = 0;
 
 	// Adds button to list
 	new_button.Id = Button_List_Add(&new_button);
@@ -152,15 +153,20 @@ void Button_Mouse_Collision_Check_All()
 		{
 			if (Button_Mouse_Collision_Check(i))
 			{
-				if (CP_Input_MouseClicked())
+				if (CP_Input_MouseDown(MOUSE_BUTTON_1))
 				{
 					button_list[scene_id][i].Darken = 1;
-					Button_Mouse_Collision_Click_ById(i);
+					//Button_Mouse_Collision_Click_ById(i);
 				}
-				else
+				else if (button_list[scene_id][i].Darken)
 				{
+					Button_Mouse_Collision_Click_ById(i);
 					button_list[scene_id][i].Darken = 0;
 				}
+			}
+			else
+			{
+				button_list[scene_id][i].Darken = 0;
 			}
 		}
 	}
@@ -248,6 +254,10 @@ void Button_Render(int id)
 	{
 		CP_Settings_Fill(button_list[scene_id][id].Hover_Color);
 	}
+	if (button_list[scene_id][id].Image == NULL || button_list[scene_id][id].Enable_SpecialEffects)
+	{
+		CP_Graphics_DrawRect(button_list[scene_id][id].Position.x, button_list[scene_id][id].Position.y, button_list[scene_id][id].Size.x * button_list[scene_id][id].Scale, button_list[scene_id][id].Size.y * button_list[scene_id][id].Scale);
+	}
 	if (button_list[scene_id][id].Image != NULL)
 	{
 		CP_Image_Draw(button_list[scene_id][id].Image, 
@@ -255,11 +265,7 @@ void Button_Render(int id)
 			button_list[scene_id][id].Position.y + (button_list[scene_id][id].Size.y / 2),
 			button_list[scene_id][id].Size.x,
 			button_list[scene_id][id].Size.y,
-			255);
-	}
-	else
-	{
-		CP_Graphics_DrawRect(button_list[scene_id][id].Position.x, button_list[scene_id][id].Position.y, button_list[scene_id][id].Size.x * button_list[scene_id][id].Scale, button_list[scene_id][id].Size.y * button_list[scene_id][id].Scale);
+			255 - (!!button_list[scene_id][id].Enable_SpecialEffects * 55));
 	}
 
 	CP_Settings_Fill(button_list[scene_id][id].Text_Color);
@@ -270,8 +276,6 @@ void Button_Render(int id)
 char Button_Image_Set_Override(int id, char* img)
 {
 	button_list[scene_id][id].Image = CP_Image_Load(img);
-	//button_list[scene_id][id].Image_Size.x = (float)CP_Image_GetWidth(button_list[scene_id][id].Image);
-	//button_list[scene_id][id].Image_Size.y = (float)CP_Image_GetHeight(button_list[scene_id][id].Image);
 	button_list[scene_id][id].Size.x = (float)CP_Image_GetWidth(button_list[scene_id][id].Image);
 	button_list[scene_id][id].Size.y = (float)CP_Image_GetHeight(button_list[scene_id][id].Image);
 	return 1;
@@ -280,7 +284,11 @@ char Button_Image_Set_Override(int id, char* img)
 char Button_Image_Set(int id, char* img)
 {
 	button_list[scene_id][id].Image = CP_Image_Load(img);
-	//button_list[scene_id][id].Image_Size.x = (float)CP_Image_GetWidth(button_list[scene_id][id].Image);
-	//button_list[scene_id][id].Image_Size.y = (float)CP_Image_GetHeight(button_list[scene_id][id].Image);
 	return 1;
+}
+
+void Button_SpecialEffects_Set(int id, char x)
+{
+	button_list[scene_id][id].Enable_SpecialEffects = x;
+	return;
 }
