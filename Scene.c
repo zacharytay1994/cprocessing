@@ -50,3 +50,8 @@ void Scene_ChangeScene(const int id)
 		printf("No scene with id exists");
 	}
 }
+
+int Scene_GetCurrentID()
+{
+	return current_scene._id;
+}

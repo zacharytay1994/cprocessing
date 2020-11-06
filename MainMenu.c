@@ -14,6 +14,8 @@ void MainMenu_Initialize()
 	Button_Translate(button_exit.Id, 0, 50);
 	Button_Text_Translate(button_exit.Id, 0, 50);
 	Button_Text_Set(button_exit.Id, "Exit");
+	Button_Image_Set_Override(button_exit.Id, "ground_block.png");
+	Button_SpecialEffects_Set(button_exit.Id, 1);
 	
 	return;
 }
