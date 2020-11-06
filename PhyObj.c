@@ -934,7 +934,7 @@ void PhyObj_ResolveContact(const CP_Vector contact_position, const float contact
 	/* ____________________________________________________________________________________________________________ */
 	// calculate baumgarte - basically brute forcing the shape out over a timestep based on penetration depth
 	float bias_factor = 0.2f;
-	float allowed_penetration = 0.02f;
+	float allowed_penetration = 0.08f;
 	float penetration = contact_penetration - allowed_penetration;
 	penetration = penetration < 0.0f ? 0.0f : penetration;
 	float baumgarte = penetration * bias_factor / CP_System_GetDt();

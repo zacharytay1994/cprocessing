@@ -1,5 +1,7 @@
 #include "Tilemap.h"
 #include "PhyObj.h"
+#include "Sprite.h"
+#include "Camera.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -7,6 +9,10 @@ Tilemap tilemaps[MAX_TILEMAPS] = { 0 };
 int tilemaps_size = 0;
 CP_Image tilesets[Tilemap_Tile_Size] = { 0 };
 int tilemap_debug = 0;
+Tilemap_TileSheet tilesheets[MAX_TILESHEETS] = { 0 };
+int tilesheets_size = 0;
+int tilemap_active_tilesheet = 0;
+int tilemap_active_tilesheet_cell = 0;
 
 
 void Tilemap_Initialize()
@@ -27,6 +33,9 @@ void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
 
 	int tile_width = tilemaps[id]._tile_width;
 	int tile_height = tilemaps[id]._tile_height;
+
+	/*int offset_x = tilemaps[id]._offset_x;
+	int offset_y = tilemaps[id]._offset_y;*/
 
 	float screen_width = (float)CP_System_GetWindowWidth();
 	float screen_height = (float)CP_System_GetWindowHeight();
@@ -60,9 +69,27 @@ void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
 		// render lines
 		CP_Graphics_DrawLine(0.0f, start.y, screen_width, start.y);
 	}
+	// render red lines
+	float area_width = (float)(tilemaps[id]._width * tile_width);
+	float area_height = (float)(tilemaps[id]._height * tile_height);
+	CP_Vector top_left = CP_Vector_Set(0.0f, 0.0f);
+	CP_Vector top_right = CP_Vector_Set(area_width, 0.0f);
+	CP_Vector bottom_left = CP_Vector_Set(0.0f, area_height);
+	CP_Vector bottom_right = CP_Vector_Set(area_width, area_height);
+	// apply cam transform
+	top_left = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), top_left);
+	top_right = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), top_right);
+	bottom_left = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), bottom_left);
+	bottom_right = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), bottom_right);
+	CP_Settings_Stroke((CP_Color) { 255, 0, 0, 255 });
+	CP_Graphics_DrawLine(top_left.x, top_left.y, top_right.x, top_right.y);
+	CP_Graphics_DrawLine(top_right.x, top_right.y, bottom_right.x, bottom_right.y);
+	CP_Graphics_DrawLine(bottom_right.x, bottom_right.y, bottom_left.x, bottom_left.y);
+	CP_Graphics_DrawLine(bottom_left.x, bottom_left.y, top_left.x, top_left.y);
+	CP_Settings_Stroke((CP_Color) { 0, 0, 0, 255 });
 }
 
-int Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int width, const int height)
+int Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int width, const int height, const int offsetx, const int offsety)
 {
 	if (tilemaps_size < MAX_TILEMAPS) {
 		Tilemap tilemap;
@@ -71,12 +98,14 @@ int Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int widt
 		tilemap._tile_height = tileHeight;
 		tilemap._width = width;
 		tilemap._height = height;
+		tilemap._offset_x = offsetx;
+		tilemap._offset_y = offsety;
 
 		// initialize array of tiles
 		int size = width * height;
 		tilemap._tiles = malloc((unsigned long long)size * sizeof(int));
 		for (int i = 0; i < size; i++) {
-			tilemap._tiles[i] = 0;
+			tilemap._tiles[i] = -1;
 		}
 		tilemaps[tilemaps_size] = tilemap;
 		tilemaps_size++;
@@ -90,6 +119,47 @@ void Tilemap_AddTileset(const int tile, const char* path)
 	if (tile < MAX_TILESET) {
 		tilesets[tile] = CP_Image_Load(path);
 	}
+}
+
+int Tilemap_LoadTileSheet(const char* path, const int row, const int col, const int frames)
+{
+	if (tilesheets_size < MAX_TILESHEETS) {
+		tilesheets[tilesheets_size] = (Tilemap_TileSheet) { tilesheets_size,frames,{0} };
+	}
+	else {
+		printf("Tilemap_LoadTileSheet :: Amount of tilesheets exceeded!");
+		return -1;
+	}
+	CP_Image sheet = CP_Image_Load(path);
+	// generate sub images - maybe temp solution
+	int frame_count = 0;
+	float percent_width = 1.0f / (float)col;
+	float percent_height = 1.0f / (float)row;
+	for (int y = 0; y < row; y++) {
+		for (int x = 0; x < col; x++) {
+			if (frame_count < frames) {
+				float u0 = percent_width * (float)x;
+				float v0 = percent_height * (float)y;
+				float u1 = percent_width * (float)x + percent_width;
+				float v1 = percent_height * (float)y + percent_height;
+				u0 = u0 < 0.0f ? 0.0f : u0;
+				u0 = u0 > 1.0f ? 1.0f : u0;
+				v0 = v0 < 0.0f ? 0.0f : v0;
+				v0 = v0 > 1.0f ? 1.0f : v0;
+				u1 = u1 < 0.0f ? 0.0f : u1;
+				u1 = u1 > 1.0f ? 1.0f : u1;
+				v1 = v1 < 0.0f ? 0.0f : v1;
+				v1 = v1 > 1.0f ? 1.0f : v1;
+				tilesheets[tilesheets_size]._images[frame_count] = Sprite_GenerateSubImage(u0, v0, u1, v1, sheet);
+				frame_count++;
+			}
+			else { // end of frames, end generating subimages
+				break;
+			}
+		}
+	}
+	tilesheets_size++;
+	return tilesheets_size - 1;
 }
 
 int Tilemap_GetTile(const int id, const int x, const int y)
@@ -109,6 +179,13 @@ void Tilemap_SetTile(const int id, const int x, const int y, const int tile)
 	}
 }
 
+void Tilemap_SetTileToBrush(const int id, const int x, const int y)
+{
+	if (id < tilemaps_size && x < tilemaps[id]._width && y < tilemaps[id]._height) {
+		tilemaps[id]._tiles[y * tilemaps[id]._width + x] = tilemap_active_tilesheet_cell;
+	}
+}
+
 CP_Vector Tilemap_WorldToGrid(const int id, const float x, const float y)
 {
 	if (id < tilemaps_size && x >= 0.0f && y >= 0.0f) {
@@ -124,17 +201,21 @@ void Tilemap_Render(const int id, const CP_Matrix cam)
 	}
 	float half_tile_width = (float)tilemaps[id]._tile_width / 2.0f;
 	float half_tile_height = (float)tilemaps[id]._tile_height / 2.0f;
+	float twice_offset_x = (float)(tilemaps[id]._offset_x * 2);
+	float twice_offset_y = (float)(tilemaps[id]._offset_y * 2);
+	float half_offset_x = (float)tilemaps[id]._offset_x / 2.0f;
+	float half_offset_y = (float)tilemaps[id]._offset_y / 2.0f;
 	CP_Vector tile_position = CP_Vector_Set(-1.0f, -1.0f);
 	if (id < tilemaps_size) {
 		for (int y = 0; y < tilemaps[id]._height; y++) {
 			for (int x = 0; x < tilemaps[id]._width; x++) {
 				int tile;
-				if ((tile = tilemaps[id]._tiles[y * tilemaps[id]._width + x]) != 0) {
+				if ((tile = tilemaps[id]._tiles[y * tilemaps[id]._width + x]) != -1) {
 					tile_position.x = (float)(x * tilemaps[id]._tile_width) + half_tile_width;
 					tile_position.y = (float)(y * tilemaps[id]._tile_height) + half_tile_height;
 					tile_position = CP_Vector_MatrixMultiply(cam, tile_position);
-					CP_Image_DrawAdvanced(tilesets[tile], tile_position.x, tile_position.y,
-						(float)tilemaps[id]._tile_width, (float)tilemaps[id]._tile_height, 255, 0.0f);
+					CP_Image_DrawAdvanced(tilesheets[tilemap_active_tilesheet]._images[tile], tile_position.x - half_offset_x, tile_position.y - half_offset_y,
+						(float)tilemaps[id]._tile_width + twice_offset_x, (float)tilemaps[id]._tile_height + twice_offset_y, 255, 0.0f);
 				}
 			}
 		}
@@ -170,7 +251,7 @@ void Tilemap_GeneratePhyObjs(const int id)
 	for (int y = 0; y < height; ++y) {
 		center_y = (float)(y * tile_height) + (float)(tile_height / 2.0f);
 		for (int x = 0; x < width; ++x) { // if tile in tilemap is solid
-			if (tilemaps[id]._tiles[y * width + x] == 1) {
+			if (tilemaps[id]._tiles[y * width + x] >= 0) {
 				if (!new_row) {
 					new_row = 1; 
 				}
@@ -197,6 +278,20 @@ void Tilemap_GeneratePhyObjs(const int id)
 	}
 }
 
+void Tilemap_SetActiveTileSheet(const int id)
+{
+	if (id < tilesheets_size) {
+		tilemap_active_tilesheet = id;
+	}
+}
+
+void Tilemap_SetTileSheetBrush(const int id)
+{
+	if (id < MAX_TILESHEET_CELLS) {
+		tilemap_active_tilesheet_cell = id;
+	}
+}
+
 void Tilemap_TxtSave256(const int id, const char* file)
 {
 	if (id < tilemaps_size) {
@@ -209,6 +304,15 @@ void Tilemap_TxtSave256(const int id, const char* file)
 			fputc('\n', f);
 			fputc((char)height, f);
 			fputc('\n', f);
+			fputc((char)(tilemaps[id]._offset_x+'A'), f);
+			fputc('\n', f);
+			fputc((char)(tilemaps[id]._offset_y+'A'), f);
+			fputc('\n', f);
+			fputc((char)tilemaps[id]._tile_width, f);
+			fputc('\n', f);
+			fputc((char)tilemaps[id]._tile_height, f);
+			fputc('\n', f);
+
 			// write width and height at top of file
 			for (int y = 0; y < height; ++y) {
 				for (int x = 0; x < width; ++x) {
@@ -233,12 +337,16 @@ void Tilemap_TxtLoad256(const char* file)
 	char c;
 	int width = 0;
 	int height = 0;
+	int tile_width = 0;
+	int tile_height = 0;
+	int offset_x = 0;
+	int offset_y = 0;
 	int tilemap = -1;
 	int x = 0;
 	int y = 0;
 	if (f) {
 		while ((c=(char)fgetc(f)) != EOF) {
-			if (read && tilemap) {
+			if (read && tilemap >= 0) {
 				if (c != '\n') {
 					Tilemap_SetTile(tilemap, x++, y, (int)(c - 'a'));
 					if (x >= width) {
@@ -247,18 +355,44 @@ void Tilemap_TxtLoad256(const char* file)
 					}
 				}
 			}
-			else if (start_reading == 0) {
+			switch (start_reading) {
+			case 0:
 				width = (int)c;
 				start_reading++;
-			}
-			else if (start_reading == 1) {
-				if (c != '\n') {
+				break;
+			case 1:
+				if (c != '\n' && c != '\0') {
 					height = (int)c;
+					start_reading++;
+				}
+				break;
+			case 2:
+				if (c != '\n' && c != '\0') {
+					offset_x = (int)(c-'A');
+					start_reading++;
+				}
+				break;
+			case 3:
+				if (c != '\n' && c != '\0') {
+					offset_y = (int)(c-'A');
+					start_reading++;
+				}
+				break;
+			case 4:
+				if (c != '\n' && c != '\0') {
+					tile_width = (int)c;
+					start_reading++;
+				}
+				break;
+			case 5:
+				if (c != '\n' && c != '\0') {
+					tile_height = (int)c;
 					start_reading++;
 					read = 1;
 					// create new tilemap
-					tilemap = Tilemap_AddTilemap(64, 64, width, height);
+					tilemap = Tilemap_AddTilemap(tile_width, tile_height, width, height, offset_x, offset_y);
 				}
+				break;
 			}
 		}
 		fclose(f);

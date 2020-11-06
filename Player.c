@@ -89,7 +89,7 @@ void Player_Input(const float dt)
 	for (int i = 0; i < Player_players_size; ++i) {
 		PhyObjBoundingShape* shape = PhyObj_GetShape(Player_players[i]._box);
 		if (CP_Input_KeyDown(KEY_O)) {
-			shape->_position = CP_Vector_Set(100.0f, 100.0f);
+			shape->_position = CP_Vector_Set(200.0f, 20.0f);
 		}
 		int some_input = 0;
 		// detect key press

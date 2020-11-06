@@ -2,7 +2,7 @@
 #include "CProcessing/inc/cprocessing.h"
 
 #define INITIAL_SIZE 3
-#define RESOLUTION_ITERATIONS 5
+#define RESOLUTION_ITERATIONS 10
 
 #define MANIFOLD_CIRCLE_CIRCLE 0
 #define MANIFOLD_CIRCLE_OBOX 1

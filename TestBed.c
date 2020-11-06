@@ -4,6 +4,7 @@
 #include "Tilemap.h"
 #include "Camera.h"
 #include "Sprite.h"
+#include "Player.h"
 
 #include <stdio.h>
 
@@ -21,6 +22,8 @@ float cam_y = 0.0f;
 //float t1 = 1.0f;
 
 int tilemap;
+int tilemap1;
+int tilesheet;
 //int sprite_test;
 //CP_Image test_image;
 
@@ -30,6 +33,7 @@ void TestBed_Init()
 	PhyObj_Initialize();
 	Tilemap_Initialize();
 	Sprite_Initialize();
+	Player_Initialize();
 
 	/*PhyObj_AddCircle((float)(CP_System_GetWindowWidth() / 2), (float)(CP_System_GetWindowHeight() / 2), 0.0f, 30.0f,0.0f);
 	PhyObj_AddOBox((float)(CP_System_GetWindowWidth() / 2) + 200.0f, (float)(CP_System_GetWindowHeight() / 2), 0.0f, 30.0f, 30.0f, 0.0f);
@@ -40,7 +44,13 @@ void TestBed_Init()
 	Sprite_AddSprite((CP_Vector) { 200.0f, 150.0f }, 50.0f, 50.0f, "demo_player2.png", 8, 2, 16, 20);*/
 
 	// adding a tilemap to the scene
-	tilemap = Tilemap_AddTilemap(64, 64, 100, 100);
+	//tilemap = Tilemap_AddTilemap(64, 64, 25, 16, 0, 16);
+	tilesheet = Tilemap_LoadTileSheet("mossy_image.png", 6, 6, 36);
+	Tilemap_SetActiveTileSheet(tilesheet);
+	Tilemap_SetTileSheetBrush(0);
+	//Tilemap_TxtLoad256("prototype_world_under.txt");
+	Tilemap_TxtLoad256("prototype_world.txt");
+	Tilemap_GeneratePhyObjs(0);
 	//test = CP_Image_Load("demo_player.png");
 
 	//PhyObj_SetAllVisible(1);
@@ -49,22 +59,44 @@ void TestBed_Init()
 void TestBed_Update(const float dt)
 {
 	// UPDATES
-	PhyObj_Update(CP_System_GetDt());
-	Camera_Update(CP_System_GetDt());
+	PhyObj_Update(dt);
+	Camera_Update(dt);
+	Player_Update(dt);
 
 	// RENDERS
-	Tilemap_Render(tilemap, Camera_GetCameraTransform());
-	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform()); // renders tilemap grid lines, comment out if not wanted
-	Tilemap_Render(1, Camera_GetCameraTransform());
-	Tilemap_Debug_Render(1, Camera_GetCameraTransform());
+	/*Tilemap_Render(tilemap, Camera_GetCameraTransform());
+	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());*/ // renders tilemap grid lines, comment out if not wanted
+	Tilemap_Render(0, Camera_GetCameraTransform());
+	//Tilemap_Debug_Render(0, Camera_GetCameraTransform());
+	/*Tilemap_Render(1, Camera_GetCameraTransform());
+	Tilemap_Debug_Render(1, Camera_GetCameraTransform());*/
 	PhyObj_Render();
 	Sprite_Render(CP_System_GetDt());
+	Player_Render();
 
 	if (CP_Input_MouseClicked()) {
 		CP_Vector world = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 		CP_Vector tile = Tilemap_WorldToGrid(tilemap, world.x, world.y);
 		printf("%.1f,%.1f\n", tile.x, tile.y);
-		Tilemap_SetTile(0, (int)tile.x, (int)tile.y, Tilemap_Solid);
+		Tilemap_SetTileToBrush(0, (int)tile.x, (int)tile.y);
+	}
+	if (CP_Input_KeyReleased(KEY_0)) {
+		Tilemap_SetTileSheetBrush(0);
+	}
+	if (CP_Input_KeyReleased(KEY_1)) {
+		Tilemap_SetTileSheetBrush(1);
+	}
+	if (CP_Input_KeyReleased(KEY_2)) {
+		Tilemap_SetTileSheetBrush(2);
+	}
+	if (CP_Input_KeyReleased(KEY_3)) {
+		Tilemap_SetTileSheetBrush(3);
+	}
+	if (CP_Input_KeyReleased(KEY_4)) {
+		Tilemap_SetTileSheetBrush(4);
+	}
+	if (CP_Input_KeyReleased(KEY_5)) {
+		Tilemap_SetTileSheetBrush(5);
 	}
 
 	if (CP_Input_KeyReleased(KEY_P)) {
@@ -73,13 +105,12 @@ void TestBed_Update(const float dt)
 	}
 	if (CP_Input_KeyReleased(KEY_O)) {
 		CP_Vector world = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
-		PhyObj_AddOBox(world.x, world.y, 30.0f, 32.0f, 32.0f, 0.6f)->super._visible = 1;
+		PhyObj_AddOBox(world.x, world.y, 10.0f, 32.0f, 32.0f, 0.6f)->super._visible = 1;
 	}
 	if (CP_Input_KeyReleased(KEY_I)) {
-		Tilemap_TxtSave256(tilemap, "test_save.txt");
+		Tilemap_TxtSave256(tilemap, "prototype_world.txt");
 	}
 	if (CP_Input_KeyReleased(KEY_U)) {
-		Tilemap_TxtLoad256("test_save.txt");
 	}
 	// INPUT
 	//if (CP_Input_MouseClicked()) {
