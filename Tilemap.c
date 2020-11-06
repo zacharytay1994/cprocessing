@@ -19,6 +19,9 @@ void Tilemap_Initialize()
 {
 	Tilemap_AddTileset(Tilemap_Solid, "dirt_block.png");
 	Tilemap_AddTileset(Tilemap_Ground, "ground_block.png");
+
+	// loading tilesheets
+	Tilemap_SetActiveTileSheet(Tilemap_LoadTileSheet("mossy_image.png", 6, 6, 36));
 }
 
 void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
@@ -328,7 +331,7 @@ void Tilemap_TxtSave256(const int id, const char* file)
 	}
 }
 
-void Tilemap_TxtLoad256(const char* file)
+int Tilemap_TxtLoad256(const char* file)
 {
 	FILE* f;
 	fopen_s(&f, file, "r");
@@ -400,4 +403,5 @@ void Tilemap_TxtLoad256(const char* file)
 	else {
 		printf("Tilemap_TxtLoad :: Could not open file to load!\n");
 	}
+	return tilemap;
 }

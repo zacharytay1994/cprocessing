@@ -83,8 +83,8 @@ extern float					gravity;
 void	PhyObj_Initialize();
 void	PhyObj_DrawCircles();
 void	PhyObj_DrawOBoxes();
-void	PhyObj_SetVisible(const int id, const int visible);
-void	PhyObj_SetAllVisible(const int visible);
+void	PhyObj_SetVisible(const int id, const int visible);	// IMPORTANT* All physics objects are instantiated invisible since they are a bounding box
+void	PhyObj_SetAllVisible(const int visible);			// Rendering only for debugging, USE ^ and this function to see them
 void	PhyObj_SetPosition(PhyObjBoundingShape* s, CP_Vector p);
 void	PhyObj_AddShape(PhyObjBoundingShape* s);
 void	PhyObj_AddManifold(PhyObjManifold m);

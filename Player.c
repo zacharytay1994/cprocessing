@@ -8,7 +8,7 @@ int Player_players_size = 0;
 void Player_Initialize()
 {
 	// initialize player at the center of the screen
-	CP_Vector position = CP_Vector_Set((float)CP_System_GetWindowWidth()/2.0f, (float)CP_System_GetWindowHeight() / 2.0f);
+	CP_Vector position = CP_Vector_Set(200.0f, 20.0f);
 
 	// Adding a player into the scene
 	Player_AddPlayer(position,
@@ -19,11 +19,11 @@ void Player_Initialize()
 		KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT);
 
 	// Adding player 2 into the scene
-	Player_AddPlayer(position, 10.0f, 22.5f, 55.0f, 0.0f, 60.0f, 60.0f,
+	/*Player_AddPlayer(position, 10.0f, 22.5f, 55.0f, 0.0f, 60.0f, 60.0f,
 		"player_idle.png", 3, 4, 10, 10,
 		"player_run.png", 3, 3, 8, 15,
 		"player_jump.png", 3, 4, 10, 30,
-		KEY_W,KEY_S,KEY_A,KEY_D);
+		KEY_W,KEY_S,KEY_A,KEY_D);*/
 }
 
 void Player_AddPlayer(const CP_Vector pos, const float mass, const float bwidth, const float bheight, const float friction,
