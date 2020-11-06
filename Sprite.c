@@ -1,4 +1,5 @@
 #include "Sprite.h"
+#include "Camera.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -77,7 +78,8 @@ void Sprite_RenderSprite(const float dt, const int id)
 	float width = sprites[id]._flip ? -sprites[id]._width : sprites[id]._width;
 	width *= sprites[id]._scale * sprites[id]._scale_x;
 	float height = sprites[id]._height * sprites[id]._scale * sprites[id]._scale_y;
-	CP_Image_DrawAdvanced(images[sprites[id]._image_resource][sprites[id]._current_frame-1], sprites[id]._position.x, sprites[id]._position.y,
+	CP_Vector cam_translated_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), sprites[id]._position);
+	CP_Image_DrawAdvanced(images[sprites[id]._image_resource][sprites[id]._current_frame-1], cam_translated_pos.x, cam_translated_pos.y,
 		width, height, sprites[id]._alpha, sprites[id]._rotation);
 }
 
