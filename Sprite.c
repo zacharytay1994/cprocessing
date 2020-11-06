@@ -12,7 +12,7 @@ void Sprite_Initialize()
 {
 }
 
-int Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps)
+int Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut)
 {
 	if (images_size >= MAX_IMAGE_RESOURCE) {
 		printf("Sprite::MAX_IMAGE_RESORUCE exceeded!");
@@ -48,7 +48,7 @@ int Sprite_AddSprite(const CP_Vector position, const float width, const float he
 				}
 			}
 		}
-		sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f/(float)col,1.0f/(float)row,1,frame,1.0f/(float)fps,0.0f,images_size,1,1 };
+		sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f/(float)col,1.0f/(float)row,1,frame,1.0f/(float)fps,0.0f,images_size,1,1,optOut };
 		++images_size;
 		return sprites_size - 1;
 	}
@@ -57,7 +57,7 @@ int Sprite_AddSprite(const CP_Vector position, const float width, const float he
 
 int Sprite_AddSpriteInitData(const Sprite_InitData data)
 {
-	return Sprite_AddSprite(data._position, data._width, data._height, data._path, data._col, data._row, data._frames, data._fps);
+	return Sprite_AddSprite(data._position, data._width, data._height, data._path, data._col, data._row, data._frames, data._fps, data._optOut);
 }
 
 void Sprite_RenderSprite(const float dt, const int id)
@@ -91,7 +91,7 @@ void Sprite_RenderSprite(const float dt, const int id)
 void Sprite_Render(const float dt)
 {
 	for (int i = 0; i < sprites_size; i++) {
-		if (sprites[i]._visible) {
+		if (sprites[i]._visible && !sprites[i]._optOut) {
 			Sprite_RenderSprite(dt, i);
 		}
 	}

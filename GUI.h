@@ -9,7 +9,7 @@
 #define GUI_MAX_CONTAINERS 100
 
 typedef struct GUI_Container {
-	int				_id[GUI_MAX_DEPTH];
+	int				_id;
 	CP_Vector		_position;
 	CP_Vector		_dimensions;
 	int				_sprite;
@@ -21,8 +21,10 @@ typedef struct GUI_Container {
 void GUI_Initialize();
 void GUI_Update(const float dt);
 void GUI_Exit();
-void GUI_RenderContainers();
+void GUI_UpdateContainers(const float dt);
+void GUI_UpdateNest(const float dt, const int index);
 
 // id is a stack
-void GUI_AddContainer(const int* id, const CP_Vector pos, const CP_Vector dimension, const char* path);
+int GUI_AddRootContainer(const CP_Vector pos, const CP_Vector dimension, const Sprite_InitData spriteData);
+int GUI_AddContainer(const int parentId, const CP_Vector pos, const CP_Vector dimension, const Sprite_InitData path);
 GUI_Container* GUI_GetContainer(const int* id);

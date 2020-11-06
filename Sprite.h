@@ -27,6 +27,7 @@ typedef struct Sprite {
 	int			_image_resource;		// the sub images generated from the sprite sheet
 	int			_visible;
 	int			_repeat;
+	int			_optOut;
 } Sprite;
 
 typedef struct Sprite_InitData {
@@ -38,6 +39,7 @@ typedef struct Sprite_InitData {
 	int			_row;
 	int			_frames;
 	int			_fps;
+	int			_optOut;
 } Sprite_InitData;
 
 extern Sprite sprites[MAX_SPRITES];
@@ -50,7 +52,7 @@ extern int images_size;
 // MISCELLANEOUS
 /*____________________________________________________________________________________________________________________________________*/
 void	Sprite_Initialize();
-int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps);
+int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut);
 int		Sprite_AddSpriteInitData(const Sprite_InitData data);
 void	Sprite_RenderSprite(const float dt, const int id);
 void	Sprite_Render(const float dt);
