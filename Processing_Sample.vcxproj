@@ -192,8 +192,10 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.c" />
     <ClCompile Include="Camera.c" />
     <ClCompile Include="Demo.c" />
+    <ClCompile Include="MainMenu.c" />
     <ClCompile Include="PhyObj.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Player.c" />
@@ -205,8 +207,11 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
     <ClCompile Include="Tilemap.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Demo.h" />
+    <ClInclude Include="GameState.h" />
+    <ClInclude Include="MainMenu.h" />
     <ClInclude Include="PhyObj.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Scene.h" />

@@ -17,13 +17,16 @@
 #include "TestScene1.h"
 #include "TestScene2.h"
 #include "TestBed.h"
+#include "MainMenu.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
+
 int test_scene_1;
 int test_scene_2;
 int test_bed;
+int main_menu;
 
 // use CP_Engine_SetNextGameState to specify this function as the initialization function
 // this function will be called once at the beginning of the program
@@ -31,6 +34,7 @@ void game_init(void)
 {
 	CP_System_SetWindowSize(1600, 900);
 	CP_Settings_AntiAlias(0);
+
 	// system settings
 	CP_System_ShowConsole();
 	
@@ -38,16 +42,20 @@ void game_init(void)
 	test_scene_1 = Scene_AddScene(TestScene1_Init,TestScene1_Update,TestScene1_Exit);
 	test_scene_2 = Scene_AddScene(TestScene2_Init, TestScene2_Update, TestScene2_Exit);
 	test_bed = Scene_AddScene(TestBed_Init, TestBed_Update, TestBed_Exit);
-	Scene_ChangeScene(test_bed);
+	main_menu = Scene_AddScene(MainMenu_Initialize, MainMenu_Update, MainMenu_Exit);
+	Scene_ChangeScene(main_menu);
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the update function
 // this function will be called repeatedly every frame
 void game_update(void)
 {
+
 	// check input, update simulation, render etc.
 	CP_Settings_Background(CP_Color_Create(100, 100, 100, 255));
+
 	Scene_Update();
+
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the exit function
