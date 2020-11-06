@@ -1,4 +1,6 @@
 #include "Button.h"
+#include "Scene.h"
+#include "TestScene1.h"
 #include <stdio.h>
 
 struct Button Button_Initialize_Default()
@@ -190,6 +192,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 	{
 	case 0:		// Start
 	{
+		Scene_ChangeScene(0); //0 - testScene 1
 		break;
 	}
 	case 1:		// Credits
@@ -199,6 +202,16 @@ void Button_Mouse_Collision_Click_ById(int id)
 	case 2:		// Exit
 	{
 		CP_Engine_Terminate();
+		break;
+	}
+	case 3:
+	{
+		TestScene1_BtnManager();
+		//go next case
+	}
+	case 4:
+	{
+		//Run TestScene1_BtnManager() again to close it
 		break;
 	}
 	}
