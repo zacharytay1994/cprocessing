@@ -83,6 +83,11 @@ struct Button Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector te
 	// Initialize darken state
 	new_button.Darken = 0;
 
+	// Sets image to NULL
+	new_button.Image = NULL;
+	new_button.Image_Size.x = 0;
+	new_button.Image_Size.y = 0;
+
 	// Adds button to list
 	new_button.Id = Button_List_Add(&new_button);
 
@@ -243,8 +248,39 @@ void Button_Render(int id)
 	{
 		CP_Settings_Fill(button_list[scene_id][id].Hover_Color);
 	}
-	CP_Graphics_DrawRect(button_list[scene_id][id].Position.x, button_list[scene_id][id].Position.y, button_list[scene_id][id].Size.x * button_list[scene_id][id].Scale, button_list[scene_id][id].Size.y * button_list[scene_id][id].Scale);
+	if (button_list[scene_id][id].Image != NULL)
+	{
+		CP_Image_Draw(button_list[scene_id][id].Image, 
+			button_list[scene_id][id].Position.x + (button_list[scene_id][id].Size.x / 2),
+			button_list[scene_id][id].Position.y + (button_list[scene_id][id].Size.y / 2),
+			button_list[scene_id][id].Size.x,
+			button_list[scene_id][id].Size.y,
+			255);
+	}
+	else
+	{
+		CP_Graphics_DrawRect(button_list[scene_id][id].Position.x, button_list[scene_id][id].Position.y, button_list[scene_id][id].Size.x * button_list[scene_id][id].Scale, button_list[scene_id][id].Size.y * button_list[scene_id][id].Scale);
+	}
+
 	CP_Settings_Fill(button_list[scene_id][id].Text_Color);
 	CP_Settings_TextSize(button_list[scene_id][id].Text_Size);
 	CP_Font_DrawText(button_list[scene_id][id].Text, button_list[scene_id][id].Text_Position.x, button_list[scene_id][id].Text_Position.y);
+}
+
+char Button_Image_Set_Override(int id, char* img)
+{
+	button_list[scene_id][id].Image = CP_Image_Load(img);
+	//button_list[scene_id][id].Image_Size.x = (float)CP_Image_GetWidth(button_list[scene_id][id].Image);
+	//button_list[scene_id][id].Image_Size.y = (float)CP_Image_GetHeight(button_list[scene_id][id].Image);
+	button_list[scene_id][id].Size.x = (float)CP_Image_GetWidth(button_list[scene_id][id].Image);
+	button_list[scene_id][id].Size.y = (float)CP_Image_GetHeight(button_list[scene_id][id].Image);
+	return 1;
+}
+
+char Button_Image_Set(int id, char* img)
+{
+	button_list[scene_id][id].Image = CP_Image_Load(img);
+	//button_list[scene_id][id].Image_Size.x = (float)CP_Image_GetWidth(button_list[scene_id][id].Image);
+	//button_list[scene_id][id].Image_Size.y = (float)CP_Image_GetHeight(button_list[scene_id][id].Image);
+	return 1;
 }

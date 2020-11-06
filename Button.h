@@ -5,11 +5,13 @@ struct Button
 {
 	CP_Vector	Position;
 	CP_Vector	Size;
+	CP_Vector	Image_Size;
 	CP_Vector	Text_Position;
 	CP_Color	Button_Color;
 	CP_Color	Text_Color;
 	CP_Color	Hover_Color;
 	CP_Color	Darken_Color;
+	CP_Image	Image;
 	float		Text_Size;
 	float		Scale;
 	int			Id;
@@ -33,6 +35,8 @@ char Button_Translate(int id, float displacement_x, float displacement_y);
 char Button_Text_Translate(int id, float displacement_x, float displacement_y);
 char Button_Text_SetPosition(int id, float new_x, float new_y);
 char Button_Text_Set(int id, char* new_text);
+char Button_Image_Set(int id, char* img);
+char Button_Image_Set_Override(int id, char* img);
 int Button_GetID_By_Name(char* text);
 
 struct Button Button_Initialize_Default();
