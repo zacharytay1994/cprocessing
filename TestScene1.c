@@ -148,12 +148,12 @@ void TestScene1_BtnManager()
 	if (mainGUI_isOpen)
 	{
 		mainGUI_isOpen = 0;
-		printf("Clicked Btn ID: %d\n", btn_closePopup.Id);
+		printf("Clicked Btn ID: %d\n", btn_closePopup);
 	}
 	else
 	{
 		mainGUI_isOpen = 1;
-		printf("Clicked Btn ID: %d\n", btn_popupWind.Id);
+		printf("Clicked Btn ID: %d\n", btn_popupWind);
 	}
 }
 
@@ -161,12 +161,12 @@ void GUIRender()
 {
 	if (mainGUI_isOpen)
 	{
-		Button_Render(btn_closePopup.Id);
+		Button_Render(btn_closePopup);
 		
 	}
 	else
 	{
-		Button_Render(btn_popupWind.Id);
+		Button_Render(btn_popupWind);
 		
 	}
 }

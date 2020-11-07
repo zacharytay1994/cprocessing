@@ -4,12 +4,12 @@
 #include "Camera.h"
 #include "Enemy.h"
 
-struct Button btn_popupWind;
-struct Button btn_closePopup;
+int btn_popupWind;
+int btn_closePopup;
 
-struct Button btn_test1;
-struct Button btn_test2;
-struct Button btn_test3;
+int btn_test1;
+int btn_test2;
+int btn_test3;
 
 
 

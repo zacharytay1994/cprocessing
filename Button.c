@@ -3,7 +3,7 @@
 #include "TestScene1.h"
 #include <stdio.h>
 
-struct Button Button_Initialize_Default()
+int Button_Initialize_Default()
 {
 	CP_Vector default_pos;
 	default_pos.x = (float)CP_System_GetWindowWidth() / 2;
@@ -28,9 +28,22 @@ struct Button Button_Initialize_Default()
 		1
 	);
 
+	/*
+	return Button_Initialize(
+		default_pos,
+		default_size,
+		default_text_pos,
+		CP_Color_Create(255, 240, 255, 255),
+		CP_Color_Create(0, 0, 0, 255),
+		50.0f,
+		"Text Not Set",
+		1
+	);
+	*/
+
 }
 
-struct Button Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_position, CP_Color button_color, CP_Color text_color, float text_size, char* text, char visible)
+int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_position, CP_Color button_color, CP_Color text_color, float text_size, char* text, char visible)
 {
 	struct Button new_button;
 
@@ -94,7 +107,8 @@ struct Button Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector te
 	// Adds button to list
 	new_button.Id = Button_List_Add(&new_button);
 
-	return new_button;
+	//return new_button;
+	return new_button.Id;
 }
 
 char Button_Translate(int id, float displacement_x, float displacement_y)
@@ -104,12 +118,46 @@ char Button_Translate(int id, float displacement_x, float displacement_y)
 	return 1;
 }
 
+char Button_Position_Set(int id, float new_x, float new_y)
+{
+	button_list[scene_id][id].Position.x = new_x;
+	button_list[scene_id][id].Position.y = new_y;
+	return 1;
+}
+
+char Button_Size_Set(int id, float new_x, float new_y)
+{
+	button_list[scene_id][id].Size.x = new_x;
+	button_list[scene_id][id].Size.y = new_y;
+	return 1;
+}
+
+char Button_Size_Scale(int id, float scale_x, float scale_y)
+{
+	button_list[scene_id][id].Size.x *= scale_x;
+	button_list[scene_id][id].Size.y *= scale_y;
+	return 1;
+}
+
+char Button_SceneID_Set(int id)
+{
+	scene_id = id;
+	return (char)id;
+}
+
 char Button_Text_Translate(int id, float displacement_x, float displacement_y)
 {
 	button_list[scene_id][id].Text_Position.x += displacement_x;
 	button_list[scene_id][id].Text_Position.y += displacement_y;
 	return 1;
 }
+
+char Button_Text_Scale(int id, float scale)
+{
+	button_list[scene_id][id].Text_Size *= scale;
+	return 1;
+}
+
 
 char Button_Text_SetPosition(int id, float new_x, float new_y)
 {
@@ -228,21 +276,24 @@ void Button_Mouse_Collision_Click_ById(int id)
 		{
 			switch (id)
 			{
-			case 0:		// Start
-			{
-				Scene_ChangeScene(0); //0 - testScene 1
-				break;
-			}
-			case 1:		// Credits
-			{
-				break;
-			}
-			case 2:		// Exit
-			{
-				CP_Engine_Terminate();
-				break;
-			}
-			
+				case 0:		// Start
+				{
+					Scene_ChangeScene(0); //0 - testScene 1
+					break;
+				}
+				case 1:		// Setting
+				{
+					break;
+				}
+				case 2:		// Credits
+				{
+					break;
+				}
+				case 3:		// Exit
+				{
+					CP_Engine_Terminate();
+					break;
+				}
 			}
 		}
 	}
