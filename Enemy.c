@@ -83,7 +83,7 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 		enem_sprite_col,
 		enem_sprite_row,
 		enem_sprite_frames,
-		enem_sprite_animate_speed);
+		enem_sprite_animate_speed,0);
 
 	new_enemy.isAlive = 1;	//1 - alive, 0 - dead
 	printf("NEWeneScaleX: %2f, NEWeneScaleY: %2f\n", (new_enemy.enem_HitboxScale.x), (new_enemy.enem_HitboxScale.y));

@@ -31,7 +31,8 @@ void TestScene1_Init()
 		1,
 		1,
 		1,
-		1);
+		1,
+		0);
 
 }
 
