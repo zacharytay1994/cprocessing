@@ -7,6 +7,10 @@ void TestScene1_Init()
 {
 	printf("Scene1 Initialized\n");
 
+	//temp var for wind size to shorten the call
+	wind_Width = (float)CP_System_GetWindowWidth();
+	wind_Height = (float)CP_System_GetWindowHeight();
+
 	// Scene Button GUI Temp init 
 	TestScene1_BtnInit();
 }
@@ -16,7 +20,7 @@ void TestScene1_Update(const float dt)
 	// Debug Spawn VitC
 	if (CP_Input_KeyReleased(KEY_I)) {
 		CreateEnemy(10,
-			(CP_Vector){(float)CP_System_GetWindowWidth() / 1.1f,(float)CP_System_GetWindowHeight() / 2},
+			(CP_Vector){(float)CP_System_GetWindowWidth()/1.1f,(float)CP_System_GetWindowHeight() / 2},
 			(CP_Vector){100.f,100.f},
 			100.f, 0);
 	}
@@ -48,8 +52,10 @@ void TestScene1_Update(const float dt)
 	Button_Update();
 	
 	GUIRender();
+	Camera_Update(dt);
 }
 
+// Enemy Stuff - TODO (Move to Enemy class)
 void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int enemy_type)
 {
 	struct Enemy new_enemy;
@@ -60,6 +66,7 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 	int enem_sprite_row;
 	int enem_sprite_frames;
 	int enem_sprite_animate_speed;
+	
 
 	// Basic Enemy Variables
 	new_enemy.health = hp;
@@ -76,6 +83,8 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 		enem_sprite_row = 1;
 		enem_sprite_frames = 1;
 		enem_sprite_animate_speed = 1;
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		
 		break;
 	}
 	case 1:	// NoOxygen
@@ -87,6 +96,8 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 		enem_sprite_row = 1;
 		enem_sprite_frames = 1;
 		enem_sprite_animate_speed = 1;
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		
 		break;
 	}
 	case 2:	// Late4Class
@@ -98,6 +109,8 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 		enem_sprite_row = 1;
 		enem_sprite_frames = 8;
 		enem_sprite_animate_speed = 50;
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		
 		break;
 	}
 	default:	// ???
@@ -107,6 +120,8 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 		enem_sprite_row = 1;
 		enem_sprite_frames = 1;
 		enem_sprite_animate_speed = 1;
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		
 		break;
 	}
 	}
@@ -123,7 +138,7 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 		enem_sprite_animate_speed);
 
 	new_enemy.isAlive = 1;	//1 - alive, 0 - dead
-
+	printf("NEWeneScaleX: %2f, NEWeneScaleY: %2f\n", (new_enemy.enem_HitboxScale.x), (new_enemy.enem_HitboxScale.y));
 	// Add enemy to list
 	new_enemy.ene_id = Add_Enem_toList(&new_enemy);
 	//Debug
@@ -164,32 +179,57 @@ void UpdateEnemy(const float dt)
 			
 			//Only render alive enemies
 			Sprite_RenderSprite(dt, enemy_list[i].ene_sprite_id);
-			printf("Enemy updated x: %f, y: %f\n", enemy_list[i].position.x, enemy_list[i].position.y);
+			
+			//if out of map (left boundaries only, not like enemy gonna move right...right?)
+			if (CheckEnemyCollision(0.f, wind_Height, -10.f, 0.f, i) == 1)
+			{
+				enemy_list[i].isAlive = 0;
+			}
 		}
 
-		//if enemy out of screen
-		if (enemy_list[i].position.x > (float)CP_System_GetWindowWidth() 
-			|| enemy_list[i].position.x < 0)
-		{
-			enemy_list[i].isAlive = 0;
-		}
 	}
 }
 
+int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float minPos_Y, int enemy_id)
+{
+	// Get enemy max hitbox boundery
+	float maxhitBox_posX = enemy_list[enemy_id].position.x + (enemy_list[enemy_id].enem_HitboxScale.x / 2.f);
+	float minhitBox_posX = enemy_list[enemy_id].position.x - (enemy_list[enemy_id].enem_HitboxScale.x / 2.f);
+	// Get enemy min hitbox boundary
+	float maxhitBox_posY = enemy_list[enemy_id].position.y + (enemy_list[enemy_id].enem_HitboxScale.y / 2.f);
+	float minhitBox_posY = enemy_list[enemy_id].position.y - (enemy_list[enemy_id].enem_HitboxScale.y / 2.f);
+
+	// Compares objbox with enemy hitbox
+	if (maxPos_X >= minhitBox_posX &&
+		maxPos_Y >= minhitBox_posY)
+	{
+		return 1;
+	}
+	else if (minPos_X <= maxhitBox_posX &&
+		minPos_Y >= maxhitBox_posY)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+// End of Enemy Stuff
+
+// in-Game UI Stuffs
 void TestScene1_BtnInit()
 {
-	//temp var for wind size to shorten the call
-	float win_Width = (float)CP_System_GetWindowWidth();
-	float win_Height = (float)CP_System_GetWindowHeight();
+	
 	// Scene Button GUI Temp init 
 	//################ MAIN BTN ################
 	CP_Vector test_GUI_pos;
-	test_GUI_pos.x = win_Width / 1.17f;
-	test_GUI_pos.y = win_Height / 16.f;
+	test_GUI_pos.x = wind_Width / 1.17f;
+	test_GUI_pos.y = wind_Height / 16.f;
 
 	CP_Vector test_GUI_size;
-	test_GUI_size.x = win_Width / 10.f;
-	test_GUI_size.y = win_Height / 11.f;
+	test_GUI_size.x = wind_Width / 10.f;
+	test_GUI_size.y = wind_Height / 11.f;
 
 	CP_Vector test_GUI_textpos;
 	test_GUI_textpos.x = test_GUI_pos.x + 8;
@@ -212,7 +252,7 @@ void TestScene1_BtnInit()
 
 	btn_closePopup = Button_Initialize(
 		test_GUI_pos,
-		(CP_Vector) {win_Width,win_Height/10},
+		(CP_Vector) {wind_Width,wind_Height/10},
 		test_GUI_textpos,
 		CP_Color_Create(255, 50, 50, 255),
 		CP_Color_Create(0, 0, 0, 255),
@@ -251,6 +291,7 @@ void GUIRender()
 		
 	}
 }
+// End of in-Game UI Stuff
 
 void TestScene1_Exit()
 {
