@@ -28,6 +28,20 @@ int test_scene_2;
 int test_bed;
 int main_menu;
 
+//Button Shortcut Test
+struct tempBtn {
+	float b_widthPos;
+	float b_heightPos;
+	float b_widthSize;
+	float b_heightSize;
+}tempBtn;
+
+struct tempBtn MainBtnArr[2];
+/*
+* 1 - Main popup Btn
+* 2 - Close main popup
+*/
+
 // use CP_Engine_SetNextGameState to specify this function as the initialization function
 // this function will be called once at the beginning of the program
 void game_init(void)
@@ -35,6 +49,22 @@ void game_init(void)
 	CP_System_SetWindowSize(1600, 900);
 	CP_Settings_AntiAlias(0);
 
+
+
+	//Button Shortcut init
+	/*MainBtnArr[0].b_widthPos = (float)(CP_System_GetWindowWidth() / 1.1f);
+	MainBtnArr[0].b_heightPos = (float)(CP_System_GetWindowHeight() / 9);
+	MainBtnArr[0].b_widthSize = (float)(CP_System_GetWindowWidth() / 9);
+	MainBtnArr[0].b_heightSize = (float)(CP_System_GetWindowHeight() / 11);
+	Sprite_AddSprite((CP_Vector) { MainBtnArr[0].b_widthPos, MainBtnArr[0].b_heightPos},
+		MainBtnArr[0].b_widthSize, MainBtnArr[0].b_heightSize, "Assets/demo_mShortcut.png", 1, 1, 1, 1);
+
+	MainBtnArr[1].b_widthPos = (float)(CP_System_GetWindowWidth() / 1.25f);
+	MainBtnArr[1].b_heightPos = (float)(CP_System_GetWindowHeight() / 2);
+	MainBtnArr[1].b_widthSize = (float)(CP_System_GetWindowWidth() / 9);
+	MainBtnArr[1].b_heightSize = (float)(CP_System_GetWindowHeight() / 1.2);*/
+
+	
 	// system settings
 	CP_System_ShowConsole();
 	
@@ -54,7 +84,26 @@ void game_update(void)
 	// check input, update simulation, render etc.
 	CP_Settings_Background(CP_Color_Create(100, 100, 100, 255));
 
+
+	//DEBUG MOUSE POSITION DISPLAY
+	char mouseX[100];
+	char mouseY[100];
+	//char tempDebugX[100];
+	//char tempDebugY[100];
+	CP_Settings_TextSize(30.f);
+	sprintf_s(mouseX, 100, "Mouse X Pos: %.2f", CP_Input_GetMouseX());
+	CP_Font_DrawText(mouseX, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 5));
+	sprintf_s(mouseY, 100, "Mouse Y Pos: %.2f", CP_Input_GetMouseY());
+	CP_Font_DrawText(mouseY, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 6));
+	//sprintf_s(tempDebugX, 100, "btnWPos : %.2f", bm_widthPos);
+	//CP_Font_DrawText(tempDebugX, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 7));
+	//sprintf_s(tempDebugY, 100, "btnWSize : %.2f", bm_widthSize);
+	//CP_Font_DrawText(tempDebugY, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 8));
+
+	
+
 	Scene_Update();
+
 
 }
 
