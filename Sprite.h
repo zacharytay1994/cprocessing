@@ -3,8 +3,10 @@
 #include "CProcessing/inc/cprocessing.h"
 
 #define MAX_SPRITES 100
+#define SPRITES_INITIAL_SIZE 2
 #define MAX_IMAGE_RESOURCE 100
 #define MAX_SPRITE_FRAMES 32
+#define SPRITE_MAX_PATH_LENGTH 50
 
 typedef struct Sprite {
 	CP_Vector	_position;
@@ -42,7 +44,7 @@ typedef struct Sprite_InitData {
 	int			_optOut;
 } Sprite_InitData;
 
-extern Sprite sprites[MAX_SPRITES];
+extern Sprite* sprites;
 extern int sprites_size;
 
 extern CP_Image images[MAX_IMAGE_RESOURCE][MAX_SPRITE_FRAMES]; // shared image resource between sprites
@@ -53,6 +55,8 @@ extern int images_size;
 /*____________________________________________________________________________________________________________________________________*/
 void	Sprite_Initialize();
 int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut);
+int		Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int image);
+int		Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int image, const int col, const int row, const int frame, const int fps, const int optOut);
 int		Sprite_AddSpriteInitData(const Sprite_InitData data);
 void	Sprite_RenderSprite(const float dt, const int id);
 void	Sprite_Render(const float dt);
@@ -87,3 +91,4 @@ float		Sprite_GetWidth(const int id);
 float		Sprite_GetHeight(const int id);
 int			Sprite_GetFPS(const int id);
 int			Sprite_GetVisible(const int id);
+int			Sprite_GetImageResource(const int id);

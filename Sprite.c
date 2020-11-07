@@ -3,13 +3,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Sprite sprites[MAX_SPRITES] = { 0 };
+Sprite* sprites;
 int sprites_size = 0;
+int sprites_max_size;
 CP_Image images[MAX_IMAGE_RESOURCE][MAX_SPRITE_FRAMES];
 int images_size = 0;
+char images_path[MAX_IMAGE_RESOURCE][SPRITE_MAX_PATH_LENGTH];
+int Sprite_path_size = 0;
 
 void Sprite_Initialize()
 {
+	sprites = (Sprite*)malloc(SPRITES_INITIAL_SIZE * sizeof(Sprite));
+	sprites_max_size = SPRITES_INITIAL_SIZE;
 }
 
 int Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut)
@@ -18,41 +23,92 @@ int Sprite_AddSprite(const CP_Vector position, const float width, const float he
 		printf("Sprite::MAX_IMAGE_RESORUCE exceeded!");
 		return -1;
 	}
-	if (sprites_size < MAX_SPRITES) {
-		//CP_Image* image_array = malloc(frame * sizeof(CP_Image));
-		CP_Image sheet = CP_Image_Load(path);
-		// generate sub images - maybe temp solution
-		int frame_count = 0;
-		float percent_width = 1.0f / (float)col;
-		float percent_height = 1.0f / (float)row;
-		for (int y = 0; y < row; y++) {
-			for (int x = 0; x < col; x++) {
-				if (frame_count < frame) {
-					float u0 = percent_width * (float)x;
-					float v0 = percent_height * (float)y;
-					float u1 = percent_width * (float)x + percent_width;
-					float v1 = percent_height * (float)y + percent_height;
-					u0 = u0 < 0.0f ? 0.0f : u0;
-					u0 = u0 > 1.0f ? 1.0f : u0;
-					v0 = v0 < 0.0f ? 0.0f : v0;
-					v0 = v0 > 1.0f ? 1.0f : v0;
-					u1 = u1 < 0.0f ? 0.0f : u1;
-					u1 = u1 > 1.0f ? 1.0f : u1;
-					v1 = v1 < 0.0f ? 0.0f : v1;
-					v1 = v1 > 1.0f ? 1.0f : v1;
-					images[images_size][frame_count] = Sprite_GenerateSubImage(u0,v0,u1,v1,sheet);
-					frame_count++;
-				}
-				else { // end of frames, end generating subimages
-					break;
-				}
+	//CP_Image* image_array = malloc(frame * sizeof(CP_Image));
+	CP_Image sheet = CP_Image_Load(path);
+	// generate sub images - maybe temp solution
+	int frame_count = 0;
+	float percent_width = 1.0f / (float)col;
+	float percent_height = 1.0f / (float)row;
+	for (int y = 0; y < row; y++) {
+		for (int x = 0; x < col; x++) {
+			if (frame_count < frame) {
+				float u0 = percent_width * (float)x;
+				float v0 = percent_height * (float)y;
+				float u1 = percent_width * (float)x + percent_width;
+				float v1 = percent_height * (float)y + percent_height;
+				u0 = u0 < 0.0f ? 0.0f : u0;
+				u0 = u0 > 1.0f ? 1.0f : u0;
+				v0 = v0 < 0.0f ? 0.0f : v0;
+				v0 = v0 > 1.0f ? 1.0f : v0;
+				u1 = u1 < 0.0f ? 0.0f : u1;
+				u1 = u1 > 1.0f ? 1.0f : u1;
+				v1 = v1 < 0.0f ? 0.0f : v1;
+				v1 = v1 > 1.0f ? 1.0f : v1;
+				images[images_size][frame_count] = Sprite_GenerateSubImage(u0, v0, u1, v1, sheet);
+				frame_count++;
+			}
+			else { // end of frames, end generating subimages
+				break;
 			}
 		}
-		sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f/(float)col,1.0f/(float)row,1,frame,1.0f/(float)fps,0.0f,images_size,1,1,optOut };
-		++images_size;
-		return sprites_size - 1;
 	}
-	return -1;
+	if (sprites_size >= sprites_max_size) {
+		Sprite* check = (Sprite*)realloc(sprites, sizeof(Sprite) * sprites_max_size * 2);
+		sprites_max_size *= 2;
+		if (check != NULL) {
+			sprites = check;
+		}
+		else {
+			printf("Sprite_AddSprite :: realloc returned null");
+		}
+	}
+	sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f / (float)col,1.0f / (float)row,1,frame,1.0f / (float)fps,0.0f,images_size,1,1,optOut };
+	++images_size;
+	return sprites_size - 1;
+}
+
+int Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int image)
+{
+	if (image >= sprites_size) {
+		printf("Sprite::sprites_size exceeded!");
+		return -1;
+	}
+	if (images_size >= MAX_IMAGE_RESOURCE) {
+		printf("Sprite::MAX_IMAGE_RESORUCE exceeded!");
+		return -1;
+	}
+	if (sprites_size >= sprites_max_size) {
+		Sprite* check = (Sprite*)realloc(sprites, sizeof(Sprite) * sprites_max_size * 2);
+		sprites_max_size *= 2;
+		if (check != NULL) {
+			sprites = check;
+		}
+		else {
+			printf("Sprite_AddSprite :: realloc returned null");
+		}
+	}
+	sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,sprites[image]._columns,sprites[image]._rows,sprites[image]._subwidth,sprites[image]._subheight,1,sprites[image]._number_of_frames,sprites[image]._frame_second,0.0f,image,1,1,sprites[image]._optOut };
+	return sprites_size - 1;
+}
+
+int Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int image, const int col, const int row, const int frame, const int fps, const int optOut)
+{
+	if (images_size >= MAX_IMAGE_RESOURCE) {
+		printf("Sprite::MAX_IMAGE_RESORUCE exceeded!");
+		return -1;
+	}
+	if (sprites_size >= sprites_max_size) {
+		Sprite* check = (Sprite*)realloc(sprites, sizeof(Sprite) * sprites_max_size * 2);
+		sprites_max_size *= 2;
+		if (check != NULL) {
+			sprites = check;
+		}
+		else {
+			printf("Sprite_AddSprite :: realloc returned null");
+		}
+	}
+	sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f / (float)col,1.0f / (float)row,1,frame,1.0f / (float)fps,0.0f,image,1,1,optOut };
+	return sprites_size - 1;
 }
 
 int Sprite_AddSpriteInitData(const Sprite_InitData data)
@@ -130,6 +186,7 @@ CP_Image Sprite_GenerateSubImage(const float u0, const float v0, const float u1,
 void Sprite_Free()
 {
 	// free up resources
+	free(sprites);
 }
 
 void Sprite_SetFlip(const int id, const int flip)
@@ -266,6 +323,14 @@ int Sprite_GetVisible(const int id)
 {
 	if (id < sprites_size) {
 		return sprites[id]._visible;
+	}
+	return -1;
+}
+
+int Sprite_GetImageResource(const int id)
+{
+	if (id < sprites_size) {
+		return sprites[id]._image_resource;
 	}
 	return -1;
 }
