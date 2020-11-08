@@ -27,7 +27,6 @@ typedef struct Tilemap_TileSheet {
 
 extern Tilemap		tilemaps[MAX_TILEMAPS];
 extern int			tilemaps_size;
-//extern CP_Image		tilesets[Tilemap_Tile_Size];
 extern int			tilemap_debug;
 
 /*____________________________________________________________________________________________________________________________________*/

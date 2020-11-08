@@ -3,8 +3,10 @@
 #include "CProcessing/inc/cprocessing.h"
 
 #define MAX_SPRITES 100
+#define SPRITES_INITIAL_SIZE 2
 #define MAX_IMAGE_RESOURCE 100
 #define MAX_SPRITE_FRAMES 32
+#define SPRITE_MAX_PATH_LENGTH 50
 
 typedef struct Sprite {
 	CP_Vector	_position;
@@ -27,9 +29,22 @@ typedef struct Sprite {
 	int			_image_resource;		// the sub images generated from the sprite sheet
 	int			_visible;
 	int			_repeat;
+	int			_optOut;
 } Sprite;
 
-extern Sprite sprites[MAX_SPRITES];
+typedef struct Sprite_InitData {
+	CP_Vector	_position;
+	float		_width;
+	float		_height;
+	char*		_path;
+	int			_col;
+	int			_row;
+	int			_frames;
+	int			_fps;
+	int			_optOut;
+} Sprite_InitData;
+
+extern Sprite* sprites;
 extern int sprites_size;
 
 extern CP_Image images[MAX_IMAGE_RESOURCE][MAX_SPRITE_FRAMES]; // shared image resource between sprites
@@ -39,7 +54,10 @@ extern int images_size;
 // MISCELLANEOUS
 /*____________________________________________________________________________________________________________________________________*/
 void	Sprite_Initialize();
-int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps);
+int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut);
+int		Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int image);
+int		Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int image, const int col, const int row, const int frame, const int fps, const int optOut);
+int		Sprite_AddSpriteInitData(const Sprite_InitData data);
 void	Sprite_RenderSprite(const float dt, const int id);
 void	Sprite_Render(const float dt);
 CP_Image Sprite_GenerateSubImage(const float u0, const float v0, const float u1, const float v1, const CP_Image img); // generate subimages to allow individual processing of frames
@@ -73,3 +91,4 @@ float		Sprite_GetWidth(const int id);
 float		Sprite_GetHeight(const int id);
 int			Sprite_GetFPS(const int id);
 int			Sprite_GetVisible(const int id);
+int			Sprite_GetImageResource(const int id);
