@@ -1,6 +1,5 @@
 #include "SplashScreen.h"
 #include "Scene.h"
-#include <stdio.h>
 
 void SplashScreen_Init()
 {
