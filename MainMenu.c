@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "MainMenu.h"
+#include "Scene.h"
 
 void MainMenu_Initialize()
 {
@@ -42,7 +43,7 @@ void MainMenu_Initialize()
 	Button_Text_Scale(button_exit, 2.f);
 	Button_Translate(button_exit, 0, 210);
 	Button_Text_Translate(button_exit, 0, 240);
-	
+	printf("%d", Scene_GetCurrentID());
 	
 	return;
 }

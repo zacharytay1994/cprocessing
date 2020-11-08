@@ -256,22 +256,22 @@ void Button_Mouse_Collision_Click_ById(int id)
 {
 	switch (Scene_GetCurrentID())
 	{
-	case 0:
-	{
-		switch (id)
+		case 0:
 		{
-		case 3:
-		{
-			TestScene1_BtnManager();
-			//go next case
+			switch (id)
+			{
+				case 4:
+				{
+					TestScene1_BtnManager();
+					//go next case
+				}
+				case 5:
+				{
+					//Run TestScene1_BtnManager() again to close it
+					break;
+				}
+			}
 		}
-		case 4:
-		{
-			//Run TestScene1_BtnManager() again to close it
-			break;
-		}
-		}
-	}
 		case 3:
 		{
 			switch (id)
