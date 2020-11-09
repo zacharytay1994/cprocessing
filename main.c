@@ -75,7 +75,7 @@ void game_init(void)
 	test_bed = Scene_AddScene(TestBed_Init, TestBed_Update, TestBed_Exit);
 	main_menu = Scene_AddScene(MainMenu_Initialize, MainMenu_Update, MainMenu_Exit);
 	splash_screen = Scene_AddScene(SplashScreen_Init, SplashScreen_Update, SplashScreen_Exit);
-	Scene_ChangeScene(splash_screen);
+	Scene_ChangeScene(test_scene_1);// splash_screen);
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the update function

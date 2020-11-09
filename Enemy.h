@@ -23,9 +23,13 @@ float wind_Width;
 float wind_Height;
 
 // Enemy Stuff
+//CP_Image enemy_sprite;
 Enemy enemy_list[127];
 void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int enemy_type);
 int Add_Enem_toList(struct Enemy* add_enem);
 void UpdateEnemy(const float dt);
 // CheckEnemyCollision() takes in other obj hitbox and enemy id to check with. Returns 1 if hit, 0 if not
 int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float minPos_Y, int enemy_id);
+int CheckEnemyAlive(int id);
+void SetEnemyDie(int id);
+
