@@ -14,7 +14,7 @@ void TestScene1_Init()
 	// Scene Button GUI Temp init 
 	TestScene1_BtnInit();
 	Sprite_Initialize();
-
+	Enemy_Initialize();
 	//Temp House stuff to check collision
 	house_posX = wind_Width / 2.7f;
 	house_posY = wind_Height / 2.2f;
