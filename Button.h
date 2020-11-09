@@ -49,6 +49,8 @@ char Button_Active_Set(int id, char x);
 //struct Button Button_Initialize_Default();
 //struct Button Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_position, CP_Color button_color, CP_Color text_color, float text_size, char* text, char visible);
 
+void Button_Class_Init();
+
 int Button_Initialize_Default();
 int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_position, CP_Color button_color, CP_Color text_color, float text_size, char* text, char visible);
 
