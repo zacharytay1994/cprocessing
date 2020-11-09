@@ -240,6 +240,7 @@ int Button_GetID_By_Name(char* text)
 
 void Button_Mouse_Collision_Click_ById(int id)
 {
+	printf("Button Pressed: Scene %d, ID: %d, \"%s\"\n", Scene_GetCurrentID(), id, button_list[Scene_GetCurrentID()][id].Text);
 	switch (Scene_GetCurrentID())
 	{
 		case 0:
@@ -250,6 +251,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 				{
 					TestScene1_BtnManager();
 					//go next case
+					break;
 				}
 				case 5:
 				{
@@ -257,6 +259,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 					break;
 				}
 			}
+			break;
 		}
 		case 3:
 		{
@@ -283,6 +286,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 					break;
 				}
 			}
+			break;
 		}
 	}
 }
@@ -356,4 +360,10 @@ void Button_SpecialEffects_Set(int id, char x)
 {
 	button_list[scene_id][id].Enable_SpecialEffects = x;
 	return;
+}
+
+char Button_Active_Set(int id, char x)
+{
+	button_list[scene_id][id].Active = x;
+	return x;
 }

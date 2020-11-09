@@ -5,10 +5,32 @@ void Inventory_Init()
 	inventory_window_width = (float)CP_System_GetWindowWidth();
 	inventory_window_height = (float)CP_System_GetWindowHeight();
 
+	if (inventory_window_width > inventory_window_height)
+	{
+		inventory_width = inventory_window_height * 0.5f;
+		inventory_height = inventory_width;
+	}
+	else
+	{
+		inventory_width = inventory_window_width * 0.5f;
+		inventory_height = inventory_width;
+	}
+
+	inventory_position.x = inventory_window_width * 0.5f - (inventory_width * 0.5f);
+	inventory_position.y = inventory_window_height * 0.5f - (inventory_height * 0.5f);
+
+	inventory_slot_width = inventory_width * 0.125f;
+
 	for (int i = 0; i < 127; i++)
 	{
 		inventory_stock[i].item_id = -1;
+		if (i < 64)
+		{
+			inventory[i] = -1;
+		}
 	}
+
+	inventory_is_visible = 0;
 	return;
 }
 
@@ -34,7 +56,28 @@ void Inventory_Update()
 
 void Inventory_Render()
 {
+	if (inventory_is_visible)
+	{
+		CP_Settings_Fill(BROWN);
+		CP_Graphics_DrawRect(inventory_position.x, inventory_position.y, inventory_width, inventory_height);
 
+		for (int i = 0; i < 8; i++)
+		{
+			for (int j = 0; j < 8; j++)
+			{
+				CP_Settings_Fill(DARK_BROWN);
+				CP_Graphics_DrawRect(inventory_position.x + (j * inventory_slot_width) + inventory_slot_width * 0.1f,
+									inventory_position.y + (i * inventory_slot_width) + inventory_slot_width * 0.1f,
+									inventory_slot_width * 0.8f,
+									inventory_slot_width * 0.8f);
+
+				if (inventory[i] != -1)
+				{
+					Inventory_Item_Render(i, 0, 0);
+				}
+			}
+		}
+	}
 }
 
 // Inventory Stock
@@ -76,9 +119,6 @@ void Inventory_Item_Create(char* name)
 	new_item.item_position.x = 0;
 	new_item.item_position.y = 0;
 
-	// Initialize slot_id
-	new_item.slot_id = -1;
-
 	// Set name
 	sprintf_s(new_item.item_name, 127, name);
 	
@@ -110,15 +150,15 @@ void Inventory_Item_Update()
 
 }
 
-void Inventory_Item_Render(int id)
+void Inventory_Item_Render(int id, float x, float y)
 {
 	if (inventory_stock[id].item_image != NULL)
 	{
-
+		CP_Image_Draw(inventory_stock[id].item_image, x, y, inventory_slot_width, inventory_slot_width, 255);
 	}
 	else
 	{
-
+		CP_Graphics_DrawCircle(x, y, inventory_slot_width);
 	}
 }
 

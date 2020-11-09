@@ -14,6 +14,7 @@ void TestScene1_Init()
 	// Scene Button GUI Temp init 
 	TestScene1_BtnInit();
 	Sprite_Initialize();
+	Inventory_Init();
 
 	//Temp House stuff to check collision
 	house_posX = wind_Width / 2.7f;
@@ -61,6 +62,7 @@ void TestScene1_Update(const float dt)
 	Button_Update();
 	Sprite_RenderSprite(dt, tempHouseSprite_id);
 	GUIRender();
+	Inventory_Render();
 	Camera_Update(dt);
 }
 
@@ -97,7 +99,18 @@ void KeyInputAssign()
 			(CP_Vector){wind_Width/1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			100.f, 0);*/
+		
 	}
+
+	////Inventory
+	//if (CP_Input_KeyDown(KEY_TAB))
+	//{
+	//	inventory_is_visible = 1;
+	//}
+	//else
+	//{
+	//	inventory_is_visible = 0;
+	//}
 }
 
 // in-Game UI Stuffs
@@ -152,11 +165,15 @@ void TestScene1_BtnManager()
 	if (mainGUI_isOpen)
 	{
 		mainGUI_isOpen = 0;
+		Button_Active_Set(btn_closePopup, 0);
+		Button_Active_Set(btn_popupWind, 1);
 		printf("Clicked Btn ID: %d\n", btn_closePopup);
 	}
 	else
 	{
 		mainGUI_isOpen = 1;
+		Button_Active_Set(btn_closePopup, 1);
+		Button_Active_Set(btn_popupWind, 0);
 		printf("Clicked Btn ID: %d\n", btn_popupWind);
 	}
 }
