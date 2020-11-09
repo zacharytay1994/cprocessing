@@ -264,7 +264,9 @@ void Button_Mouse_Collision_Click_ById(int id)
 			{
 				case 0:		// Start
 				{
-					Scene_ChangeScene(0); //0 - testScene 1
+					Scene_ChangeScene(0); 
+					//0 - testScene 1
+					//2 - zac testbed
 					break;
 				}
 				case 1:		// Setting

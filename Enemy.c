@@ -32,7 +32,7 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 		enem_sprite_frames = 1;
 		enem_sprite_animate_speed = 1;
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
-
+		//enemy_sprite = CP_Image_Load(path);
 		break;
 	}
 	case 1:	// NoOxygen
@@ -163,5 +163,18 @@ int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float mi
 	{
 		return 0;
 	}
+}
+
+int CheckEnemyAlive(int id)
+{
+	if (enemy_list[id].isAlive == 1)
+		return 1;
+	else
+		return 0;
+}
+
+void SetEnemyDie(int id)
+{
+	enemy_list[id].isAlive = 0;
 }
 // End of Enemy Stuff
