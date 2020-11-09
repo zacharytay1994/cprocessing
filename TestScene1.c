@@ -13,6 +13,7 @@ void TestScene1_Init()
 
 	// Scene Button GUI Temp init 
 	TestScene1_BtnInit();
+	Sprite_Initialize();
 
 
 	//Temp House stuff to check collision

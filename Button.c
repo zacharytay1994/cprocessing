@@ -27,20 +27,6 @@ int Button_Initialize_Default()
 		"Text Not Set",
 		1
 	);
-
-	/*
-	return Button_Initialize(
-		default_pos,
-		default_size,
-		default_text_pos,
-		CP_Color_Create(255, 240, 255, 255),
-		CP_Color_Create(0, 0, 0, 255),
-		50.0f,
-		"Text Not Set",
-		1
-	);
-	*/
-
 }
 
 int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_position, CP_Color button_color, CP_Color text_color, float text_size, char* text, char visible)
@@ -278,7 +264,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 			{
 				case 0:		// Start
 				{
-					Scene_ChangeScene(2); //0 - testScene 1
+					Scene_ChangeScene(0); //0 - testScene 1
 					break;
 				}
 				case 1:		// Setting
