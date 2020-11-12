@@ -207,6 +207,7 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
     <ClCompile Include="TestBed.c" />
     <ClCompile Include="TestScene1.c" />
     <ClCompile Include="TestScene2.c" />
+    <ClCompile Include="TestScene3.c" />
     <ClCompile Include="Tilemap.c" />
   </ItemGroup>
   <ItemGroup>
@@ -225,6 +226,7 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
     <ClInclude Include="TestBed.h" />
     <ClInclude Include="TestScene1.h" />
     <ClInclude Include="TestScene2.h" />
+    <ClInclude Include="TestScene3.h" />
     <ClInclude Include="Tilemap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

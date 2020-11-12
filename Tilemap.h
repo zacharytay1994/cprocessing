@@ -59,3 +59,5 @@ void		Tilemap_SetTileSheetBrush(const int id);
 /*____________________________________________________________________________________________________________________________________*/
 void		Tilemap_TxtSave256(const int id, const char* file);		// only saves tilemaps of <= 256 per dimensions
 int			Tilemap_TxtLoad256(const char* file);					// only saves tilemaps of <= 256 per dimensions
+
+void		Tilemap_TestFunction();
