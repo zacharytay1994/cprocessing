@@ -13,8 +13,8 @@ void TestScene1_Init()
 
 	// Scene Button GUI Temp init 
 	TestScene1_BtnInit();
-
-
+	Sprite_Initialize();
+	Enemy_Initialize();
 	//Temp House stuff to check collision
 	house_posX = wind_Width / 2.7f;
 	house_posY = wind_Height / 2.2f;
@@ -45,12 +45,13 @@ void TestScene1_Update(const float dt)
 		any ways to check which is what enemy at the moment. */
 	for (int i = 0; i < sizeof(enemy_list)-1; ++i)
 	{
-		if (enemy_list[i].isAlive == 1)
+		if (CheckEnemyAlive(i) == 1)
 		{
 			if (CheckEnemyCollision(house_posX + house_SizeX / 2, house_posY + house_SizeY / 2,
 				house_posX - house_SizeX / 2, house_posY - house_SizeY / 2, i) == 1)
 			{
-				enemy_list[i].isAlive = 0;
+				SetEnemyDie(i);
+				//enemy_list[i].isAlive = 0;
 			}
 		}
 	}
@@ -65,10 +66,12 @@ void TestScene1_Update(const float dt)
 
 void KeyInputAssign()
 {
+	float YspawnRange = CP_Random_RangeFloat((wind_Height/2)+200.f, (wind_Height / 2) - 200.f);
+	//float lowYspawn = CP_Random_RangeFloat();
 	// Debug Spawn VitC
 	if (CP_Input_KeyReleased(KEY_I)) {
 		CreateEnemy(10,
-			(CP_Vector){wind_Width/1.1f,wind_Height / 2},
+			(CP_Vector){wind_Width/1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			100.f, 0);
 	}
@@ -76,24 +79,24 @@ void KeyInputAssign()
 	if (CP_Input_KeyReleased(KEY_O))
 	{
 		CreateEnemy(10,
-			(CP_Vector){wind_Width / 1.1f,wind_Height / 2},
+			(CP_Vector){wind_Width / 1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
-			100.f, 1);
+			50.f, 1);
 	}
 	//Debug spawn lateGuy
 	if (CP_Input_KeyReleased(KEY_P))
 	{
 		CreateEnemy(10,
-			(CP_Vector){wind_Width / 1.1f, wind_Height / 2},
+			(CP_Vector){wind_Width / 1.1f, YspawnRange},
 			(CP_Vector){100.f,100.f},
-			100.f, 2);
+			200.f, 2);
 	}
-	//Spawn Vit C below the house
-	if (CP_Input_KeyDown(KEY_J)) {
-		CreateEnemy(10,
-			(CP_Vector){wind_Width/1.1f,wind_Height / 1.3f},
+	//free key input
+	if (CP_Input_KeyReleased(KEY_J)) {
+		/*CreateEnemy(10,
+			(CP_Vector){wind_Width/1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
-			100.f, 0);
+			100.f, 0);*/
 	}
 }
 
@@ -176,5 +179,6 @@ void GUIRender()
 void TestScene1_Exit()
 {
 	printf("Scene1 exited\n");
+	Sprite_Free();
 }
  
