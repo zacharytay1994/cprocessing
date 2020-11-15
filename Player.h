@@ -60,3 +60,5 @@ void Player_FlipAnimationsH(const int id, const int flip);
 void Player_Deccelerate(const float dt);
 CP_Vector Player_GetPosition(const int id);
 CP_Vector* Player_GetPosition_P(const int id);
+
+void Player_SetCameraFocus(const int id);

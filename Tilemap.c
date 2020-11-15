@@ -394,3 +394,8 @@ int Tilemap_TxtLoad256(const char* file)
 	}
 	return tilemap;
 }
+
+void Tilemap_TestFunction()
+{
+	CP_Image_Draw(tilesheets[tilemap_active_tilesheet]._images[0], CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.0f, 30.0f, 255);
+}
