@@ -7,7 +7,7 @@ int enemy_two;
 int enemy_three;
 int enemyhp_Sprite;
 
-
+float HP_maxSpriteSize;
 
 // Enemy Stuff - 
 void Enemy_Initialize()
@@ -52,6 +52,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 
 
 	// Basic Enemy Variables
+	HP_maxSpriteSize = hp;
 	new_enemy.health = hp;
 	new_enemy.position = position;
 	new_enemy.speed = speed;
@@ -120,7 +121,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 
 	new_enemy.enemyHP_spriteID = Sprite_AddSpriteRepeatManual(
 		new_enemy.HPsprite_position,
-		new_enemy.health * 20.f, 10.f,
+		(new_enemy.health / HP_maxSpriteSize) * 200.f, 10.f,
 		enemyhp_Sprite,
 		1, 1, 1, 1,0);
 	
@@ -229,7 +230,7 @@ void SetEnemySpeed(int id, float newSpeed)
 void SetEnemyHP(int id, float newHP)
 {
 	enemy_list[id].health = newHP;
-	Sprite_SetWidth(enemy_list[id].enemyHP_spriteID, enemy_list[id].health * 20.f);
+	Sprite_SetWidth(enemy_list[id].enemyHP_spriteID, (enemy_list[id].health / HP_maxSpriteSize) * 200.f);
 
 	if (enemy_list[id].health <= 0)
 	{

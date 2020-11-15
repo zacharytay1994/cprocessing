@@ -79,7 +79,7 @@ void TestScene1_Update(const float dt)
 				test_circle->super._position.y - test_circle->_radius, i) == 1)
 			{
 				//SetEnemyDie(i);
-				SetEnemyHP(i, GetEnemyHP(i) - dt*2.f);
+				SetEnemyHP(i, GetEnemyHP(i) - dt*10.f);
 			}
 		}
 	}
@@ -109,7 +109,7 @@ void KeyInputAssign()
 	//Debug Spawn NoOxy
 	if (CP_Input_KeyReleased(KEY_O))
 	{
-		CreateEnemy(10.f,
+		CreateEnemy(50.f,
 			(CP_Vector){wind_Width / 1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			50.f, 1);
