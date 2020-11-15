@@ -78,7 +78,7 @@ void KeyInputAssign()
 	//Debug Spawn NoOxy
 	if (CP_Input_KeyReleased(KEY_O))
 	{
-		CreateEnemy(10,
+		CreateEnemy(70.f,
 			(CP_Vector){wind_Width / 1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			50.f, 1);
