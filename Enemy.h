@@ -16,6 +16,7 @@ typedef struct Enemy
 	int			ene_sprite_id;
 	int			enemyHP_spriteID;
 	int			ene_Type;	// 0 - VitaminC, 1 - NoOxygen, 2 - Late4Class
+	int			ene_dmg;
 	const char* sprite_path;
 	char		isAlive;
 }Enemy;
@@ -34,8 +35,9 @@ void UpdateEnemy(const float dt);
 int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float minPos_Y, int enemy_id);
 int CheckEnemyAlive(int id);
 void SetEnemySpeed(int id, float newSpeed);
-void GetEnemyHP(int id);
-void SetEnemyHP(int id, int newHP);
+void SetEnemyHP(int id, float newHP);
+float GetEnemyHP(int id);
+int GetEnemyDMG(int id);
 void SetEnemyDie(int id);
 
 void Enemy_Initialize();

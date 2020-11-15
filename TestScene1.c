@@ -67,8 +67,9 @@ void TestScene1_Update(const float dt)
 			if (CheckEnemyCollision(house_posX + house_SizeX / 2, house_posY + house_SizeY / 2,
 				house_posX - house_SizeX / 2, house_posY - house_SizeY / 2, i) == 1)
 			{
-				SetEnemyDie(i);
-				houseHP -= 5.f;
+				//SetEnemyDie(i);
+				SetEnemySpeed(i, 0.f);
+				houseHP -= dt * (float)(GetEnemyDMG(i));
 				Sprite_SetWidth(tempHouseHP_spriteId, houseHP * 10.f);
 			}
 			//TEST BALL COLLISION
@@ -77,7 +78,8 @@ void TestScene1_Update(const float dt)
 				test_circle->super._position.x - test_circle->_radius,
 				test_circle->super._position.y - test_circle->_radius, i) == 1)
 			{
-				SetEnemyDie(i);
+				//SetEnemyDie(i);
+				SetEnemyHP(i, GetEnemyHP(i) - dt*2.f);
 			}
 		}
 	}
@@ -130,8 +132,8 @@ void KeyInputAssign()
 
 	if (CP_Input_MouseClicked())
 	{
-		test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 5.f, 5.f, 1.f);
-		test_circle->super._visible = 1;
+		//test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 5.f, 5.f, 1.f);
+		//test_circle->super._visible = 1;
 		//PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.f, 30.f, 1.f)->super._visible = 1;
 	}
 }

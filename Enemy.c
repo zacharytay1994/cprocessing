@@ -62,7 +62,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	case 0:	// VitaminC
 	{
 		path_id = enemy_one;
-		
+		new_enemy.ene_dmg = 1;
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 30.f };
 		break;
@@ -70,6 +70,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	case 1:	// NoOxygen
 	{
 		path_id = enemy_two;
+		new_enemy.ene_dmg = 2;
 		new_enemy.enem_Size.x = size.x * 2.5f;
 		new_enemy.enem_Size.y = size.y * 2.5f;
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
@@ -80,6 +81,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	case 2:	// Late4Class
 	{
 		path_id = enemy_three;
+		new_enemy.ene_dmg = 3;
 		new_enemy.enem_Size.x = size.x * 1.2f;
 		new_enemy.enem_Size.y = size.y * 1.2f;
 		enem_sprite_col = 8;
@@ -217,6 +219,35 @@ int CheckEnemyAlive(int id)
 		return 1;
 	else
 		return 0;
+}
+
+void SetEnemySpeed(int id, float newSpeed)
+{
+	enemy_list[id].speed = newSpeed;
+}
+
+void SetEnemyHP(int id, float newHP)
+{
+	enemy_list[id].health = newHP;
+	Sprite_SetWidth(enemy_list[id].enemyHP_spriteID, enemy_list[id].health * 20.f);
+
+	if (enemy_list[id].health <= 0)
+	{
+		SetEnemyDie(enemy_list[id].ene_id);
+	}
+}
+
+float GetEnemyHP(int id)
+{
+	float currHP;
+	currHP = enemy_list[id].health;
+	return currHP;
+}
+
+int GetEnemyDMG(int id)
+{
+	int dmg = enemy_list[id].ene_dmg;
+	return dmg;
 }
 
 void SetEnemyDie(int id)
