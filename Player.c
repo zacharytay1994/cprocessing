@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Camera.h"
+#include "Inventory.h"
 
 #include <stdio.h>
 
@@ -140,6 +141,15 @@ void Player_Input(const float dt)
 		}
 		else {
 			PhyObj_SetVisible(Player_players[i]._box, 0);
+		}
+
+		if (CP_Input_KeyDown(KEY_TAB))
+		{
+			Inventory_Open();
+		}
+		else
+		{
+			Inventory_Close();
 		}
 	}
 }

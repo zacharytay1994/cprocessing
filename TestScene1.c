@@ -18,7 +18,7 @@ void TestScene1_Init()
 	TestScene1_BtnInit();
 	Sprite_Initialize();
 
-	Inventory_Init();
+	//Inventory_Init();
 
 
 	Enemy_Initialize();
@@ -95,7 +95,7 @@ void TestScene1_Update(const float dt)
 	Sprite_RenderSprite(dt, tempHouseSprite_id);
 	Sprite_RenderSprite(dt, tempHouseHP_spriteId);
 	GUIRender();
-	Inventory_Render();
+	//Inventory_Render();
 	Camera_Update(dt);
 	PhyObj_Update(dt);
 	PhyObj_Render();
@@ -154,7 +154,6 @@ void KeyInputAssign()
 		//test_circle->super._visible = 1;
 		//PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.f, 30.f, 1.f)->super._visible = 1;
 	}
-
 }
 
 // in-Game UI Stuffs

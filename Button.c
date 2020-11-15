@@ -302,7 +302,7 @@ void Button_Render_All()
 {
 	for (int i = 0; i < 127; i++)
 	{
-		if (button_list[scene_id][i].Active == 0)
+		if (button_list[scene_id][i].Id == -1)
 		{
 			return;
 		}
@@ -367,4 +367,15 @@ char Button_Active_Set(int id, char x)
 {
 	button_list[scene_id][id].Active = x;
 	return x;
+}
+
+void Button_Class_Init()
+{
+	for (int i = 0; i < 63; i++)
+	{
+		for (int j = 0; j < 127; j++)
+		{
+			button_list[i][j].Id = -1;
+		}
+	}
 }
