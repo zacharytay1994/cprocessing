@@ -54,6 +54,7 @@ void MainMenu_Update(const float dt)
 	
 	Button_Update();
 	MainMenu_Render();
+
 	return;
 }
 
@@ -80,6 +81,6 @@ void Background_Render()
 
 void MainMenu_Exit()
 {
-	CP_Image_Free(&logo_farmology);
-	CP_Image_Free(&house);
+	/*CP_Image_Free(&logo_farmology);
+	CP_Image_Free(&house);*/
 }

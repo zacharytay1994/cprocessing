@@ -33,3 +33,5 @@ int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float mi
 int CheckEnemyAlive(int id);
 void SetEnemyDie(int id);
 
+void Enemy_Initialize();
+

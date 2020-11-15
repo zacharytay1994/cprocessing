@@ -1,22 +1,15 @@
 #include "Player.h"
+#include "Camera.h"
 
 #include <stdio.h>
 
 PlayerData Player_players[PLAYER_MAX_PLAYERS] = { 0 };
 int Player_players_size = 0;
 
+int Player_initialized = 0;
+
 void Player_Initialize()
 {
-	// initialize player at the center of the screen
-	CP_Vector position = CP_Vector_Set(200.0f, 20.0f);
-
-	// Adding a player into the scene
-	Player_AddPlayer(position,
-		PLAYER1_MASS, PLAYER1_BOUNDING_WIDTH, PLAYER1_BOUNDING_HEIGHT, PLAYER1_FRICTION, PLAYER1_SPRITE_WIDTH, PLAYER1_SPRITE_HEIGHT,
-		"player_idle.png", 3, 4, 10, 10,
-		"player_run.png", 3, 3, 8, 15,
-		"player_jump.png", 3, 4, 10, 30,
-		KEY_UP,KEY_DOWN,KEY_LEFT,KEY_RIGHT);
 
 	// Adding player 2 into the scene
 	/*Player_AddPlayer(position, 10.0f, 22.5f, 55.0f, 0.0f, 60.0f, 60.0f,
@@ -59,6 +52,20 @@ void Player_AddPlayer(const CP_Vector pos, const float mass, const float bwidth,
 
 void Player_Update(const float dt)
 {
+	if (!Player_initialized && CP_Input_KeyReleased(KEY_I)) {
+		// initialize player at the center of the screen
+		CP_Vector position = CP_Vector_Set(200.0f, -800.0f);
+
+		// Adding a player into the scene
+		Player_AddPlayer(position,
+			PLAYER1_MASS, PLAYER1_BOUNDING_WIDTH, PLAYER1_BOUNDING_HEIGHT, PLAYER1_FRICTION, PLAYER1_SPRITE_WIDTH, PLAYER1_SPRITE_HEIGHT,
+			"player_idle.png", 3, 4, 10, 10,
+			"player_run.png", 3, 3, 8, 15,
+			"player_jump.png", 3, 4, 10, 30,
+			KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
+		Player_SetCameraFocus(0);
+		Player_initialized = 1;
+	}
 	for (int i = 0; i < Player_players_size; ++i) {
 		Player_players[i]._grounded = 0;
 		Player_SyncPositionWithBoundingShape();
@@ -225,4 +232,11 @@ CP_Vector* Player_GetPosition_P(const int id)
 		return &(Player_players[id]._position);
 	}
 	return NULL;
+}
+
+void Player_SetCameraFocus(const int id)
+{
+	if (id < PLAYER_MAX_PLAYERS) {
+		Camera_BindToPosition(Player_GetPosition_P(id)); // magic number 0 here means player 1, index 0 in players array
+	}
 }

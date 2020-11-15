@@ -16,6 +16,7 @@
 #include "Scene.h"
 #include "TestScene1.h"
 #include "TestScene2.h"
+#include "TestScene3.h"
 #include "TestBed.h"
 #include "MainMenu.h"
 #include "SplashScreen.h"
@@ -28,20 +29,21 @@ int test_scene_1;
 int test_scene_2;
 int test_bed;
 int main_menu;
+int test_scene_3;
 
 //Button Shortcut Test
-struct tempBtn {
-	float b_widthPos;
-	float b_heightPos;
-	float b_widthSize;
-	float b_heightSize;
-}tempBtn;
-
-struct tempBtn MainBtnArr[2];
-/*
-* 1 - Main popup Btn
-* 2 - Close main popup
-*/
+//struct tempBtn {
+//	float b_widthPos;
+//	float b_heightPos;
+//	float b_widthSize;
+//	float b_heightSize;
+//}tempBtn;
+//
+//struct tempBtn MainBtnArr[2];
+///*
+//* 1 - Main popup Btn
+//* 2 - Close main popup
+//*/
 
 // use CP_Engine_SetNextGameState to specify this function as the initialization function
 // this function will be called once at the beginning of the program
@@ -76,7 +78,8 @@ void game_init(void)
 	test_bed = Scene_AddScene(TestBed_Init, TestBed_Update, TestBed_Exit);
 	main_menu = Scene_AddScene(MainMenu_Initialize, MainMenu_Update, MainMenu_Exit);
 	splash_screen = Scene_AddScene(SplashScreen_Init, SplashScreen_Update, SplashScreen_Exit);
-	Scene_ChangeScene(test_scene_1);// splash_screen);
+	test_scene_3 = Scene_AddScene(TestScene3_Init, TestScene3_Update, TestScene3_Exit);
+	Scene_ChangeScene(test_bed);// splash_screen);
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the update function
@@ -89,15 +92,15 @@ void game_update(void)
 
 
 	//DEBUG MOUSE POSITION DISPLAY
-	char mouseX[100];
-	char mouseY[100];
+	/*char mouseX[100];
+	char mouseY[100];*/
 	//char tempDebugX[100];
 	//char tempDebugY[100];
-	CP_Settings_TextSize(30.f);
+	/*CP_Settings_TextSize(30.f);
 	sprintf_s(mouseX, 100, "Mouse X Pos: %.2f", CP_Input_GetMouseX());
 	CP_Font_DrawText(mouseX, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 5));
 	sprintf_s(mouseY, 100, "Mouse Y Pos: %.2f", CP_Input_GetMouseY());
-	CP_Font_DrawText(mouseY, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 6));
+	CP_Font_DrawText(mouseY, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 6));*/
 	//sprintf_s(tempDebugX, 100, "btnWPos : %.2f", bm_widthPos);
 	//CP_Font_DrawText(tempDebugX, (float)(CP_System_GetWindowWidth() / 1.5), (float)(CP_System_GetWindowHeight() / 7));
 	//sprintf_s(tempDebugY, 100, "btnWSize : %.2f", bm_widthSize);

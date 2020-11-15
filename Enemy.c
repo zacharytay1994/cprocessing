@@ -1,19 +1,56 @@
 #include "Enemy.h"
 
 
+int not_init = 1;
+int enemy_one;
+int enemy_two;
+int enemy_three;
 
 
-// Enemy Stuff - TODO (Move to Enemy class)
+
+// Enemy Stuff - 
+void Enemy_Initialize()
+{
+	enemy_one = Sprite_AddSprite(
+		(CP_Vector) {-100,-100},
+		1.f,
+		1.f,
+		"demo_enemy.png",
+		1,
+		1,
+		1,
+		1, 1);
+	enemy_two = Sprite_AddSprite(
+		(CP_Vector) {-100,-100},
+		1.f,
+		1.f,
+		"demo_enemy2.png",
+		1,
+		1,
+		1,
+		1, 1);
+	enemy_three = Sprite_AddSprite(
+		(CP_Vector) {-100,-100},
+		1.f,
+		1.f,
+		"demo_player.png",
+		8,
+		1,
+		8,
+		50, 1);
+}
+
 void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int enemy_type)
 {
 	struct Enemy new_enemy;
 
 	// Enemy Type Dependant variables
-	char* path;
-	int enem_sprite_col;
-	int enem_sprite_row;
-	int enem_sprite_frames;
-	int enem_sprite_animate_speed;
+	//char* path;
+	int path_id;
+	int enem_sprite_col = 1;
+	int enem_sprite_row = 1;
+	int enem_sprite_frames = 1;
+	int enem_sprite_animate_speed = 1;
 
 
 	// Basic Enemy Variables
@@ -26,44 +63,38 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 	{
 	case 0:	// VitaminC
 	{
-		path = ("demo_enemy.png");
-		enem_sprite_col = 1;
-		enem_sprite_row = 1;
-		enem_sprite_frames = 1;
-		enem_sprite_animate_speed = 1;
+		path_id = enemy_one;
+		
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
 		//enemy_sprite = CP_Image_Load(path);
 		break;
 	}
 	case 1:	// NoOxygen
 	{
-		path = ("demo_enemy2.png");
+		path_id = enemy_two;
 		new_enemy.enem_Size.x = size.x * 2.5f;
 		new_enemy.enem_Size.y = size.y * 2.5f;
-		enem_sprite_col = 1;
-		enem_sprite_row = 1;
-		enem_sprite_frames = 1;
-		enem_sprite_animate_speed = 1;
+		
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
 
 		break;
 	}
 	case 2:	// Late4Class
 	{
-		path = ("demo_player.png");
-		new_enemy.enem_Size.x = size.x * 1.2f;
-		new_enemy.enem_Size.y = size.y * 1.2f;
-		enem_sprite_col = 8;
-		enem_sprite_row = 1;
-		enem_sprite_frames = 8;
-		enem_sprite_animate_speed = 50;
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+path_id = enemy_three;
+new_enemy.enem_Size.x = size.x * 1.2f;
+new_enemy.enem_Size.y = size.y * 1.2f;
+enem_sprite_col = 8;
+enem_sprite_row = 1;
+enem_sprite_frames = 8;
+enem_sprite_animate_speed = 50;
+new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
 
-		break;
+break;
 	}
 	default:	// ???
 	{
-		path = ("demo_enemy.png");
+		path_id = enemy_one;
 		enem_sprite_col = 1;
 		enem_sprite_row = 1;
 		enem_sprite_frames = 1;
@@ -74,16 +105,17 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 	}
 	}
 
+
 	// Assign Enemy Sprite
-	new_enemy.ene_sprite_id = Sprite_AddSprite(
+	new_enemy.ene_sprite_id = Sprite_AddSpriteRepeatManual(
 		new_enemy.position,
 		-(new_enemy.enem_Size.x),
 		new_enemy.enem_Size.y,
-		path,
+		path_id,
 		enem_sprite_col,
 		enem_sprite_row,
 		enem_sprite_frames,
-		enem_sprite_animate_speed,0);
+		enem_sprite_animate_speed, 0);
 
 	new_enemy.isAlive = 1;	//1 - alive, 0 - dead
 	printf("NEWeneScaleX: %2f, NEWeneScaleY: %2f\n", (new_enemy.enem_HitboxScale.x), (new_enemy.enem_HitboxScale.y));
@@ -133,7 +165,7 @@ void UpdateEnemy(const float dt)
 			{
 				enemy_list[i].isAlive = 0;
 			}
-			
+
 		}
 
 	}
@@ -149,7 +181,12 @@ int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float mi
 	float minhitBox_posY = enemy_list[enemy_id].position.y - (enemy_list[enemy_id].enem_HitboxScale.y / 2.f);
 
 	// Compares objbox with enemy hitbox
-	if (maxPos_X >= minhitBox_posX &&
+	if (!(maxPos_X < minhitBox_posX || maxPos_Y < minhitBox_posY || minPos_X > maxhitBox_posX || minPos_Y > maxhitBox_posY)) {
+		return 1;
+	}
+
+	return 0;
+	/*if (maxPos_X >= minhitBox_posX &&
 		maxPos_Y >= minhitBox_posY)
 	{
 		return 1;
@@ -162,7 +199,7 @@ int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float mi
 	else
 	{
 		return 0;
-	}
+	}*/
 }
 
 int CheckEnemyAlive(int id)
@@ -177,4 +214,5 @@ void SetEnemyDie(int id)
 {
 	enemy_list[id].isAlive = 0;
 }
+
 // End of Enemy Stuff

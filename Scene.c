@@ -1,5 +1,11 @@
 #include "Scene.h"
+#include "PhyObj.h"
+#include "Sprite.h"
+#include "Tilemap.h"
+#include "Camera.h"
 #include "CProcessing/inc/cprocessing.h"
+#include "Player.h"
+#include "GUI.h"
 #include <stdio.h>
 
 Scene_Scene Scene_scenes[MAX_SCENES] = { 0 };
@@ -10,17 +16,33 @@ Scene_Scene current_scene;
 
 void Scene_Initialize()
 {
+	// SCENE INITIALIZE
+	PhyObj_Initialize();
+	Sprite_Initialize();
 }
 
 void Scene_Update()
 {
+	float dt = CP_System_GetDt();
+	// SCENE UPDATES
+	PhyObj_Update(dt);
+	Camera_Update(dt);
+	GUI_Update(dt);
+
 	if (Scene_has_scene) {
 		current_scene.update(CP_System_GetDt());
 	}
+
+	// SCENE RENDERS
+	//PhyObj_Render();
+	Sprite_Render(CP_System_GetDt());
 }
 
 void Scene_Exit()
 {
+	// SCENE EXITS
+	PhyObj_Free();
+	Sprite_Free();
 }
 
 int Scene_AddScene(void(*init)(), void(*update)(const float), void(*exit)())

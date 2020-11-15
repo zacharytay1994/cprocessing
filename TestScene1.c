@@ -1,7 +1,10 @@
 #include "TestScene1.h"
 #include "CProcessing/inc/cprocessing.h"
 #include <stdio.h>
+#include "PhyObj.h"
 
+
+PhyObjBoundingCircle* test_circle;
 
 void TestScene1_Init()
 {
@@ -14,7 +17,12 @@ void TestScene1_Init()
 	// Scene Button GUI Temp init 
 	TestScene1_BtnInit();
 	Sprite_Initialize();
+
 	Inventory_Init();
+
+
+	Enemy_Initialize();
+	PhyObj_Initialize();
 
 	//Temp House stuff to check collision
 	house_posX = wind_Width / 2.7f;
@@ -22,6 +30,9 @@ void TestScene1_Init()
 	house_SizeX = wind_Width / 7.f;
 	house_SizeY = wind_Height / 5.f;
 
+
+	test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 0.f, 30.f, 1.f);
+	test_circle->super._visible = 1;
 
 
 	tempHouseSprite_id = Sprite_AddSprite(
@@ -42,6 +53,9 @@ void TestScene1_Update(const float dt)
 	//Checks for keyboard input
 	KeyInputAssign();
 
+	test_circle->super._position.x = CP_Input_GetMouseX();
+	test_circle->super._position.y = CP_Input_GetMouseY();
+	printf("ballRad: %f\n", test_circle->_radius);
 	/*Check if enemy collide with house. PS. Cant really think of 
 		any ways to check which is what enemy at the moment. */
 	for (int i = 0; i < sizeof(enemy_list)-1; ++i)
@@ -54,6 +68,13 @@ void TestScene1_Update(const float dt)
 				SetEnemyDie(i);
 				//enemy_list[i].isAlive = 0;
 			}
+			if (CheckEnemyCollision(test_circle->super._position.x + test_circle->_radius,
+				test_circle->super._position.y + test_circle->_radius,
+				test_circle->super._position.x - test_circle->_radius,
+				test_circle->super._position.y - test_circle->_radius, i) == 1)
+			{
+				SetEnemyDie(i);
+			}
 		}
 	}
 	// Misc Updates
@@ -64,6 +85,8 @@ void TestScene1_Update(const float dt)
 	GUIRender();
 	Inventory_Render();
 	Camera_Update(dt);
+	PhyObj_Update(dt);
+	PhyObj_Render();
 }
 
 void KeyInputAssign()
@@ -102,6 +125,7 @@ void KeyInputAssign()
 		
 	}
 
+
 	////Inventory
 	//if (CP_Input_KeyDown(KEY_TAB))
 	//{
@@ -111,6 +135,13 @@ void KeyInputAssign()
 	//{
 	//	inventory_is_visible = 0;
 	//}
+
+	if (CP_Input_MouseClicked())
+	{
+		test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 5.f, 5.f, 1.f);
+		test_circle->super._visible = 1;
+		//PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.f, 30.f, 1.f)->super._visible = 1;
+	}
 }
 
 // in-Game UI Stuffs
@@ -197,5 +228,6 @@ void TestScene1_Exit()
 {
 	printf("Scene1 exited\n");
 	Sprite_Free();
+
 }
  
