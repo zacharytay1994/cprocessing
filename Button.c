@@ -162,6 +162,25 @@ char Button_Text_Set(int id, char* new_text)
 	return 1;
 }
 
+char Button_Color_Set(int id, int r, int g, int b, int a)
+{
+	CP_Color new_color = CP_Color_Create(r, g, b, a);
+	button_list[scene_id][id].Button_Color = new_color;
+	
+	// Set Hover Color
+	int nr = (r + 100 > 255) ? 255 : r + 100;
+	int ng = (g + 100 > 255) ? 255 : g + 100;
+	int nb = (b + 100 > 255) ? 255 : b + 100;
+	button_list[scene_id][id].Hover_Color = CP_Color_Create(nr, ng, nb, a);
+
+	// Set Darken Color
+	nr = (r - 100 < 0) ? 0 : r - 100;
+	ng = (g - 100 < 0) ? 0 : g - 100;
+	nb = (b - 100 < 0) ? 0 : b - 100;
+	button_list[scene_id][id].Darken_Color = CP_Color_Create(nr, ng, nb, a);
+	return 1;
+}
+
 char Button_Name_Set(int id, char* new_text)
 {
 	sprintf_s(button_list[scene_id][id].Name, 127, new_text);
