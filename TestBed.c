@@ -27,6 +27,7 @@ void TestBed_Init()
 	Inventory_Init();
 	Inventory_Item_Create("poop");
 	Inventory_Add_Item_Name("poop");
+	Inventory_Item_Set_Image("poop", "demo_test.png");
 
 	Sprite_InitData s_data = { (CP_Vector) { 100.0f,100.0f },100.0f,100.0f,"dirt_block.png",1,1,1,1,1 };
 	int parent = GUI_AddRootContainer((CP_Vector) { 100.0f, 100.0f }, CP_Vector_Set(30.0f, 30.0f), s_data);
@@ -47,6 +48,7 @@ void TestBed_Update(const float dt)
 	//// UPDATES
 	Player_Update(dt);
 	GUI_Update(dt);
+	Inventory_Update();
 
 	//// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());

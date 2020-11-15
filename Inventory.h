@@ -15,7 +15,6 @@ struct inventory_item
 	char		item_name[127];
 	char		item_description[127];
 	char		is_visible;
-	char		is_dragging;
 };
 
 CP_Vector inventory_position;
@@ -27,6 +26,7 @@ float inventory_height;
 float inventory_slot_width;
 int inventory[64];
 char inventory_is_visible;
+//char is_dragging;
 
 void Inventory_Init();
 void Inventory_Open();
@@ -38,8 +38,12 @@ void Inventory_Render();
 
 struct inventory_item Inventory_Stock_Get_Struct_By_Name(char* name);
 struct inventory_item Inventory_Stock_Get_Struct_By_ID(int id);
+int Inventory_Item_Set_Image(char* name, char* image);
 
 void Inventory_Item_Create(char* name);
 void Inventory_Item_Update();
 void Inventory_Item_Render(int id, float x, float y);
-void Inventory_Item_Remove();
+int Inventory_Item_Remove_ID(int id);
+int Inventory_Item_Remove_Name(char* name);
+void Inventory_Item_Use_Name(char* name);
+void Inventory_Item_Use_ID(int id);
