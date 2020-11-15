@@ -14,6 +14,7 @@ struct Button
 	float		Text_Size;
 	float		Scale;
 	int			Id;
+	char		Name[127];
 	char		Text[127];
 	char		Active;
 	char		Visible;

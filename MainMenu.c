@@ -24,7 +24,8 @@ void MainMenu_Initialize()
 	Button_Text_Translate(button_start, 0, -120);
 
 	button_credits = Button_Initialize_Default();
-	Button_Text_Set(button_credits, "Settings");
+	//Button_Text_Set(button_credits, "Settings");
+	Button_Text_Set(button_credits, "Survey");
 	Button_Size_Scale(button_credits, 2.f, 2.f);
 	Button_Text_Scale(button_credits, 2.f);
 	Button_Translate(button_credits, 0, -30);

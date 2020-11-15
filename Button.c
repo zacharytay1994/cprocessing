@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "TestScene1.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int Button_Initialize_Default()
 {
@@ -68,6 +69,9 @@ int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_positio
 
 	// Set Text
 	sprintf_s(new_button.Text, 127, text);
+
+	// Set Name
+	sprintf_s(new_button.Name, 127, text);
 
 	// Set Scale
 	new_button.Scale = 1.0f;
@@ -155,6 +159,12 @@ char Button_Text_SetPosition(int id, float new_x, float new_y)
 char Button_Text_Set(int id, char* new_text)
 {
 	sprintf_s(button_list[scene_id][id].Text, 127, new_text);
+	return 1;
+}
+
+char Button_Name_Set(int id, char* new_text)
+{
+	sprintf_s(button_list[scene_id][id].Name, 127, new_text);
 	return 1;
 }
 
@@ -275,6 +285,13 @@ void Button_Mouse_Collision_Click_ById(int id)
 				}
 				case 1:		// Setting
 				{
+					#ifdef _WIN32 
+						system("start https://forms.gle/wiLHNBcqdAMYVNKY9");
+					#elif __APPLE__ 
+						system("open https://forms.gle/wiLHNBcqdAMYVNKY9");
+					#elif __linux__ 
+						system("xdg-open https://forms.gle/wiLHNBcqdAMYVNKY9");
+					#endif
 					break;
 				}
 				case 2:		// Credits
