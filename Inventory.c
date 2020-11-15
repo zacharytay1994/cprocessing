@@ -174,7 +174,6 @@ void Inventory_Item_Update()
 
 void Inventory_Item_Render(int id, float x, float y)
 {
-	printf("RENDERING: %d\n", id);
 	if (inventory_stock[id].item_image != NULL)
 	{
 		CP_Image_Draw(inventory_stock[id].item_image, x, y, inventory_slot_width, inventory_slot_width, 255);
