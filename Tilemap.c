@@ -199,7 +199,7 @@ void Tilemap_Render(const int id, const CP_Matrix cam)
 	float half_offset_y = (float)tilemaps[id]._offset_y / 2.0f;
 	CP_Vector tile_position = CP_Vector_Set(-1.0f, -1.0f);
 	if (id < tilemaps_size) {
-		for (int y = 0; y < tilemaps[id]._height; y++) {
+		for (int y = tilemaps[id]._height-1; y >= 0; y--) {
 			for (int x = 0; x < tilemaps[id]._width; x++) {
 				int tile;
 				if ((tile = tilemaps[id]._tiles[y * tilemaps[id]._width + x]) != -1) {

@@ -8,9 +8,18 @@ int Player_players_size = 0;
 
 int Player_initialized = 0;
 
+// temp
+int Player_health;
+int Player_max_health = 10;
+CP_Image Player_heart;
+float Player_heart_offset_x = 50.0f;
+float Player_heart_offset_y = 50.0f;
+float Player_heart_spacing = 60.0f;
+
 void Player_Initialize()
 {
-
+	Player_health = Player_max_health;
+	Player_heart = CP_Image_Load("demo_heart.png");
 	// Adding player 2 into the scene
 	/*Player_AddPlayer(position, 10.0f, 22.5f, 55.0f, 0.0f, 60.0f, 60.0f,
 		"player_idle.png", 3, 4, 10, 10,
@@ -83,6 +92,11 @@ void Player_Update(const float dt)
 		}
 	}
 	Player_Input(dt);
+
+	// temp render player ui
+	for (int j = 0; j < Player_health; j++) {
+		CP_Image_Draw(Player_heart, Player_heart_offset_x + j * Player_heart_spacing, Player_heart_offset_y, 60.0f, 60.0f, 255);
+	}
 }
 
 void Player_Render()
@@ -104,7 +118,7 @@ void Player_Input(const float dt)
 			Player_SwitchAnimationState(i,Player_Anim_Jump);
 			some_input = 1;
 		}
-		if (CP_Input_KeyDown(Player_players[i]._right)) {
+		if (CP_Input_KeyDown(Player_players[i]._right) || CP_Input_KeyDown(KEY_D)) {
 			// check if horizontal velocity has not exceeded velocity limit
 			if (shape->_velocity.x < PLAYER_MAX_HVELOCITY) {
 				PhyObj_AddVelocity(shape, CP_Vector_Set(PLAYER_APPLIED_HVELOCITY * dt, 0.0f));
@@ -116,7 +130,7 @@ void Player_Input(const float dt)
 			}
 			Player_FlipAnimationsH(i,0);
 		}
-		if (CP_Input_KeyDown(Player_players[i]._left)) {
+		if (CP_Input_KeyDown(Player_players[i]._left) || CP_Input_KeyDown(KEY_A)) {
 			if (shape->_velocity.x > -PLAYER_MAX_HVELOCITY) {
 				PhyObj_AddVelocity(shape, CP_Vector_Set(-PLAYER_APPLIED_HVELOCITY * dt, 0.0f));
 			}
@@ -126,7 +140,7 @@ void Player_Input(const float dt)
 			}
 			Player_FlipAnimationsH(i,1);
 		}
-		if (CP_Input_KeyDown(Player_players[i]._up)) {
+		if (CP_Input_KeyDown(Player_players[i]._up) || CP_Input_KeyDown(KEY_W)) {
 			if (Player_players[i]._grounded && shape->_velocity.y > -PLAYER_MAX_VVELOCITY) {
 				PhyObj_ApplyImpulse(shape, CP_Vector_Set(0.0f, -PLAYER_APPLIED_VVELOCITY));
 			}
