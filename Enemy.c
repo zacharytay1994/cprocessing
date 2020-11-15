@@ -81,16 +81,16 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 	}
 	case 2:	// Late4Class
 	{
-		path_id = enemy_three;
-		new_enemy.enem_Size.x = size.x * 1.2f;
-		new_enemy.enem_Size.y = size.y * 1.2f;
-		enem_sprite_col = 8;
-		enem_sprite_row = 1;
-		enem_sprite_frames = 8;
-		enem_sprite_animate_speed = 50;
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+path_id = enemy_three;
+new_enemy.enem_Size.x = size.x * 1.2f;
+new_enemy.enem_Size.y = size.y * 1.2f;
+enem_sprite_col = 8;
+enem_sprite_row = 1;
+enem_sprite_frames = 8;
+enem_sprite_animate_speed = 50;
+new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
 
-		break;
+break;
 	}
 	default:	// ???
 	{
@@ -165,7 +165,7 @@ void UpdateEnemy(const float dt)
 			{
 				enemy_list[i].isAlive = 0;
 			}
-			
+
 		}
 
 	}
@@ -181,7 +181,12 @@ int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float mi
 	float minhitBox_posY = enemy_list[enemy_id].position.y - (enemy_list[enemy_id].enem_HitboxScale.y / 2.f);
 
 	// Compares objbox with enemy hitbox
-	if (maxPos_X >= minhitBox_posX &&
+	if (!(maxPos_X < minhitBox_posX || maxPos_Y < minhitBox_posY || minPos_X > maxhitBox_posX || minPos_Y > maxhitBox_posY)) {
+		return 1;
+	}
+
+	return 0;
+	/*if (maxPos_X >= minhitBox_posX &&
 		maxPos_Y >= minhitBox_posY)
 	{
 		return 1;
@@ -194,7 +199,7 @@ int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float mi
 	else
 	{
 		return 0;
-	}
+	}*/
 }
 
 int CheckEnemyAlive(int id)
