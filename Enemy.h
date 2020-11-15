@@ -12,6 +12,7 @@ typedef struct Enemy
 	//CP_Vector	enem_minHitbox;
 	float		speed;
 	float		health;
+	float		maxHealth;
 	int			ene_id;
 	int			ene_sprite_id;
 	int			enemyHP_spriteID;
