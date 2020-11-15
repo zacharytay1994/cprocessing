@@ -40,7 +40,6 @@ void TestScene2_Init()
 	t8_x = -(BG_WindowWidth / 2.0f);
 	t9_x = BG_WindowWidth / 2.0f;
 	t10_x = BG_WindowWidth / 2.0f;
-
 }
 
 void TestScene2_Update(const float dt)
@@ -148,7 +147,6 @@ void TestScene2_Update(const float dt)
 
 		CP_Image_Draw(BG_Pic_Mountain_2, t4_x, BG_WindowHeight / 2.0f, BG_WindowWidth, BG_WindowHeight, 255);
 	}
-	
 }
 	
 

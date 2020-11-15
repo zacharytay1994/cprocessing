@@ -1,19 +1,54 @@
 #include "Enemy.h"
 
 
+int not_init = 1;
+int enemy_one;
+int enemy_two;
+int enemy_three;
+int enemyhp_Sprite;
 
 
-// Enemy Stuff - TODO (Move to Enemy class)
-void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int enemy_type)
+
+// Enemy Stuff - 
+void Enemy_Initialize()
+{
+	enemy_one = Sprite_AddSprite(
+		(CP_Vector) {-100,-100},
+		1.f, 1.f,
+		"demo_enemy.png",
+		1,1,1,1, 1);
+
+	enemy_two = Sprite_AddSprite(
+		(CP_Vector) {-100,-100},
+		1.f,1.f,
+		"demo_enemy2.png",
+		1,1,1,1, 1);
+
+	enemy_three = Sprite_AddSprite(
+		(CP_Vector) {-100,-100},
+		1.f,1.f,
+		"demo_player.png",
+		8,1,8,50, 1);
+
+	enemyhp_Sprite = Sprite_AddSprite(
+		(CP_Vector) {-100,-100},
+		100.f,30.f,
+		"half_redBox.png",
+		1,1,1,1,1);
+	
+}
+
+void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int enemy_type)
 {
 	struct Enemy new_enemy;
 
 	// Enemy Type Dependant variables
-	char* path;
-	int enem_sprite_col;
-	int enem_sprite_row;
-	int enem_sprite_frames;
-	int enem_sprite_animate_speed;
+	//char* path;
+	int path_id;
+	int enem_sprite_col = 1;
+	int enem_sprite_row = 1;
+	int enem_sprite_frames = 1;
+	int enem_sprite_animate_speed = 1;
 
 
 	// Basic Enemy Variables
@@ -26,64 +61,67 @@ void CreateEnemy(int hp, CP_Vector position, CP_Vector size, float speed, int en
 	{
 	case 0:	// VitaminC
 	{
-		path = ("demo_enemy.png");
-		enem_sprite_col = 1;
-		enem_sprite_row = 1;
-		enem_sprite_frames = 1;
-		enem_sprite_animate_speed = 1;
+		path_id = enemy_one;
+		
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
-
+		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 30.f };
 		break;
 	}
 	case 1:	// NoOxygen
 	{
-		path = ("demo_enemy2.png");
+		path_id = enemy_two;
 		new_enemy.enem_Size.x = size.x * 2.5f;
 		new_enemy.enem_Size.y = size.y * 2.5f;
-		enem_sprite_col = 1;
-		enem_sprite_row = 1;
-		enem_sprite_frames = 1;
-		enem_sprite_animate_speed = 1;
+		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
 
 		break;
 	}
 	case 2:	// Late4Class
 	{
-		path = ("demo_player.png");
+		path_id = enemy_three;
 		new_enemy.enem_Size.x = size.x * 1.2f;
 		new_enemy.enem_Size.y = size.y * 1.2f;
 		enem_sprite_col = 8;
 		enem_sprite_row = 1;
 		enem_sprite_frames = 8;
 		enem_sprite_animate_speed = 50;
+		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
 
 		break;
 	}
-	default:	// ???
+	default:	// jus some random fall thru in case something happens
 	{
-		path = ("demo_enemy.png");
+		path_id = enemy_one;
 		enem_sprite_col = 1;
 		enem_sprite_row = 1;
 		enem_sprite_frames = 1;
 		enem_sprite_animate_speed = 1;
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
-
+		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 30.f };
 		break;
 	}
 	}
 
+
 	// Assign Enemy Sprite
-	new_enemy.ene_sprite_id = Sprite_AddSprite(
+	new_enemy.ene_sprite_id = Sprite_AddSpriteRepeatManual(
 		new_enemy.position,
 		-(new_enemy.enem_Size.x),
 		new_enemy.enem_Size.y,
-		path,
+		path_id,
 		enem_sprite_col,
 		enem_sprite_row,
 		enem_sprite_frames,
-		enem_sprite_animate_speed,0);
+		enem_sprite_animate_speed, 0);
+
+	new_enemy.enemyHP_spriteID = Sprite_AddSpriteRepeatManual(
+		new_enemy.HPsprite_position,
+		new_enemy.health * 20.f, 10.f,
+		enemyhp_Sprite,
+		1, 1, 1, 1,0);
+	
 
 	new_enemy.isAlive = 1;	//1 - alive, 0 - dead
 	printf("NEWeneScaleX: %2f, NEWeneScaleY: %2f\n", (new_enemy.enem_HitboxScale.x), (new_enemy.enem_HitboxScale.y));
@@ -116,7 +154,8 @@ void UpdateEnemy(const float dt)
 		if (enemy_list[i].isAlive == 0)
 		{
 			// if Enemy is "dead", set sprite visible off
-			Sprite_SetVisible(enemy_list[i].ene_sprite_id, 1);
+			Sprite_SetVisible(enemy_list[i].ene_sprite_id, 0);
+			Sprite_SetVisible(enemy_list[i].enemyHP_spriteID, 0);
 			continue;
 		}
 		else
@@ -124,16 +163,18 @@ void UpdateEnemy(const float dt)
 			//Update Movement/sprite movement 
 			enemy_list[i].position.x -= dt * (enemy_list[i].speed);
 			Sprite_SetPosition(enemy_list[i].ene_sprite_id, enemy_list[i].position);
+			Sprite_SetPosition(enemy_list[i].enemyHP_spriteID, (CP_Vector) {enemy_list[i].position.x - 50.f, enemy_list[i].HPsprite_position.y});
 
 			//Only render alive enemies
 			Sprite_RenderSprite(dt, enemy_list[i].ene_sprite_id);
+			Sprite_RenderSprite(dt, enemy_list[i].enemyHP_spriteID);
 
 			//if out of map (left boundaries only, not like enemy gonna move right...right?)
 			if (CheckEnemyCollision(0.f, wind_Height, -10.f, 0.f, i) == 1)
 			{
 				enemy_list[i].isAlive = 0;
 			}
-			
+
 		}
 
 	}
@@ -149,7 +190,12 @@ int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float mi
 	float minhitBox_posY = enemy_list[enemy_id].position.y - (enemy_list[enemy_id].enem_HitboxScale.y / 2.f);
 
 	// Compares objbox with enemy hitbox
-	if (maxPos_X >= minhitBox_posX &&
+	if (!(maxPos_X < minhitBox_posX || maxPos_Y < minhitBox_posY || minPos_X > maxhitBox_posX || minPos_Y > maxhitBox_posY)) {
+		return 1;
+	}
+
+	return 0;
+	/*if (maxPos_X >= minhitBox_posX &&
 		maxPos_Y >= minhitBox_posY)
 	{
 		return 1;
@@ -162,6 +208,20 @@ int CheckEnemyCollision(float maxPos_X, float maxPos_Y, float minPos_X, float mi
 	else
 	{
 		return 0;
-	}
+	}*/
 }
+
+int CheckEnemyAlive(int id)
+{
+	if (enemy_list[id].isAlive == 1)
+		return 1;
+	else
+		return 0;
+}
+
+void SetEnemyDie(int id)
+{
+	enemy_list[id].isAlive = 0;
+}
+
 // End of Enemy Stuff

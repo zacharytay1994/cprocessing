@@ -1,7 +1,10 @@
 #include "TestScene1.h"
 #include "CProcessing/inc/cprocessing.h"
 #include <stdio.h>
+#include "PhyObj.h"
 
+
+PhyObjBoundingCircle* test_circle;
 
 void TestScene1_Init()
 {
@@ -13,8 +16,9 @@ void TestScene1_Init()
 
 	// Scene Button GUI Temp init 
 	TestScene1_BtnInit();
-
-
+	Sprite_Initialize();
+	Enemy_Initialize();
+	PhyObj_Initialize();
 	//Temp House stuff to check collision
 	house_posX = wind_Width / 2.7f;
 	house_posY = wind_Height / 2.2f;
@@ -22,17 +26,23 @@ void TestScene1_Init()
 	house_SizeY = wind_Height / 5.f;
 
 
+	test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 0.f, 30.f, 1.f);
+	test_circle->super._visible = 1;
+
+	houseHP = 100.f;
+
+	tempHouseHP_spriteId = Sprite_AddSprite(
+		(CP_Vector) {house_posX - 250.f, house_posY-130},
+		houseHP * 10.f,30,
+		"half_redBox.png",
+		1,1,1,1,0);
 
 	tempHouseSprite_id = Sprite_AddSprite(
 		(CP_Vector) {house_posX, house_posY},
 		house_SizeX,
 		house_SizeY,
 		"demo_house.png",
-		1,
-		1,
-		1,
-		1,
-		0);
+		1,1,1,1,0);
 
 }
 
@@ -41,16 +51,33 @@ void TestScene1_Update(const float dt)
 	//Checks for keyboard input
 	KeyInputAssign();
 
-	/*Check if enemy collide with house. PS. Cant really think of 
+	//TEST BALL FOR COLLISION
+	test_circle->super._position.x = CP_Input_GetMouseX();
+	test_circle->super._position.y = CP_Input_GetMouseY();
+	//printf("ballRad: %f\n", test_circle->_radius);
+
+	/*Check if enemy collide with house. 
+	PS. Cant really think of 
 		any ways to check which is what enemy at the moment. */
 	for (int i = 0; i < sizeof(enemy_list)-1; ++i)
 	{
-		if (enemy_list[i].isAlive == 1)
+		if (CheckEnemyAlive(i) == 1)
 		{
+			//HOUSE COLLISION
 			if (CheckEnemyCollision(house_posX + house_SizeX / 2, house_posY + house_SizeY / 2,
 				house_posX - house_SizeX / 2, house_posY - house_SizeY / 2, i) == 1)
 			{
-				enemy_list[i].isAlive = 0;
+				SetEnemyDie(i);
+				houseHP -= 5.f;
+				Sprite_SetWidth(tempHouseHP_spriteId, houseHP * 10.f);
+			}
+			//TEST BALL COLLISION
+			if (CheckEnemyCollision(test_circle->super._position.x + test_circle->_radius,
+				test_circle->super._position.y + test_circle->_radius,
+				test_circle->super._position.x - test_circle->_radius,
+				test_circle->super._position.y - test_circle->_radius, i) == 1)
+			{
+				SetEnemyDie(i);
 			}
 		}
 	}
@@ -59,41 +86,53 @@ void TestScene1_Update(const float dt)
 	//printf("Scene1 updating\n");
 	Button_Update();
 	Sprite_RenderSprite(dt, tempHouseSprite_id);
+	Sprite_RenderSprite(dt, tempHouseHP_spriteId);
 	GUIRender();
 	Camera_Update(dt);
+	PhyObj_Update(dt);
+	PhyObj_Render();
 }
 
 void KeyInputAssign()
 {
+	float YspawnRange = CP_Random_RangeFloat((wind_Height/2)+200.f, (wind_Height / 2) - 200.f);
+	//float lowYspawn = CP_Random_RangeFloat();
 	// Debug Spawn VitC
 	if (CP_Input_KeyReleased(KEY_I)) {
-		CreateEnemy(10,
-			(CP_Vector){wind_Width/1.1f,wind_Height / 2},
+		CreateEnemy(10.f,
+			(CP_Vector){wind_Width/1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			100.f, 0);
 	}
 	//Debug Spawn NoOxy
 	if (CP_Input_KeyReleased(KEY_O))
 	{
-		CreateEnemy(10,
-			(CP_Vector){wind_Width / 1.1f,wind_Height / 2},
+		CreateEnemy(10.f,
+			(CP_Vector){wind_Width / 1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
-			100.f, 1);
+			50.f, 1);
 	}
 	//Debug spawn lateGuy
 	if (CP_Input_KeyReleased(KEY_P))
 	{
-		CreateEnemy(10,
-			(CP_Vector){wind_Width / 1.1f, wind_Height / 2},
+		CreateEnemy(10.f,
+			(CP_Vector){wind_Width / 1.1f, YspawnRange},
 			(CP_Vector){100.f,100.f},
-			100.f, 2);
+			200.f, 2);
 	}
-	//Spawn Vit C below the house
-	if (CP_Input_KeyDown(KEY_J)) {
-		CreateEnemy(10,
-			(CP_Vector){wind_Width/1.1f,wind_Height / 1.3f},
+	//free key input
+	if (CP_Input_KeyReleased(KEY_J)) {
+		/*CreateEnemy(10,
+			(CP_Vector){wind_Width/1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
-			100.f, 0);
+			100.f, 0);*/
+	}
+
+	if (CP_Input_MouseClicked())
+	{
+		test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 5.f, 5.f, 1.f);
+		test_circle->super._visible = 1;
+		//PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.f, 30.f, 1.f)->super._visible = 1;
 	}
 }
 
@@ -176,5 +215,7 @@ void GUIRender()
 void TestScene1_Exit()
 {
 	printf("Scene1 exited\n");
+	Sprite_Free();
+
 }
  
