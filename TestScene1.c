@@ -18,7 +18,7 @@ void TestScene1_Init()
 	TestScene1_BtnInit();
 	Sprite_Initialize();
 
-	Inventory_Init();
+	//Inventory_Init();
 
 
 	Enemy_Initialize();
@@ -83,7 +83,7 @@ void TestScene1_Update(const float dt)
 	Button_Update();
 	Sprite_RenderSprite(dt, tempHouseSprite_id);
 	GUIRender();
-	Inventory_Render();
+	//Inventory_Render();
 	Camera_Update(dt);
 	PhyObj_Update(dt);
 	PhyObj_Render();

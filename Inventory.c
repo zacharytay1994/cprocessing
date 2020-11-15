@@ -1,4 +1,5 @@
 #include "Inventory.h"
+#include <string.h>
 
 void Inventory_Init()
 {
@@ -29,23 +30,44 @@ void Inventory_Init()
 			inventory[i] = -1;
 		}
 	}
-
 	inventory_is_visible = 0;
 	return;
 }
 
 void Inventory_Open()
 {
-
+	inventory_is_visible = 1;
 }
 
 void Inventory_Close()
 {
-
+	inventory_is_visible = 0;
 }
 
-int Inventory_Add_Item(int id)
+int Inventory_Add_Item_ID(int id)
 {
+	for (int i = 0; i < 64; i++)
+	{
+		if (inventory[i] == -1)
+		{
+			inventory[i] = id;
+			return i;
+		}
+	}
+	return -1;
+}
+
+int Inventory_Add_Item_Name(char* name)
+{
+	int id = Inventory_Stock_Get_Struct_By_Name(name).item_id;
+	for (int i = 0; i < 64; i++)
+	{
+		if (inventory[i] == -1)
+		{
+			inventory[i] = id;
+			return i;
+		}
+	}
 	return -1;
 }
 
@@ -70,10 +92,11 @@ void Inventory_Render()
 									inventory_position.y + (i * inventory_slot_width) + inventory_slot_width * 0.1f,
 									inventory_slot_width * 0.8f,
 									inventory_slot_width * 0.8f);
-
-				if (inventory[i] != -1)
+				if (inventory[j+(i*8)] != -1)
 				{
-					Inventory_Item_Render(i, 0, 0);
+					Inventory_Item_Render(i, 
+						inventory_position.x + (j * inventory_slot_width) + inventory_slot_width * 0.1f,
+						inventory_position.y + (i * inventory_slot_width) + inventory_slot_width * 0.1f);
 				}
 			}
 		}
@@ -85,12 +108,11 @@ struct inventory_item Inventory_Stock_Get_Struct_By_Name(char* name)
 {
 	for (int i = 0; i < 127; i++)
 	{
-		if (inventory_stock[i].item_name == name)
+		if (!strcmp(inventory_stock[i].item_name,name))
 		{
 			return inventory_stock[i];
 		}
 	}
-
 	return inventory_stock[126];
 }
 
@@ -152,13 +174,18 @@ void Inventory_Item_Update()
 
 void Inventory_Item_Render(int id, float x, float y)
 {
+	printf("RENDERING: %d\n", id);
 	if (inventory_stock[id].item_image != NULL)
 	{
 		CP_Image_Draw(inventory_stock[id].item_image, x, y, inventory_slot_width, inventory_slot_width, 255);
 	}
 	else
 	{
-		CP_Graphics_DrawCircle(x, y, inventory_slot_width);
+		CP_Settings_Fill(BLUE);
+		CP_Graphics_DrawRect(x, y,
+			inventory_slot_width * 0.8f,
+			inventory_slot_width * 0.8f);
+		//CP_Graphics_DrawCircle(x, y, inventory_slot_width);
 	}
 }
 

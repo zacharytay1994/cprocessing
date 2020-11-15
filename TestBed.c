@@ -6,6 +6,7 @@
 #include "Sprite.h"
 #include "Player.h"
 #include "GUI.h"
+#include "Inventory.h"
 
 #include <stdio.h>
 
@@ -23,6 +24,9 @@ void TestBed_Init()
 	tilemap = Tilemap_TxtLoad256("prototype_map.txt");
 	Tilemap_GeneratePhyObjs(tilemap);
 	Player_Initialize();
+	Inventory_Init();
+	Inventory_Item_Create("poop");
+	Inventory_Add_Item_Name("poop");
 
 	Sprite_InitData s_data = { (CP_Vector) { 100.0f,100.0f },100.0f,100.0f,"dirt_block.png",1,1,1,1,1 };
 	int parent = GUI_AddRootContainer((CP_Vector) { 100.0f, 100.0f }, CP_Vector_Set(30.0f, 30.0f), s_data);
@@ -48,6 +52,7 @@ void TestBed_Update(const float dt)
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
 	Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
 	Player_Render();
+	Inventory_Render();
 }
 
 void TestBed_Exit()

@@ -5,6 +5,7 @@
 
 #define		 BROWN	CP_Color_Create(150, 75, 0, 255)
 #define DARK_BROWN	CP_Color_Create(125, 50, 0, 255)
+#define	     BLUE   CP_Color_Create(0, 0, 255, 255)
 
 struct inventory_item
 {
@@ -30,7 +31,8 @@ char inventory_is_visible;
 void Inventory_Init();
 void Inventory_Open();
 void Inventory_Close();
-int Inventory_Add_Item(int id);
+int Inventory_Add_Item_ID(int id);
+int Inventory_Add_Item_Name(char* name);
 void Inventory_Update();
 void Inventory_Render();
 
