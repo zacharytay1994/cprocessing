@@ -21,6 +21,8 @@ float house_posY;
 float house_SizeX;
 float house_SizeY;
 int tempHouseSprite_id;
+int tempHouseHP_spriteId;
+float houseHP;
 void KeyInputAssign();	//Checks for keyboard input 
 
 
