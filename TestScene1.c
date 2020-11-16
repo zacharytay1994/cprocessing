@@ -17,8 +17,13 @@ void TestScene1_Init()
 	// Scene Button GUI Temp init 
 	TestScene1_BtnInit();
 	Sprite_Initialize();
+
+	//Inventory_Init();
+
+
 	Enemy_Initialize();
 	PhyObj_Initialize();
+
 	//Temp House stuff to check collision
 	house_posX = wind_Width / 2.7f;
 	house_posY = wind_Height / 2.2f;
@@ -67,8 +72,9 @@ void TestScene1_Update(const float dt)
 			if (CheckEnemyCollision(house_posX + house_SizeX / 2, house_posY + house_SizeY / 2,
 				house_posX - house_SizeX / 2, house_posY - house_SizeY / 2, i) == 1)
 			{
-				SetEnemyDie(i);
-				houseHP -= 5.f;
+				//SetEnemyDie(i);
+				SetEnemySpeed(i, 0.f);
+				houseHP -= dt * (float)(GetEnemyDMG(i));
 				Sprite_SetWidth(tempHouseHP_spriteId, houseHP * 10.f);
 			}
 			//TEST BALL COLLISION
@@ -77,7 +83,8 @@ void TestScene1_Update(const float dt)
 				test_circle->super._position.x - test_circle->_radius,
 				test_circle->super._position.y - test_circle->_radius, i) == 1)
 			{
-				SetEnemyDie(i);
+				//SetEnemyDie(i);
+				SetEnemyHP(i, GetEnemyHP(i) - dt*10.f);
 			}
 		}
 	}
@@ -88,6 +95,7 @@ void TestScene1_Update(const float dt)
 	Sprite_RenderSprite(dt, tempHouseSprite_id);
 	Sprite_RenderSprite(dt, tempHouseHP_spriteId);
 	GUIRender();
+	//Inventory_Render();
 	Camera_Update(dt);
 	PhyObj_Update(dt);
 	PhyObj_Render();
@@ -107,7 +115,7 @@ void KeyInputAssign()
 	//Debug Spawn NoOxy
 	if (CP_Input_KeyReleased(KEY_O))
 	{
-		CreateEnemy(10.f,
+		CreateEnemy(50.f,
 			(CP_Vector){wind_Width / 1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			50.f, 1);
@@ -126,12 +134,24 @@ void KeyInputAssign()
 			(CP_Vector){wind_Width/1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			100.f, 0);*/
+		
 	}
+
+
+	////Inventory
+	//if (CP_Input_KeyDown(KEY_TAB))
+	//{
+	//	inventory_is_visible = 1;
+	//}
+	//else
+	//{
+	//	inventory_is_visible = 0;
+	//}
 
 	if (CP_Input_MouseClicked())
 	{
-		test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 5.f, 5.f, 1.f);
-		test_circle->super._visible = 1;
+		//test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 5.f, 5.f, 1.f);
+		//test_circle->super._visible = 1;
 		//PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.f, 30.f, 1.f)->super._visible = 1;
 	}
 }
@@ -188,11 +208,15 @@ void TestScene1_BtnManager()
 	if (mainGUI_isOpen)
 	{
 		mainGUI_isOpen = 0;
+		Button_Active_Set(btn_closePopup, 0);
+		Button_Active_Set(btn_popupWind, 1);
 		printf("Clicked Btn ID: %d\n", btn_closePopup);
 	}
 	else
 	{
 		mainGUI_isOpen = 1;
+		Button_Active_Set(btn_closePopup, 1);
+		Button_Active_Set(btn_popupWind, 0);
 		printf("Clicked Btn ID: %d\n", btn_popupWind);
 	}
 }

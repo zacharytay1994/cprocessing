@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "Camera.h"
 #include "Enemy.h"
+#include "Inventory.h"
 
 int btn_popupWind;
 int btn_closePopup;

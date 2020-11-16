@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Camera.h"
+#include "Inventory.h"
 
 #include <stdio.h>
 
@@ -26,6 +27,18 @@ void Player_Initialize()
 		"player_run.png", 3, 3, 8, 15,
 		"player_jump.png", 3, 4, 10, 30,
 		KEY_W,KEY_S,KEY_A,KEY_D);*/
+	// initialize player at the center of the screen
+	CP_Vector position = CP_Vector_Set(200.0f, -800.0f);
+
+	// Adding a player into the scene
+	Player_AddPlayer(position,
+		PLAYER1_MASS, PLAYER1_BOUNDING_WIDTH, PLAYER1_BOUNDING_HEIGHT, PLAYER1_FRICTION, PLAYER1_SPRITE_WIDTH, PLAYER1_SPRITE_HEIGHT,
+		"player_idle.png", 3, 4, 10, 10,
+		"player_run.png", 3, 3, 8, 15,
+		"player_jump.png", 3, 4, 10, 30,
+		KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
+	Player_SetCameraFocus(0);
+	Player_initialized = 1;
 }
 
 void Player_AddPlayer(const CP_Vector pos, const float mass, const float bwidth, const float bheight, const float friction,
@@ -155,6 +168,15 @@ void Player_Input(const float dt)
 		else {
 			PhyObj_SetVisible(Player_players[i]._box, 0);
 		}
+
+		if (CP_Input_KeyDown(KEY_TAB))
+		{
+			Inventory_Open();
+		}
+		else
+		{
+			Inventory_Close();
+		}
 	}
 }
 
@@ -253,4 +275,10 @@ void Player_SetCameraFocus(const int id)
 	if (id < PLAYER_MAX_PLAYERS) {
 		Camera_BindToPosition(Player_GetPosition_P(id)); // magic number 0 here means player 1, index 0 in players array
 	}
+}
+
+void Player_temp()
+{
+	PhyObjBoundingShape* shape = PhyObj_GetShape(Player_players[0]._box);
+	shape->_position = CP_Vector_Set(200.0f, 20.0f);
 }

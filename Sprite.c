@@ -210,7 +210,7 @@ void Sprite_Free()
 	free(sprites);
 }
 
-void Sprite_SetFlip(const int id, const int flip)
+void Sprite_SetFlip(const int id, const int flip)															
 {
 	if (id < sprites_size) {
 		sprites[id]._flip = flip;

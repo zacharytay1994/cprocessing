@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "GUI.h"
 #include "ParallaxBackground.h"
+#include "Inventory.h"
 
 #include <stdio.h>
 
@@ -42,6 +43,10 @@ int tb_bombs_size = 0;
 int tb_bombs_init = 0;
 int tb_bombs_resource;
 
+float tb_zombie_spawn = 3.0f;
+float tb_temp = 3.0f;
+int tb_check = 0;
+
 void TestBed_Init()
 {
 	printf("Switched to testbed.\n");
@@ -60,6 +65,10 @@ void TestBed_Init()
 	Tilemap_GeneratePhyObjs(tilemap);
 	Player_Initialize();
 	PB_Initialize();
+	Inventory_Init();
+	Inventory_Item_Create("poop");
+	Inventory_Add_Item_Name("poop");
+	Inventory_Item_Set_Image("poop", "demo_test.png");
 
 	/*Sprite_InitData s_data = { (CP_Vector) { 100.0f,100.0f },100.0f,100.0f,"dirt_block.png",1,1,1,1,1 };
 	int parent = GUI_AddRootContainer((CP_Vector) { 100.0f, 100.0f }, CP_Vector_Set(30.0f, 30.0f), s_data);
@@ -77,6 +86,9 @@ void TestBed_Init()
 	Camera_SetLimit(1);
 	Camera_SetHorizontalLimit(CP_Vector_Set(-(float)CP_System_GetWindowWidth()/2.0f+64.0f, 1760.0f-64.0f));
 	Camera_SetVerticalLimit(CP_Vector_Set(0.0f,830.0f));
+	CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+	TestBed_SpawnBomb(position);
+	TestBed_SpawnZombie();
 }
 
 void TestBed_Update(const float dt)
@@ -85,6 +97,7 @@ void TestBed_Update(const float dt)
 	PB_Update(dt);
 	Player_Update(dt);
 	GUI_Update(dt);
+	Inventory_Update();
 
 	//// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
@@ -111,6 +124,23 @@ void TestBed_Update(const float dt)
 	if (CP_Input_MouseClicked()) {
 		CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 		TestBed_SpawnBomb(position);
+	}
+	Inventory_Render();
+	if (tb_zombie_spawn < 0.0f) {
+		TestBed_SpawnZombie();
+		tb_zombie_spawn = 3.0f;
+	}
+	else {
+		tb_zombie_spawn -= dt;
+	}
+	if (tb_temp < 0.0f) {
+		if (!tb_check) {
+			Player_temp();
+			tb_check = 1;
+		}
+	}
+	else {
+		tb_temp -= dt;
 	}
 }
 
