@@ -63,3 +63,7 @@ CP_Vector* Player_GetPosition_P(const int id);
 
 void Player_SetCameraFocus(const int id);
 void Player_temp();
+
+void Player_ShowWeapon();
+void Player_HideWeapon();
+void Player_WeaponUpdate();

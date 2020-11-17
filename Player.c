@@ -3,6 +3,7 @@
 #include "Inventory.h"
 
 #include <stdio.h>
+#include <math.h>
 
 PlayerData Player_players[PLAYER_MAX_PLAYERS] = { 0 };
 int Player_players_size = 0;
@@ -17,10 +18,26 @@ float Player_heart_offset_x = 50.0f;
 float Player_heart_offset_y = 50.0f;
 float Player_heart_spacing = 60.0f;
 
+// Weapon code
+int Player_weapon;
+CP_Vector Player_weapon_position;
+float Player_weapon_width = 200.0f;
+float Player_weapon_height = 200.0f;
+CP_Vector Player_weapon_offset;
+int Player_weapon_out = 0;
+
 void Player_Initialize()
 {
 	Player_health = Player_max_health;
 	Player_heart = CP_Image_Load("demo_heart.png");
+
+	// initialize weapon
+	Player_weapon_offset = (CP_Vector){ 0.0f,-100.0f };
+	Player_weapon_position = (CP_Vector){ 0.0f,0.0f };
+	Player_weapon = Sprite_AddSprite(Player_weapon_position, Player_weapon_width, Player_weapon_height, "./Sprites/weapon.png", 2, 3, 6, 10, 0);
+	Sprite_SetRepeat(Player_weapon, 0);
+	Sprite_SetVisible(Player_weapon, 0);
+
 	// Adding player 2 into the scene
 	/*Player_AddPlayer(position, 10.0f, 22.5f, 55.0f, 0.0f, 60.0f, 60.0f,
 		"player_idle.png", 3, 4, 10, 10,
@@ -33,9 +50,9 @@ void Player_Initialize()
 	// Adding a player into the scene
 	Player_AddPlayer(position,
 		PLAYER1_MASS, PLAYER1_BOUNDING_WIDTH, PLAYER1_BOUNDING_HEIGHT, PLAYER1_FRICTION, PLAYER1_SPRITE_WIDTH, PLAYER1_SPRITE_HEIGHT,
-		"player_idle.png", 3, 4, 10, 10,
-		"player_run.png", 3, 3, 8, 15,
-		"player_jump.png", 3, 4, 10, 30,
+		"./Sprites/p_idle.png", 2, 3, 6, 8,
+		"./Sprites/p_run.png", 2, 3, 6, 12,
+		"./Sprites/p_jump.png", 2, 3, 6, 25,
 		KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
 	Player_SetCameraFocus(0);
 	Player_initialized = 1;
@@ -110,6 +127,7 @@ void Player_Update(const float dt)
 	for (int j = 0; j < Player_health; j++) {
 		CP_Image_Draw(Player_heart, Player_heart_offset_x + j * Player_heart_spacing, Player_heart_offset_y, 60.0f, 60.0f, 255);
 	}
+	Player_WeaponUpdate();
 }
 
 void Player_Render()
@@ -176,6 +194,13 @@ void Player_Input(const float dt)
 		else
 		{
 			Inventory_Close();
+		}
+
+		if (CP_Input_MouseDown(0)) {
+			Player_ShowWeapon();
+		}
+		else if (Player_weapon_out) {
+			Player_HideWeapon();
 		}
 	}
 }
@@ -281,4 +306,45 @@ void Player_temp()
 {
 	PhyObjBoundingShape* shape = PhyObj_GetShape(Player_players[0]._box);
 	shape->_position = CP_Vector_Set(200.0f, 20.0f);
+}
+
+void Player_ShowWeapon()
+{
+	if (Player_initialized) {
+		Sprite_SetVisible(Player_weapon, 1);
+		Player_weapon_out = 1;
+	}
+}
+
+void Player_HideWeapon()
+{
+	if (Player_initialized) {
+		Sprite_Reset(Player_weapon);
+		Sprite_SetVisible(Player_weapon, 0);
+		Player_weapon_out = 0;
+	}
+}
+
+void Player_WeaponUpdate()
+{
+	if (Player_initialized) {
+		CP_Vector weapon_position = CP_Vector_Add(Player_players[0]._position, Player_weapon_offset);
+		Sprite_SetPosition(Player_weapon, weapon_position);
+
+		// rotate weapon to mouse
+		CP_Vector mouse_position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+		CP_Vector mouse_vector = CP_Vector_Subtract(mouse_position, weapon_position);
+		float angle = CP_Vector_Angle((CP_Vector) { 1.0f, 0.0f }, mouse_vector);
+		if (mouse_vector.y < 0.0f) {
+			angle *= -1;
+		}
+		if (mouse_vector.x < 0.0f) {
+			Sprite_SetFlip(Player_weapon, 1);
+			angle -= 180;
+		}
+		else {
+			Sprite_SetFlip(Player_weapon, 0);
+		}
+		Sprite_SetRotation(Player_weapon, angle);
+	}
 }
