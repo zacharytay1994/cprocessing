@@ -26,6 +26,12 @@ int tempHouseHP_spriteId;
 float houseHP;
 void KeyInputAssign();	//Checks for keyboard input 
 
+//Gameplay nonsense
+void SpawnEnemyWaves(const float dt);
+void SpawnWave_1(const float dt);
+void SpawnWave_2(const float dt);
+void SpawnWave_3(const float dt);
+
 
 // GUI Buttons stuff
 int mainGUI_isOpen;	// 0 - isClosed, 1 - isOpened
