@@ -1,9 +1,12 @@
 #include "Player.h"
 #include "Camera.h"
 #include "Inventory.h"
+#include "Particles.h"
 
 #include <stdio.h>
 #include <math.h>
+
+#define PLAYER_DUST_TIMER 0.2f
 
 PlayerData Player_players[PLAYER_MAX_PLAYERS] = { 0 };
 int Player_players_size = 0;
@@ -25,6 +28,8 @@ float Player_weapon_width = 200.0f;
 float Player_weapon_height = 200.0f;
 CP_Vector Player_weapon_offset;
 int Player_weapon_out = 0;
+
+float Player_dust_timer = PLAYER_DUST_TIMER;
 
 void Player_Initialize()
 {
@@ -160,6 +165,14 @@ void Player_Input(const float dt)
 				some_input = !some_input;
 			}
 			Player_FlipAnimationsH(i,0);
+			if (Player_dust_timer > 0.0f) {
+				Player_dust_timer -= dt;
+			}
+			else {
+				CP_Vector temp_pos = CP_Vector_Add(Player_players[i]._position, (CP_Vector) { 0.0f, 30.0f });
+				Particle_EmitOut(temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5);
+				Player_dust_timer = PLAYER_DUST_TIMER;
+			}
 		}
 		if (CP_Input_KeyDown(Player_players[i]._left) || CP_Input_KeyDown(KEY_A)) {
 			if (shape->_velocity.x > -PLAYER_MAX_HVELOCITY) {
@@ -170,6 +183,14 @@ void Player_Input(const float dt)
 				some_input = !some_input;
 			}
 			Player_FlipAnimationsH(i,1);
+			if (Player_dust_timer > 0.0f) {
+				Player_dust_timer -= dt;
+			}
+			else {
+				CP_Vector temp_pos = CP_Vector_Add(Player_players[i]._position, (CP_Vector) { 0.0f, 30.0f });
+				Particle_EmitOut(temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5);
+				Player_dust_timer = PLAYER_DUST_TIMER;
+			}
 		}
 		if (CP_Input_KeyDown(Player_players[i]._up) || CP_Input_KeyDown(KEY_W)) {
 			if (Player_players[i]._grounded && shape->_velocity.y > -PLAYER_MAX_VVELOCITY) {

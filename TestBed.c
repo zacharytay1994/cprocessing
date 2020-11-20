@@ -8,6 +8,7 @@
 #include "GUI.h"
 #include "ParallaxBackground.h"
 #include "Inventory.h"
+#include "Particles.h"
 
 #include <stdio.h>
 
@@ -47,6 +48,8 @@ float tb_zombie_spawn = 3.0f;
 float tb_temp = 3.0f;
 int tb_check = 0;
 
+int particle_hold = 0;
+
 void TestBed_Init()
 {
 	printf("Switched to testbed.\n");
@@ -69,6 +72,7 @@ void TestBed_Init()
 	Inventory_Item_Create("poop");
 	Inventory_Add_Item_Name("poop");
 	Inventory_Item_Set_Image("poop", "demo_test.png");
+	Particle_Initialize();
 
 	/*Sprite_InitData s_data = { (CP_Vector) { 100.0f,100.0f },100.0f,100.0f,"dirt_block.png",1,1,1,1,1 };
 	int parent = GUI_AddRootContainer((CP_Vector) { 100.0f, 100.0f }, CP_Vector_Set(30.0f, 30.0f), s_data);
@@ -98,6 +102,7 @@ void TestBed_Update(const float dt)
 	Player_Update(dt);
 	GUI_Update(dt);
 	Inventory_Update();
+	Particle_Update(dt);
 
 	//// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
@@ -116,15 +121,16 @@ void TestBed_Update(const float dt)
 	}
 
 	if (CP_Input_KeyReleased(KEY_P)) {
-		TestBed_SpawnZombie();
+		//TestBed_SpawnZombie();
+		//Sprite_AddSprite(tb_zombie_spawn_position, 200.0f, 200.0f, "./Sprites/slime1.png", 2, 3, 6, 5, 0);
 	}
 	TestBed_UpdateZombies(dt);
 	TestBed_UpdateBombs(dt);
-	TestBed_CheckBombOnZomb();
-	if (CP_Input_MouseClicked()) {
+	//TestBed_CheckBombOnZomb();
+	/*if (CP_Input_MouseClicked()) {
 		CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 		TestBed_SpawnBomb(position);
-	}
+	}*/
 	Inventory_Render();
 	if (tb_zombie_spawn < 0.0f) {
 		TestBed_SpawnZombie();
@@ -141,6 +147,14 @@ void TestBed_Update(const float dt)
 	}
 	else {
 		tb_temp -= dt;
+	}
+
+	if (CP_Input_KeyReleased(KEY_J)) {
+		CP_Vector world_coords = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+		Particle_EmitOut(world_coords, 30.0f, 20.0f, 30.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5);
+	}
+	if (CP_Input_KeyReleased(KEY_K)) {
+		//Particle_Reset(particle_hold);
 	}
 }
 

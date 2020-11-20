@@ -2,8 +2,8 @@
 
 #include "CProcessing/inc/cprocessing.h"
 
-#define MAX_SPRITES 100
-#define SPRITES_INITIAL_SIZE 2
+#define MAX_SPRITES 500
+#define SPRITES_INITIAL_SIZE 200
 #define MAX_IMAGE_RESOURCE 100
 #define MAX_SPRITE_FRAMES 32
 #define SPRITE_MAX_PATH_LENGTH 50
@@ -14,7 +14,7 @@ typedef struct Sprite {
 	float		_scale;					// scales both width and height
 	float		_scale_x;				// scales width
 	float		_scale_y;				// scales height
-	int			_alpha;
+	float		_alpha;
 	int			_flip;					// flips the sprite horizontally
 	float		_width;
 	float		_height;
@@ -55,8 +55,8 @@ extern int images_size;
 /*____________________________________________________________________________________________________________________________________*/
 void	Sprite_Initialize();
 int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut);
-int		Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int image);
-int		Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int image, const int col, const int row, const int frame, const int fps, const int optOut);
+int		Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int sprite);
+int		Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int sprite, const int col, const int row, const int frame, const int fps, const int optOut);
 int		Sprite_AddSpriteInitData(const Sprite_InitData data);
 void	Sprite_RenderSprite(const float dt, const int id);
 void	Sprite_Render(const float dt);
@@ -92,3 +92,4 @@ float		Sprite_GetHeight(const int id);
 int			Sprite_GetFPS(const int id);
 int			Sprite_GetVisible(const int id);
 int			Sprite_GetImageResource(const int id);
+Sprite*		Sprite_GetSprite(const int id);
