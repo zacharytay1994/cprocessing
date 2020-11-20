@@ -52,8 +52,8 @@ void TestBed_Init()
 	printf("Switched to testbed.\n");
 
 	// temp
-	TestBed_house = CP_Image_Load("demo_house.png");
-	house_position = (CP_Vector){ 1000.0f,1075.0f };
+	TestBed_house = CP_Image_Load("./Sprites/house.png");
+	house_position = (CP_Vector){ 1000.0f,1065.0f };
 	House_health = House_max_health;
 	// temp zombie
 	tb_zombie_spawn_position = (CP_Vector){ 2300.0f,1150.0f };
@@ -154,7 +154,7 @@ void TestBed_Exit()
 void TestBed_SpawnZombie()
 {
 	if (!tb_zombies_init) {
-		tb_zombie_resource = Sprite_AddSprite(tb_zombie_spawn_position, 200.0f, 200.0f, "proto_zombie.png", 4, 4, 16, 3, 0);
+		tb_zombie_resource = Sprite_AddSprite(tb_zombie_spawn_position, 200.0f, 200.0f, "./Sprites/slime1.png", 2, 3, 6, 5, 0);
 		tb_zombies_init = 1;
 		if (tb_zombies_size < TESTBED_ZOMBIES_MAX) {
 			tb_zombies[tb_zombies_size++] = (TB_Zombie){ tb_zombie_resource, TESTBED_ZOMBIES_HEALTH, 1, 0.0f, 0 };

@@ -17,7 +17,7 @@ int tilemap_active_tilesheet_cell = 0;
 void Tilemap_Initialize()
 {
 	// loading tilesheets
-	Tilemap_SetActiveTileSheet(Tilemap_LoadTileSheet("mossy_image.png", 6, 6, 36));
+	Tilemap_SetActiveTileSheet(Tilemap_LoadTileSheet("./Sprites/ground.png", 1, 1, 1));
 }
 
 void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
