@@ -22,6 +22,11 @@ void Sprite_Initialize()
 
 int Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut)
 {
+	return Sprite_AddSpriteF(position,width,height,path,col,row,frame,(float)fps,optOut);
+}
+
+int Sprite_AddSpriteF(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const float fps, const int optOut)
+{
 	if (images_size >= MAX_IMAGE_RESOURCE) {
 		printf("Sprite::MAX_IMAGE_RESOURCE exceeded!");
 		return -1;
@@ -251,6 +256,16 @@ void Sprite_SetRepeat(const int id, const int repeat)
 		sprites[id]._repeat = repeat;
 	}
 }
+
+void Sprite_OptOut(const int id, int bool_01)
+{
+	if (id < sprites_size || id > 0 )
+	{
+		sprites[id]._optOut = bool_01;
+	}
+}
+
+
 
 void Sprite_Reset(const int id)
 {

@@ -55,6 +55,7 @@ extern int images_size;
 /*____________________________________________________________________________________________________________________________________*/
 void	Sprite_Initialize();
 int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut);
+int		Sprite_AddSpriteF(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const float fps, const int optOut);
 int		Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int image);
 int		Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int image, const int col, const int row, const int frame, const int fps, const int optOut);
 int		Sprite_AddSpriteInitData(const Sprite_InitData data);
@@ -78,6 +79,8 @@ void Sprite_SetHeight(const int id, const float height);
 void Sprite_SetFPS(const int id, const int fps);
 void Sprite_SetVisible(const int id, const int visible);
 void Sprite_SetRepeat(const int id, const int repeat);
+
+void Sprite_OptOut(const int id , int bool_01);
 void Sprite_Reset(const int id); // resets all counter based variables of sprite, i.e. as if just initialized
 
 CP_Vector	Sprite_GetPosition(const int id);
