@@ -75,5 +75,7 @@ void Player_ShowWeapon();
 void Player_HideWeapon(const float dt);
 void Player_WeaponUpdate(const float dt);
 
-void Player_SpawnProjectile();
+void Player_SpawnProjectile(const float dt);
 void Player_ProjectileUpdate(const float dt);
+
+void Player_RenderProjectileArc(const CP_Vector position, const CP_Vector direction, const int lineDensity, const float fallOff, const float dt);

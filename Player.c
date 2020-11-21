@@ -36,12 +36,16 @@ Player_Projectile Player_projectiles[PLAYER_MAX_PROJECTILES];
 int Player_projectiles_size = 0;
 int Player_projectiles_init = 0;
 int Player_projectiles_resource;
+CP_Image Player_projectile_arc_resource;
+int Player_projectile_fire = 0;
 
 float Player_dust_timer = PLAYER_DUST_TIMER;
 
 
 void Player_Initialize()
 {
+	Player_projectile_arc_resource = CP_Image_Load("./Sprites/ground.png");
+
 	Player_health = Player_max_health;
 	Player_heart = CP_Image_Load("demo_heart.png");
 
@@ -391,7 +395,7 @@ void Player_WeaponUpdate(const float dt)
 	}
 }
 
-void Player_SpawnProjectile()
+void Player_SpawnProjectile(const float dt)
 {
 	CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 	CP_Vector start_position = Player_weapon_position;
@@ -399,30 +403,35 @@ void Player_SpawnProjectile()
 	CP_Vector direction = CP_Vector_Normalize(CP_Vector_Subtract(position, start_position));
 	direction = CP_Vector_Scale(direction, Player_max_weapon_strength);
 	CP_Vector spawn_position = CP_Vector_Add(start_position, CP_Vector_Scale(direction, 5.0f));
-	if (!Player_projectiles_init) {
-		Player_projectiles_resource = Sprite_AddSprite(spawn_position, 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 0);
-		Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
-		Player_projectiles_init = 1;
-		if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
-			Player_projectiles[Player_projectiles_size++] = (Player_Projectile){ Player_projectiles_resource, 0, direction };
+	if (Player_projectile_fire) {
+		if (!Player_projectiles_init) {
+			Player_projectiles_resource = Sprite_AddSprite(spawn_position, 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 0);
+			Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+			Player_projectiles_init = 1;
+			if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
+				Player_projectiles[Player_projectiles_size++] = (Player_Projectile){ Player_projectiles_resource, 0, direction };
+			}
 		}
-	}
-	else {
-		if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
-			Player_projectiles[Player_projectiles_size++] = (Player_Projectile){
-				Sprite_AddSpriteRepeatAuto(spawn_position, 50.0f, 50.0f, Player_projectiles_resource), 0, direction };
+		else {
+			if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
+				Player_projectiles[Player_projectiles_size++] = (Player_Projectile){
+					Sprite_AddSpriteRepeatAuto(spawn_position, 50.0f, 50.0f, Player_projectiles_resource), 0, direction };
 				Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+			}
 		}
+		Player_projectile_fire = 0;
 	}
+	Player_RenderProjectileArc(spawn_position, direction, 10, 9.81f, dt);
 }
 
 void Player_ProjectileUpdate(const float dt)
 {
 	// check for spawning
 	if (CP_Input_MouseClicked()) {
-		CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
-		Player_SpawnProjectile(position);
+		Player_projectile_fire = 1;
 	}
+	//CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+	Player_SpawnProjectile(dt);
 	 // update bomb velocity
 	for (int i = 0; i < Player_projectiles_size; i++) {
 		if (Player_projectiles[i]._dead) { continue; }
@@ -430,5 +439,18 @@ void Player_ProjectileUpdate(const float dt)
 		// apply velocity
 		CP_Vector new_pos = CP_Vector_Add(Sprite_GetPosition(Player_projectiles[i]._id), Player_projectiles[i]._velocity);
 		Sprite_SetPosition(Player_projectiles[i]._id, new_pos);
+	}
+}
+
+void Player_RenderProjectileArc(const CP_Vector position, const CP_Vector direction, const int lineDensity, const float fallOff, const float dt)
+{
+	if (Player_initialized) {
+		float arc_dt = dt;
+		for (int i = 0; i < 10; ++i) {
+			CP_Vector pos = CP_Vector_Add(position, CP_Vector_Scale(direction, i*30.0f* arc_dt));
+			pos.y += fallOff * i * 30.0f * arc_dt;
+			pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), pos);
+			CP_Image_Draw(Player_projectile_arc_resource, pos.x, pos.y, 30.0f, 30.0f, 255);
+		}
 	}
 }
