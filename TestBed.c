@@ -39,10 +39,10 @@ int tb_zombies_init = 0;
 int tb_zombie_resource;
 CP_Vector tb_zombie_spawn_position;
 
-TB_Bomb tb_bombs[TESTBED_ZOMBIES_MAX];
-int tb_bombs_size = 0;
-int tb_bombs_init = 0;
-int tb_bombs_resource;
+//TB_Bomb tb_bombs[TESTBED_ZOMBIES_MAX];
+//int tb_bombs_size = 0;
+//int tb_bombs_init = 0;
+//int tb_bombs_resource;
 
 float tb_zombie_spawn = 3.0f;
 float tb_temp = 3.0f;
@@ -90,8 +90,8 @@ void TestBed_Init()
 	Camera_SetLimit(1);
 	Camera_SetHorizontalLimit(CP_Vector_Set(-(float)CP_System_GetWindowWidth()/2.0f+64.0f, 1760.0f-64.0f));
 	Camera_SetVerticalLimit(CP_Vector_Set(0.0f,830.0f));
-	CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
-	TestBed_SpawnBomb(position);
+	//CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+	//TestBed_SpawnBomb(position);
 	TestBed_SpawnZombie();
 }
 
@@ -125,7 +125,7 @@ void TestBed_Update(const float dt)
 		//Sprite_AddSprite(tb_zombie_spawn_position, 200.0f, 200.0f, "./Sprites/slime1.png", 2, 3, 6, 5, 0);
 	}
 	TestBed_UpdateZombies(dt);
-	TestBed_UpdateBombs(dt);
+	//TestBed_UpdateBombs(dt);
 	//TestBed_CheckBombOnZomb();
 	/*if (CP_Input_MouseClicked()) {
 		CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
@@ -151,7 +151,7 @@ void TestBed_Update(const float dt)
 
 	if (CP_Input_KeyReleased(KEY_J)) {
 		CP_Vector world_coords = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
-		Particle_EmitOut(world_coords, 30.0f, 20.0f, 30.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5);
+		Particle_EmitOut(PT_Dust, world_coords, 30.0f, 20.0f, 30.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5, 5);
 	}
 	if (CP_Input_KeyReleased(KEY_K)) {
 		//Particle_Reset(particle_hold);
@@ -207,69 +207,69 @@ void TestBed_UpdateZombies(const float dt)
 	}
 }
 
-void TestBed_SpawnBomb(const CP_Vector position)
-{
-	CP_Vector player_position = /*CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), */Player_GetPosition(0);
-	// calculate direction
-	CP_Vector direction = CP_Vector_Normalize(CP_Vector_Subtract(position, player_position));
-	direction = CP_Vector_Scale(direction, TESTBED_BOMB_SPEED);
-	if (!tb_bombs_init) {
-		tb_bombs_resource = Sprite_AddSprite(player_position, 50.0f, 50.0f, "proto_bomb.png", 1, 1, 1, 1, 0);
-		tb_bombs_init = 1;
-		if (tb_bombs_size < TESTBED_ZOMBIES_MAX) {
-			tb_bombs[tb_bombs_size++] = (TB_Bomb){ tb_bombs_resource, 0, direction };
-		}
-	}
-	else {
-		if (tb_bombs_size < TESTBED_ZOMBIES_MAX) {
-			tb_bombs[tb_bombs_size++] = (TB_Bomb){
-				Sprite_AddSpriteRepeatAuto(player_position, 50.0f, 50.0f, tb_bombs_resource), 0, direction };
-		}
-	}
-}
+//void TestBed_SpawnBomb(const CP_Vector position)
+//{
+//	CP_Vector player_position = /*CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), */Player_GetPosition(0);
+//	// calculate direction
+//	CP_Vector direction = CP_Vector_Normalize(CP_Vector_Subtract(position, player_position));
+//	direction = CP_Vector_Scale(direction, TESTBED_BOMB_SPEED);
+//	if (!tb_bombs_init) {
+//		tb_bombs_resource = Sprite_AddSprite(player_position, 50.0f, 50.0f, "proto_bomb.png", 1, 1, 1, 1, 0);
+//		tb_bombs_init = 1;
+//		if (tb_bombs_size < TESTBED_ZOMBIES_MAX) {
+//			tb_bombs[tb_bombs_size++] = (TB_Bomb){ tb_bombs_resource, 0, direction };
+//		}
+//	}
+//	else {
+//		if (tb_bombs_size < TESTBED_ZOMBIES_MAX) {
+//			tb_bombs[tb_bombs_size++] = (TB_Bomb){
+//				Sprite_AddSpriteRepeatAuto(player_position, 50.0f, 50.0f, tb_bombs_resource), 0, direction };
+//		}
+//	}
+//}
 
-void TestBed_UpdateBombs(const float dt)
-{
-	// update bomb velocity
-	for (int i = 0; i < tb_bombs_size; i++) {
-		if (tb_bombs[i]._dead) { continue; }
-		tb_bombs[i]._velocity.y += TESTBED_BOMB_GRAVITY * dt;
-		// apply velocity
-		CP_Vector new_pos = CP_Vector_Add(Sprite_GetPosition(tb_bombs[i]._id), tb_bombs[i]._velocity);
-		Sprite_SetPosition(tb_bombs[i]._id, new_pos);
-	}
-}
+//void TestBed_UpdateBombs(const float dt)
+//{
+//	// update bomb velocity
+//	for (int i = 0; i < tb_bombs_size; i++) {
+//		if (tb_bombs[i]._dead) { continue; }
+//		tb_bombs[i]._velocity.y += TESTBED_BOMB_GRAVITY * dt;
+//		// apply velocity
+//		CP_Vector new_pos = CP_Vector_Add(Sprite_GetPosition(tb_bombs[i]._id), tb_bombs[i]._velocity);
+//		Sprite_SetPosition(tb_bombs[i]._id, new_pos);
+//	}
+//}
 
 void TestBed_CheckBombOnZomb()
 {
-	CP_Vector zombs_pos;
-	CP_Vector bombs_pos;
-	float zomb_half_x = 80.0f;
-	float zomb_half_y = 80.0f;
-	float bomb_half_x = 25.0f;
-	float bomb_half_y = 25.0f;
-	for (int i = 0; i < tb_bombs_size; i++) {
-		if (!tb_bombs[i]._dead) {
-			for (int j = 0; j < tb_zombies_size; j++) {
-				if (!tb_zombies[j]._dead && !tb_bombs[i]._dead) {
-					zombs_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), Sprite_GetPosition(tb_zombies[j]._id));
-					bombs_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), Sprite_GetPosition(tb_bombs[i]._id));
-					// do aabb
-					if (!(zombs_pos.x - zomb_half_x > bombs_pos.x + bomb_half_x ||
-						zombs_pos.x + zomb_half_x < bombs_pos.x - bomb_half_x ||
-						zombs_pos.y - zomb_half_y > bombs_pos.y + bomb_half_y ||
-						zombs_pos.y + zomb_half_y < bombs_pos.y - bomb_half_y)) {
-						// hit, minus zombs health by 1 turn bomb dead
-						tb_zombies[j]._health -= 1;
-						if (tb_zombies[j]._health <= 0) {
-							tb_zombies[j]._dead = 1;
-							Sprite_SetVisible(tb_zombies[j]._id, 0);
-						}
-						tb_bombs[i]._dead = 1;
-						Sprite_SetVisible(tb_bombs[i]._id, 0);
-					}
-				}
-			}
-		}
-	}
+	//CP_Vector zombs_pos;
+	//CP_Vector bombs_pos;
+	//float zomb_half_x = 80.0f;
+	//float zomb_half_y = 80.0f;
+	//float bomb_half_x = 25.0f;
+	//float bomb_half_y = 25.0f;
+	//for (int i = 0; i < tb_bombs_size; i++) {
+	//	if (!tb_bombs[i]._dead) {
+	//		for (int j = 0; j < tb_zombies_size; j++) {
+	//			if (!tb_zombies[j]._dead && !tb_bombs[i]._dead) {
+	//				zombs_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), Sprite_GetPosition(tb_zombies[j]._id));
+	//				bombs_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), Sprite_GetPosition(tb_bombs[i]._id));
+	//				// do aabb
+	//				if (!(zombs_pos.x - zomb_half_x > bombs_pos.x + bomb_half_x ||
+	//					zombs_pos.x + zomb_half_x < bombs_pos.x - bomb_half_x ||
+	//					zombs_pos.y - zomb_half_y > bombs_pos.y + bomb_half_y ||
+	//					zombs_pos.y + zomb_half_y < bombs_pos.y - bomb_half_y)) {
+	//					// hit, minus zombs health by 1 turn bomb dead
+	//					tb_zombies[j]._health -= 1;
+	//					if (tb_zombies[j]._health <= 0) {
+	//						tb_zombies[j]._dead = 1;
+	//						Sprite_SetVisible(tb_zombies[j]._id, 0);
+	//					}
+	//					tb_bombs[i]._dead = 1;
+	//					Sprite_SetVisible(tb_bombs[i]._id, 0);
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 }

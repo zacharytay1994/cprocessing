@@ -3,9 +3,7 @@
 #include <stdio.h>
 
 #define MAX_PARTICLE_TYPES 50
-#define MAX_PARTICLES 100
-
-#define MAX_PARTICLE_SYSTEMS 50
+#define MAX_PARTICLES 500
 
 int Particle_types[MAX_PARTICLE_TYPES] = { 0 };
 int Particle_types_size = 0;
@@ -16,6 +14,7 @@ void Particle_Initialize()
 {
 	// initializing types
 	Particle_AddParticleType("./Sprites/part_smoke.png", 2, 3, 6, 3);
+	Particle_AddParticleType("./Sprites/effect1.png", 2, 3, 6, 3);
 
 	// initialize particle pool
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
@@ -68,6 +67,7 @@ int Particle_InitParticle(const ParticleType type, const ParticleData data, cons
 			sprite->_height = data._dimensions.y;
 			sprite->_visible = 1;
 			sprite->_alpha = alpha;
+			Sprite_SetFPS(Particle_particles[i]._sprite, data._fps);
 			Particle_particles[i]._type = type;
 			Particle_particles[i]._dead = 0;
 			return i;
@@ -93,14 +93,14 @@ void Particle_Reset(const int id)
 	}
 }
 
-void Particle_EmitOut(const CP_Vector position,
+void Particle_EmitOut(const ParticleType type, const CP_Vector position,
 	const float upperSize, const float lowerSize,
 	const float upperRot, const float lowerRot,
 	const float upperSpeed, const float lowerSpeed,
 	const float upperLifetime, const float lowerLifetime,
 	const float upperAlphaChange, const float lowerAlphaChange,
 	const float upperScaleChange, const float lowerScaleChange,
-	const float alpha, const int number)
+	const float alpha, const int fps, const int number)
 {
 	ParticleData particle_data;
 	for (int i = 0; i < number; ++i) {
@@ -119,6 +119,7 @@ void Particle_EmitOut(const CP_Vector position,
 		particle_data._alpha_change = random_alpha_change;
 		float random_scale_change = CP_Random_RangeFloat(lowerScaleChange , upperScaleChange);
 		particle_data._scale_change = random_scale_change;
-		Particle_InitParticle(0, particle_data, alpha);
+		particle_data._fps = fps;
+		Particle_InitParticle(type, particle_data, alpha);
 	}
 }

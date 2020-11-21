@@ -7,6 +7,7 @@
 #include <math.h>
 
 #define PLAYER_DUST_TIMER 0.2f
+#define PLAYER_MAX_PROJECTILES 200
 
 PlayerData Player_players[PLAYER_MAX_PLAYERS] = { 0 };
 int Player_players_size = 0;
@@ -24,12 +25,20 @@ float Player_heart_spacing = 60.0f;
 // Weapon code
 int Player_weapon;
 CP_Vector Player_weapon_position;
-float Player_weapon_width = 200.0f;
-float Player_weapon_height = 200.0f;
+float Player_weapon_width = 100.0f;
+float Player_weapon_height = 100.0f;
 CP_Vector Player_weapon_offset;
 int Player_weapon_out = 0;
+float Player_max_weapon_strength = 30.0f;
+float Player_weapon_strength = 0.0f;
+
+Player_Projectile Player_projectiles[PLAYER_MAX_PROJECTILES];
+int Player_projectiles_size = 0;
+int Player_projectiles_init = 0;
+int Player_projectiles_resource;
 
 float Player_dust_timer = PLAYER_DUST_TIMER;
+
 
 void Player_Initialize()
 {
@@ -39,7 +48,7 @@ void Player_Initialize()
 	// initialize weapon
 	Player_weapon_offset = (CP_Vector){ 0.0f,-100.0f };
 	Player_weapon_position = (CP_Vector){ 0.0f,0.0f };
-	Player_weapon = Sprite_AddSprite(Player_weapon_position, Player_weapon_width, Player_weapon_height, "./Sprites/weapon.png", 2, 3, 6, 10, 0);
+	Player_weapon = Sprite_AddSprite(Player_weapon_position, Player_weapon_width, Player_weapon_height, "./Sprites/weapon.png", 2, 3, 6, 20, 0);
 	Sprite_SetRepeat(Player_weapon, 0);
 	Sprite_SetVisible(Player_weapon, 0);
 
@@ -132,7 +141,7 @@ void Player_Update(const float dt)
 	for (int j = 0; j < Player_health; j++) {
 		CP_Image_Draw(Player_heart, Player_heart_offset_x + j * Player_heart_spacing, Player_heart_offset_y, 60.0f, 60.0f, 255);
 	}
-	Player_WeaponUpdate();
+	Player_WeaponUpdate(dt);
 }
 
 void Player_Render()
@@ -170,7 +179,7 @@ void Player_Input(const float dt)
 			}
 			else {
 				CP_Vector temp_pos = CP_Vector_Add(Player_players[i]._position, (CP_Vector) { 0.0f, 30.0f });
-				Particle_EmitOut(temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5);
+				Particle_EmitOut(PT_Dust, temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5, 5);
 				Player_dust_timer = PLAYER_DUST_TIMER;
 			}
 		}
@@ -188,7 +197,7 @@ void Player_Input(const float dt)
 			}
 			else {
 				CP_Vector temp_pos = CP_Vector_Add(Player_players[i]._position, (CP_Vector) { 0.0f, 30.0f });
-				Particle_EmitOut(temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5);
+				Particle_EmitOut(PT_Dust, temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5, 5);
 				Player_dust_timer = PLAYER_DUST_TIMER;
 			}
 		}
@@ -220,8 +229,8 @@ void Player_Input(const float dt)
 		if (CP_Input_MouseDown(0)) {
 			Player_ShowWeapon();
 		}
-		else if (Player_weapon_out) {
-			Player_HideWeapon();
+		else {
+			Player_HideWeapon(dt);
 		}
 	}
 }
@@ -332,24 +341,35 @@ void Player_temp()
 void Player_ShowWeapon()
 {
 	if (Player_initialized) {
-		Sprite_SetVisible(Player_weapon, 1);
-		Player_weapon_out = 1;
+		Sprite_SetAlpha(Player_weapon, 255.0f);
+		if (!Player_weapon_out) {
+			Sprite_Reset(Player_weapon);
+			Sprite_SetVisible(Player_weapon, 1);
+			Player_weapon_out = 1;
+		}
+		//Particle_EmitOut(PT_Star, Player_weapon_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
 	}
 }
 
-void Player_HideWeapon()
+void Player_HideWeapon(const float dt)
 {
-	if (Player_initialized) {
-		Sprite_Reset(Player_weapon);
-		Sprite_SetVisible(Player_weapon, 0);
-		Player_weapon_out = 0;
+	if (Player_initialized && Player_weapon_out) {
+		float alpha = Sprite_GetAlpha(Player_weapon);
+		if (alpha > 0.0f) {
+			Sprite_SetAlpha(Player_weapon, alpha - 1000.0f * dt);
+		}
+		else {
+			Sprite_SetVisible(Player_weapon, 0);
+			Player_weapon_out = 0;
+		}
 	}
 }
 
-void Player_WeaponUpdate()
+void Player_WeaponUpdate(const float dt)
 {
 	if (Player_initialized) {
 		CP_Vector weapon_position = CP_Vector_Add(Player_players[0]._position, Player_weapon_offset);
+		Player_weapon_position = weapon_position;
 		Sprite_SetPosition(Player_weapon, weapon_position);
 
 		// rotate weapon to mouse
@@ -367,5 +387,48 @@ void Player_WeaponUpdate()
 			Sprite_SetFlip(Player_weapon, 0);
 		}
 		Sprite_SetRotation(Player_weapon, angle);
+		Player_ProjectileUpdate(dt);
+	}
+}
+
+void Player_SpawnProjectile()
+{
+	CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+	CP_Vector start_position = Player_weapon_position;
+	// calculate direction
+	CP_Vector direction = CP_Vector_Normalize(CP_Vector_Subtract(position, start_position));
+	direction = CP_Vector_Scale(direction, Player_max_weapon_strength);
+	CP_Vector spawn_position = CP_Vector_Add(start_position, CP_Vector_Scale(direction, 5.0f));
+	if (!Player_projectiles_init) {
+		Player_projectiles_resource = Sprite_AddSprite(spawn_position, 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 0);
+		Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+		Player_projectiles_init = 1;
+		if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
+			Player_projectiles[Player_projectiles_size++] = (Player_Projectile){ Player_projectiles_resource, 0, direction };
+		}
+	}
+	else {
+		if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
+			Player_projectiles[Player_projectiles_size++] = (Player_Projectile){
+				Sprite_AddSpriteRepeatAuto(spawn_position, 50.0f, 50.0f, Player_projectiles_resource), 0, direction };
+				Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+		}
+	}
+}
+
+void Player_ProjectileUpdate(const float dt)
+{
+	// check for spawning
+	if (CP_Input_MouseClicked()) {
+		CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+		Player_SpawnProjectile(position);
+	}
+	 // update bomb velocity
+	for (int i = 0; i < Player_projectiles_size; i++) {
+		if (Player_projectiles[i]._dead) { continue; }
+		Player_projectiles[i]._velocity.y += 9.81f * dt;
+		// apply velocity
+		CP_Vector new_pos = CP_Vector_Add(Sprite_GetPosition(Player_projectiles[i]._id), Player_projectiles[i]._velocity);
+		Sprite_SetPosition(Player_projectiles[i]._id, new_pos);
 	}
 }

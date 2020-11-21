@@ -6,8 +6,9 @@
 #define PARTICLE_SYSTEM_MAX 50
 
 typedef enum ParticleType {
-	PT_Nothing,
-	PT_Dust
+	//PT_Nothing,
+	PT_Dust,
+	PT_Star
 } ParticleType;
 
 typedef enum ParticleSystemType {
@@ -28,6 +29,7 @@ typedef struct ParticleData {
 	float		_lifetime;
 	float		_alpha_change;
 	float		_scale_change;
+	int			_fps;
 } ParticleData;
 
 typedef struct Particle {
@@ -45,11 +47,11 @@ int	Particle_InitParticle(const ParticleType type, const ParticleData data, cons
 void Particle_AddParticleType(const char* path, const int col, const int row, const int frames, const int fps);
 void Particle_Reset(const int id);
 
-void Particle_EmitOut(const CP_Vector position,
+void Particle_EmitOut(const ParticleType type, const CP_Vector position,
 	const float upperSize, const float lowerSize,
 	const float upperRot, const float lowerRot,
 	const float upperSpeed, const float lowerSpeed,
 	const float upperLifetime, const float lowerLifetime,
 	const float upperAlphaChange, const float lowerAlphaChange, 
 	const float upperScaleChange, const float lowerScaleChange,
-	const float alpha, const int number);
+	const float alpha, const int fps, const int number);

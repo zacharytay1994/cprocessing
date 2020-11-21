@@ -300,10 +300,10 @@ float Sprite_GetScaleY(const int id)
 	return -1.0f;
 }
 
-int Sprite_GetAlpha(const int id)
+float Sprite_GetAlpha(const int id)
 {
 	if (id < sprites_size) {
-		return (int)sprites[id]._alpha;
+		return sprites[id]._alpha;
 	}
 	return -1;
 }
@@ -399,9 +399,9 @@ void Sprite_SetScaleY(const int id, const float scaley)
 	}
 }
 
-void Sprite_SetAlpha(const int id, const int alpha)
+void Sprite_SetAlpha(const int id, const float alpha)
 {
 	if (id < sprites_size) {
-		sprites[id]._alpha = (float)alpha;
+		sprites[id]._alpha = alpha;
 	}
 }
