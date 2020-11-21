@@ -8,14 +8,16 @@ PhyObjBoundingCircle* test_circle;
 
 char curr_Timer[127];
 char wave_status[127];
+char wave_display[127];
 double timer;
 double interval_counter;
-double wave_counter;
+double wave_timer;
 const double wave_duration = 10;
-const double interval_delay = 5;
+const double interval_delay = 10;
 float YspawnRange;
 int is_interval;
 int is_wave;
+int wave_count;
 
 void TestScene1_Init()
 {
@@ -49,10 +51,10 @@ void TestScene1_Init()
 	houseHP = 100.f;
 	timer = 0;
 	interval_counter = 0;
-	wave_counter = 0;
+	wave_timer = 0;
 	is_interval = 1;
 	is_wave = 0;
-	
+	wave_count = 0;
 
 	tempHouseHP_spriteId = Sprite_AddSprite(
 		(CP_Vector) {house_posX - 250.f, house_posY-130},
@@ -145,13 +147,14 @@ void TestScene1_Update(const float dt)
 	}
 	else	// not interval, spawning enemy waves
 	{
-		if (wave_counter <= 0)
+		if (wave_timer <= 0)
 		{
-			wave_counter = wave_duration;
+			wave_timer = wave_duration;
 			is_interval = 1;
+			wave_count++;
 		}
-		wave_counter -= dt;
-		sprintf_s(wave_status, 127, "(NIGHT) time left: %.0f", wave_counter);
+		wave_timer -= dt;
+		sprintf_s(wave_status, 127, "(NIGHT) time left: %.0f", wave_timer);
 		CP_Font_DrawText(wave_status, 350, 50);
 	}
 
@@ -159,6 +162,10 @@ void TestScene1_Update(const float dt)
 	timer += dt;
 	sprintf_s(curr_Timer, 127, "Time: %.0f", timer);
 	CP_Font_DrawText(curr_Timer, 20, 50);
+
+	sprintf_s(wave_display, 127, "WAVE %d", wave_count);
+	CP_Settings_Fill((CP_Color) { 10, 20, 255, 255 });
+	CP_Font_DrawText(wave_display, 400, 100);
 
 	// Misc Updates
 	UpdateEnemy(dt);
