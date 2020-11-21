@@ -27,6 +27,12 @@ typedef enum PlayerAnimationState {
 	Player_Anim_Jump
 } PlayerAnimationState;
 
+typedef struct Player_Projectile {
+	int _id;
+	int _dead;
+	CP_Vector _velocity;
+} Player_Projectile;
+
 typedef struct PlayerData {
 	CP_Vector	_position;							// position: the position is synced to the box position
 	int			_box;								// box: the bounding box handled by PhyObj
@@ -62,3 +68,14 @@ CP_Vector Player_GetPosition(const int id);
 CP_Vector* Player_GetPosition_P(const int id);
 
 void Player_SetCameraFocus(const int id);
+void Player_temp();
+
+// WEAPON CODE
+void Player_ShowWeapon();
+void Player_HideWeapon(const float dt);
+void Player_WeaponUpdate(const float dt);
+
+void Player_SpawnProjectile(const float dt);
+void Player_ProjectileUpdate(const float dt);
+
+void Player_RenderProjectileArc(const CP_Vector position, const CP_Vector direction, const int lineDensity, const float fallOff, const float dt);

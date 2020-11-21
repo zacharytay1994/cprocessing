@@ -3,6 +3,7 @@
 #include "Sprite.h"
 #include "Camera.h"
 #include "Enemy.h"
+#include "Inventory.h"
 
 int btn_popupWind;
 int btn_closePopup;
@@ -21,7 +22,15 @@ float house_posY;
 float house_SizeX;
 float house_SizeY;
 int tempHouseSprite_id;
+int tempHouseHP_spriteId;
+float houseHP;
 void KeyInputAssign();	//Checks for keyboard input 
+
+//Gameplay nonsense
+void SpawnEnemyWaves(const float dt);
+void SpawnWave_1(const float dt);
+void SpawnWave_2(const float dt);
+void SpawnWave_3(const float dt);
 
 
 // GUI Buttons stuff

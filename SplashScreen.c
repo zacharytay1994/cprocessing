@@ -40,7 +40,7 @@ void SplashScreen_Update(const float dt)
 		splashscreen_fade_amount_white -= 3 * 10;
 		if (splashscreen_fade_amount_white <= 0)
 		{
-			Scene_ChangeScene(2);
+			Scene_ChangeScene(3);
 		}
 	}
 	SplashScreen_Render();

@@ -72,6 +72,7 @@ void game_init(void)
 	CP_System_ShowConsole();
 	
 	Scene_Initialize();
+	Button_Class_Init();
 	test_scene_1 = Scene_AddScene(TestScene1_Init,TestScene1_Update,TestScene1_Exit);
 	test_scene_2 = Scene_AddScene(TestScene2_Init, TestScene2_Update, TestScene2_Exit);
 	test_bed = Scene_AddScene(TestBed_Init, TestBed_Update, TestBed_Exit);
