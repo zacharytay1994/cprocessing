@@ -98,6 +98,22 @@ void TestBed_Init()
 	Inventory_Item_Create("poop");
 	Inventory_Add_Item_Name("poop");
 	Inventory_Item_Set_Image("poop", "demo_test.png");
+
+	Inventory_Item_Create("AddHealthFlower");
+	Inventory_Item_Set_Image("AddHealthFlower", "Assets/Items/AddHealthFlower.png");
+	Inventory_Add_Item_Name("AddHealthFlower");
+
+	Inventory_Item_Create("AddMaxHealthFlower");
+	Inventory_Item_Set_Image("AddMaxHealthFlower", "Assets/Items/AddMaxHealthFlower.png");
+	Inventory_Add_Item_Name("AddMaxHealthFlower");
+
+	Inventory_Item_Create("Thorns");
+	Inventory_Item_Set_Image("Thorns", "Assets/Items/Thorns.png");
+	Inventory_Add_Item_Name("Thorns");
+
+	Inventory_Item_Create("RadioThorns");
+	Inventory_Item_Set_Image("RadioThorns", "Assets/Items/RadioThorns.png");
+	Inventory_Add_Item_Name("RadioThorns");
 	Particle_Initialize();
 
 	Enemy_Initialize(); // Initialize enemy sprites and values- (RAY)

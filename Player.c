@@ -454,3 +454,40 @@ void Player_RenderProjectileArc(const CP_Vector position, const CP_Vector direct
 		}
 	}
 }
+
+void Player_Add_Health(int x)
+{
+	Player_health += x;
+	if (Player_health > Player_max_health)
+	{
+		Player_health = Player_max_health;
+	}
+}
+
+void Player_Lose_Health(int x)
+{
+	Player_health -= x;
+	if (Player_health < 0)
+	{
+		Player_health = 0;
+	}
+}
+
+void Player_Add_MaxHealth(int x)
+{
+	Player_max_health += x;
+	Player_health += x;
+}
+
+void Player_Lose_MaxHealth(int x)
+{
+	Player_max_health -= x;
+	if (Player_max_health < 1)
+	{
+		Player_max_health = 1;
+	}
+	if (Player_health > Player_max_health)
+	{
+		Player_health = Player_max_health;
+	}
+}
