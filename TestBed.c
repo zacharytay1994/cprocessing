@@ -101,18 +101,22 @@ void TestBed_Init()
 
 	Inventory_Item_Create("Add Health Flower");
 	Inventory_Item_Set_Image("Add Health Flower", "Assets/Items/AddHealthFlower.png");
+	Inventory_Item_Set_Description("Add Health Flower", "Increases health by 1");
 	Inventory_Add_Item_Name("Add Health Flower");
 
 	Inventory_Item_Create("Add MaxHealth Flower");
 	Inventory_Item_Set_Image("Add MaxHealth Flower", "Assets/Items/AddMaxHealthFlower.png");
+	Inventory_Item_Set_Description("Add MaxHealth Flower", "Increases maximum health by 1");
 	Inventory_Add_Item_Name("Add MaxHealth Flower");
 
 	Inventory_Item_Create("Thorns");
 	Inventory_Item_Set_Image("Thorns", "Assets/Items/Thorns.png");
+	Inventory_Item_Set_Description("Thorns", "Lose 1 health");
 	Inventory_Add_Item_Name("Thorns");
 
 	Inventory_Item_Create("Radioactive Thorns");
 	Inventory_Item_Set_Image("Radioactive Thorns", "Assets/Items/RadioThorns.png");
+	Inventory_Item_Set_Description("Radioactive Thorns", "Lose 1 maximum health");
 	Inventory_Add_Item_Name("Radioactive Thorns");
 	Particle_Initialize();
 

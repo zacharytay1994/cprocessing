@@ -30,7 +30,7 @@ void MainMenu_Initialize()
 	Button_Text_Scale(button_credits, 2.f);
 	Button_Translate(button_credits, 0, -30);
 	Button_Text_Translate(button_credits, 0, 0);
-	Button_Color_Set(button_credits, 255, 200, 200, 255);
+	//Button_Color_Set(button_credits, 255, 200, 200, 255);
 
 	button_settings = Button_Initialize_Default();
 	Button_Text_Set(button_settings, "Credits");

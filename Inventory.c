@@ -105,12 +105,23 @@ void Inventory_Render()
 		if (CP_Input_GetMouseWorldX() > inventory_position.x && CP_Input_GetMouseWorldX() < inventory_position.x + inventory_width
 			&& CP_Input_GetMouseWorldY() > inventory_position.y && CP_Input_GetMouseWorldY() < inventory_position.y + inventory_height)
 		{
+			float longeststring = (float)strlen(hover_display_desc);
+			if (strlen(hover_display) > strlen(hover_display_desc) || !strcmp(hover_display_desc, "No description"))
+			{
+				longeststring = (float)strlen(hover_display);
+			}
+
 			CP_Settings_Fill(TRANSLUCENT_WHITE);
-			CP_Graphics_DrawRect(CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY() - 28, (float)strlen(hover_display) * 18 + 10, 30);
+			CP_Graphics_DrawRect(CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY() - 28, longeststring * 18 + 10, 30 * (float)(1 + !!(strcmp(hover_display_desc, "No description"))));
 
 			CP_Settings_Fill(BLACK);
 			CP_Settings_TextSize(40);
 			CP_Font_DrawText(hover_display, CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY());
+			if (strlen(hover_display_desc) > 0 && strcmp(hover_display_desc, "No description"))
+			{
+				CP_Settings_TextSize(35);
+				CP_Font_DrawText(hover_display_desc, CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY() + 30);
+			}
 		}
 	}
 }
@@ -200,11 +211,13 @@ void Inventory_Item_Update()
 			{
 				int local_selection_x = (int)((CP_Input_GetMouseWorldX() - inventory_position.x) / inventory_slot_width);
 				int local_selection_y = (int)((CP_Input_GetMouseWorldY() - inventory_position.y) / inventory_slot_width);
-				sprintf_s(hover_display, 255, "%s", Inventory_Stock_Get_Struct_By_ID(inventory[local_selection_x + (local_selection_y * 8)]).item_name);
+				sprintf_s(hover_display, 127, "%s", Inventory_Stock_Get_Struct_By_ID(inventory[local_selection_x + (local_selection_y * 8)]).item_name);
+				sprintf_s(hover_display_desc, 127, "%s", Inventory_Stock_Get_Struct_By_ID(inventory[local_selection_x + (local_selection_y * 8)]).item_description);
 			}
 			else
 			{
-				sprintf_s(hover_display, 255, "");
+				sprintf_s(hover_display, 127, "");
+				sprintf_s(hover_display_desc, 127, "");
 			}
 		}
 	}
@@ -298,6 +311,12 @@ void Inventory_Item_Use_ID(int id)
 int Inventory_Item_Set_Image(char* name, char* image)
 {
 	inventory_stock[Inventory_Stock_Get_Struct_By_Name(name).item_id].item_image = CP_Image_Load(image);
+	return 1;
+}
+
+int Inventory_Item_Set_Description(char* name, char* text)
+{
+	sprintf_s(inventory_stock[Inventory_Stock_Get_Struct_By_Name(name).item_id].item_description, 127, "%s", text);
 	return 1;
 }
 

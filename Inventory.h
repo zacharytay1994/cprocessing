@@ -30,7 +30,8 @@ float inventory_slot_width;
 int inventory[64];
 char inventory_is_visible;
 //char is_dragging;
-char hover_display[255];
+char hover_display[127];
+char hover_display_desc[127];
 
 void Inventory_Init();
 void Inventory_Open();
@@ -43,6 +44,7 @@ void Inventory_Render();
 struct inventory_item Inventory_Stock_Get_Struct_By_Name(char* name);
 struct inventory_item Inventory_Stock_Get_Struct_By_ID(int id);
 int Inventory_Item_Set_Image(char* name, char* image);
+int Inventory_Item_Set_Description(char* name, char* text);
 
 void Inventory_Item_Create(char* name);
 void Inventory_Item_Update();
