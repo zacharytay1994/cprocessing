@@ -269,6 +269,7 @@ void DayNightManager(float dt)
 	// Time (jus an ordinary counter)
 	timer += dt;
 	sprintf_s(curr_Timer, 127, "Time: %.0f", timer);
+	CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
 	CP_Font_DrawText(curr_Timer, 20, 170);
 
 	// Simple wave count (nothing much)
