@@ -18,3 +18,6 @@ void TestBed_UpdateZombies(const float dt);
 //void TestBed_SpawnBomb(const CP_Vector position);
 //void TestBed_UpdateBombs(const float dt);
 void TestBed_CheckBombOnZomb();
+
+// Enemy/Wave functions(RAY)
+void DayNightManager(float dt);
