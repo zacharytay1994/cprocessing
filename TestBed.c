@@ -9,6 +9,7 @@
 #include "ParallaxBackground.h"
 #include "Inventory.h"
 #include "Particles.h"
+#include "Enemy.h"
 
 #include <stdio.h>
 
@@ -50,6 +51,21 @@ int tb_check = 0;
 
 int particle_hold = 0;
 
+// Wave Temp - (RAY)
+char curr_Timer[127];
+char wave_status[127];
+char wave_display[127];
+double timer;
+double interval_counter;
+double wave_timer;
+const double wave_duration = 15;
+const double interval_delay = 10;
+int is_interval;
+int is_wave;
+int wave_count;
+double spawndelay = 2;
+
+
 void TestBed_Init()
 {
 	printf("Switched to testbed.\n");
@@ -60,6 +76,15 @@ void TestBed_Init()
 	House_health = House_max_health;
 	// temp zombie
 	tb_zombie_spawn_position = (CP_Vector){ 2300.0f,1150.0f };
+
+	// Wave Init - (RAY)
+	timer = 0;
+	interval_counter = 0;
+	wave_timer = 0;
+	is_interval = 1;
+	is_wave = 0;
+	wave_count = 0;
+
 
 	// Setting up tilemaps -
 	Tilemap_Initialize();
@@ -89,6 +114,7 @@ void TestBed_Init()
 	Inventory_Item_Set_Image("RadioThorns", "Assets/Items/RadioThorns.png");
 	Inventory_Add_Item_Name("RadioThorns");
 	Particle_Initialize();
+	Enemy_Initialize(); // - (RAY)
 
 	/*Sprite_InitData s_data = { (CP_Vector) { 100.0f,100.0f },100.0f,100.0f,"dirt_block.png",1,1,1,1,1 };
 	int parent = GUI_AddRootContainer((CP_Vector) { 100.0f, 100.0f }, CP_Vector_Set(30.0f, 30.0f), s_data);
@@ -109,6 +135,8 @@ void TestBed_Init()
 	//CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 	//TestBed_SpawnBomb(position);
 	TestBed_SpawnZombie();
+
+
 }
 
 void TestBed_Update(const float dt)
@@ -119,6 +147,23 @@ void TestBed_Update(const float dt)
 	GUI_Update(dt);
 	Inventory_Update();
 	Particle_Update(dt);
+	// Enemy Functions - (RAY)
+	DayNightManager(dt);
+	UpdateEnemy(dt);
+
+	if(is_interval == 0)
+	{
+		if (spawndelay <= 0.0)
+		{
+			CreateEnemy(10.f,
+				tb_zombie_spawn_position,
+				(CP_Vector){200.f,200.f},
+				100.f, 3);
+
+			spawndelay = CP_Random_RangeFloat(0.5f,3.f);
+		}
+		spawndelay -= dt;
+	}
 
 	//// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
@@ -179,6 +224,55 @@ void TestBed_Exit()
 	printf("Exited TestBed.");
 	Tilemap_Free();
 	PB_Exit();
+}
+
+void DayNightManager(float dt)
+{
+	// if DAY time
+	if (is_interval == 1)
+	{
+		interval_counter -= dt;
+
+		// once DAY time is over
+		if (interval_counter <= 0)
+		{
+			interval_counter = interval_delay;
+			is_interval = 0;	// Set to NIGHT time
+		}
+
+		// Display if DAY
+		sprintf_s(wave_status, 127, "(DAY) time left: %.0f", interval_counter);
+		CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
+		CP_Settings_TextSize(50.f);
+		CP_Font_DrawText(wave_status, 1150, 50);
+	}
+	else	// not interval, spawning enemy waves
+	{
+		wave_timer -= dt;
+
+		// if NIGHT is over
+		if (wave_timer <= 0)
+		{
+			wave_timer = wave_duration;
+			is_interval = 1;	// set to DAY time
+			wave_count++;		// set next WAVE
+		}
+
+		// Display if NIGHT
+		sprintf_s(wave_status, 127, "(NIGHT) time left: %.0f", wave_timer);
+		CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
+		CP_Font_DrawText(wave_status, 1150, 50);
+	}
+
+	// Time (jus an ordinary counter)
+	timer += dt;
+	sprintf_s(curr_Timer, 127, "Time: %.0f", timer);
+	CP_Font_DrawText(curr_Timer, 20, 170);
+
+	// Simple wave count (nothing much)
+	sprintf_s(wave_display, 127, "WAVE %d", wave_count);
+	CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
+	CP_Font_DrawText(wave_display, 1150, 100);
 }
 
 void TestBed_SpawnZombie()
