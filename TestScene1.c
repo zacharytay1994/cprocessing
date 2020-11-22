@@ -1,7 +1,23 @@
 #include "TestScene1.h"
 #include "CProcessing/inc/cprocessing.h"
 #include <stdio.h>
+#include "PhyObj.h"
 
+
+PhyObjBoundingCircle* test_circle;
+
+char curr_Timer[127];
+char wave_status[127];
+char wave_display[127];
+double timer;
+double interval_counter;
+double wave_timer;
+const double wave_duration = 10;
+const double interval_delay = 10;
+float YspawnRange;
+int is_interval;
+int is_wave;
+int wave_count;
 
 void TestScene1_Init()
 {
@@ -15,6 +31,12 @@ void TestScene1_Init()
 	TestScene1_BtnInit();
 	Sprite_Initialize();
 
+	//Inventory_Init();
+	CP_Font_DrawText("Wave Timer: ", wind_Width + 50.f, wind_Height - 50.f);
+
+	Enemy_Initialize();
+	PhyObj_Initialize();
+
 	//Temp House stuff to check collision
 	house_posX = wind_Width / 2.7f;
 	house_posY = wind_Height / 2.2f;
@@ -22,17 +44,30 @@ void TestScene1_Init()
 	house_SizeY = wind_Height / 5.f;
 
 
+	test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 0.f, 30.f, 1.f);
+	test_circle->super._visible = 1;
+
+	//Temp Gameplay vars
+	houseHP = 100.f;
+	timer = 0;
+	interval_counter = 0;
+	wave_timer = 0;
+	is_interval = 1;
+	is_wave = 0;
+	wave_count = 0;
+
+	tempHouseHP_spriteId = Sprite_AddSprite(
+		(CP_Vector) {house_posX - 250.f, house_posY-130},
+		houseHP * 10.f,30,
+		"half_redBox.png",
+		1,1,1,1,0);
 
 	tempHouseSprite_id = Sprite_AddSprite(
 		(CP_Vector) {house_posX, house_posY},
 		house_SizeX,
 		house_SizeY,
 		"demo_house.png",
-		1,
-		1,
-		1,
-		1,
-		0);
+		1,1,1,1,0);
 
 }
 
@@ -41,36 +76,122 @@ void TestScene1_Update(const float dt)
 	//Checks for keyboard input
 	KeyInputAssign();
 
-	/*Check if enemy collide with house. PS. Cant really think of 
+	//TEST BALL FOR COLLISION
+	test_circle->super._position.x = CP_Input_GetMouseX();
+	test_circle->super._position.y = CP_Input_GetMouseY();
+	//printf("ballRad: %f\n", test_circle->_radius);
+
+	/*Check if enemy collide with house. 
+	PS. Cant really think of 
 		any ways to check which is what enemy at the moment. */
 	for (int i = 0; i < sizeof(enemy_list)-1; ++i)
 	{
 		if (CheckEnemyAlive(i) == 1)
 		{
+			//HOUSE COLLISION
 			if (CheckEnemyCollision(house_posX + house_SizeX / 2, house_posY + house_SizeY / 2,
 				house_posX - house_SizeX / 2, house_posY - house_SizeY / 2, i) == 1)
 			{
-				SetEnemyDie(i);
-				//enemy_list[i].isAlive = 0;
+				//SetEnemyDie(i);
+				SetEnemySpeed(i, 0.f);
+				houseHP -= dt * (float)(GetEnemyDMG(i));
+				Sprite_SetWidth(tempHouseHP_spriteId, houseHP * 10.f);
+			}
+			//TEST BALL COLLISION
+			if (CheckEnemyCollision(test_circle->super._position.x + test_circle->_radius,
+				test_circle->super._position.y + test_circle->_radius,
+				test_circle->super._position.x - test_circle->_radius,
+				test_circle->super._position.y - test_circle->_radius, i) == 1)
+			{
+				//SetEnemyDie(i);
+				SetEnemyHP(i, GetEnemyHP(i) - dt*10.f);
 			}
 		}
 	}
+
+	//Auto Spawn Enemy
+	{
+		/*WAVE SYSTEM:
+			CreateWave 1 :
+				- Spawn enemy type 1 every N seconds		   time X ---->
+				- Spawn for X duration.						   x   x   x   x   x   x
+					- When X duration up, end wave
+				
+			CreateWave 2 : 
+				- Spawn enemy type 1 every N seconds		   time X ---->
+				- Spawn enemy type 2 every P seconds		   x   xY   x   xY   x   xY
+					- When X duration up, end wave
+			
+			CreateWave 3 :
+				- Spawn enemy type 1 every N seconds		   time X ---->
+				- Spawn enemy type 2 every P seconds		   x   xY   x   xY   x   xY
+				- After 'A' secs, begin type 3 spawning		           Z
+				- Enemy type 3 spawn randomly 				   ------->
+					- btwn v - u range of secs					'A' secs
+					- When X duration up, end wave
+
+			*/
+
+	}
+
+	if (is_interval == 1)
+	{
+		if (interval_counter <= 0)
+		{
+			interval_counter = interval_delay;
+			is_interval = 0;
+		}
+		interval_counter -= dt;
+		sprintf_s(wave_status, 127, "(DAY) time left: %.0f", interval_counter);
+		CP_Font_DrawText(wave_status, 350, 50);
+	}
+	else	// not interval, spawning enemy waves
+	{
+		if (wave_timer <= 0)
+		{
+			wave_timer = wave_duration;
+			is_interval = 1;
+			wave_count++;
+		}
+		wave_timer -= dt;
+		sprintf_s(wave_status, 127, "(NIGHT) time left: %.0f", wave_timer);
+		CP_Font_DrawText(wave_status, 350, 50);
+	}
+
+	// Time
+	timer += dt;
+	sprintf_s(curr_Timer, 127, "Time: %.0f", timer);
+	CP_Font_DrawText(curr_Timer, 20, 50);
+
+	sprintf_s(wave_display, 127, "WAVE %d", wave_count);
+	CP_Settings_Fill((CP_Color) { 10, 20, 255, 255 });
+	CP_Font_DrawText(wave_display, 400, 100);
+
 	// Misc Updates
 	UpdateEnemy(dt);
+
+	//Spawn Enemy Waves
+	YspawnRange = CP_Random_RangeFloat((wind_Height / 2) + 200.f, (wind_Height / 2) - 200.f);
+	SpawnEnemyWaves(dt);
+
 	//printf("Scene1 updating\n");
 	Button_Update();
 	Sprite_RenderSprite(dt, tempHouseSprite_id);
+	Sprite_RenderSprite(dt, tempHouseHP_spriteId);
 	GUIRender();
+	//Inventory_Render();
 	Camera_Update(dt);
+	PhyObj_Update(dt);
+	PhyObj_Render();
 }
 
 void KeyInputAssign()
 {
-	float YspawnRange = CP_Random_RangeFloat((wind_Height/2)+200.f, (wind_Height / 2) - 200.f);
+	
 	//float lowYspawn = CP_Random_RangeFloat();
 	// Debug Spawn VitC
 	if (CP_Input_KeyReleased(KEY_I)) {
-		CreateEnemy(10,
+		CreateEnemy(10.f,
 			(CP_Vector){wind_Width/1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			100.f, 0);
@@ -78,7 +199,7 @@ void KeyInputAssign()
 	//Debug Spawn NoOxy
 	if (CP_Input_KeyReleased(KEY_O))
 	{
-		CreateEnemy(70,
+		CreateEnemy(50.f,
 			(CP_Vector){wind_Width / 1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			50.f, 1);
@@ -86,7 +207,7 @@ void KeyInputAssign()
 	//Debug spawn lateGuy
 	if (CP_Input_KeyReleased(KEY_P))
 	{
-		CreateEnemy(10,
+		CreateEnemy(10.f,
 			(CP_Vector){wind_Width / 1.1f, YspawnRange},
 			(CP_Vector){100.f,100.f},
 			200.f, 2);
@@ -97,7 +218,62 @@ void KeyInputAssign()
 			(CP_Vector){wind_Width/1.1f,YspawnRange},
 			(CP_Vector){100.f,100.f},
 			100.f, 0);*/
+		
 	}
+
+
+	////Inventory
+	//if (CP_Input_KeyDown(KEY_TAB))
+	//{
+	//	inventory_is_visible = 1;
+	//}
+	//else
+	//{
+	//	inventory_is_visible = 0;
+	//}
+
+	if (CP_Input_MouseClicked())
+	{
+		//test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 5.f, 5.f, 1.f);
+		//test_circle->super._visible = 1;
+		//PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.f, 30.f, 1.f)->super._visible = 1;
+	}
+}
+
+//Gameplay Nonsense
+void SpawnEnemyWaves(const float dt)
+{
+	if(is_interval == 0)
+		SpawnWave_1(dt);
+	//SpawnWave_2(dt);
+	//SpawnWave_3(dt);
+}
+
+double spawndelay = 2;
+void SpawnWave_1(const float dt)
+{
+	
+	if (spawndelay <= 0.0)
+	{
+		CreateEnemy(10.f,
+			(CP_Vector){wind_Width/1.1f,YspawnRange},
+			(CP_Vector){100.f,100.f},
+			100.f, 0);
+
+		spawndelay = 2;
+	}
+	spawndelay -= dt;
+
+}
+
+void SpawnWave_2(const float dt)
+{
+
+}
+
+void SpawnWave_3(const float dt)
+{
+
 }
 
 // in-Game UI Stuffs
@@ -152,11 +328,15 @@ void TestScene1_BtnManager()
 	if (mainGUI_isOpen)
 	{
 		mainGUI_isOpen = 0;
+		Button_Active_Set(btn_closePopup, 0);
+		Button_Active_Set(btn_popupWind, 1);
 		printf("Clicked Btn ID: %d\n", btn_closePopup);
 	}
 	else
 	{
 		mainGUI_isOpen = 1;
+		Button_Active_Set(btn_closePopup, 1);
+		Button_Active_Set(btn_popupWind, 0);
 		printf("Clicked Btn ID: %d\n", btn_popupWind);
 	}
 }
@@ -180,5 +360,6 @@ void TestScene1_Exit()
 {
 	printf("Scene1 exited\n");
 	Sprite_Free();
+
 }
  

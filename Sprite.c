@@ -6,10 +6,13 @@
 Sprite* sprites;
 int sprites_size = 0;
 int sprites_max_size;
-CP_Image images[MAX_IMAGE_RESOURCE][MAX_SPRITE_FRAMES];
+CP_Image images[MAX_IMAGE_RESOURCE][MAX_SPRITE_FRAMES] = { 0 };
 int images_size = 0;
-char images_path[MAX_IMAGE_RESOURCE][SPRITE_MAX_PATH_LENGTH];
-int Sprite_path_size = 0;
+
+CP_Image images_v2[MAX_IMAGE_RESOURCE] = { 0 };
+int Sprite_images_v2_size = 0;
+//char images_path[MAX_IMAGE_RESOURCE][SPRITE_MAX_PATH_LENGTH];
+//int Sprite_path_size = 0;
 
 void Sprite_Initialize()
 {
@@ -20,9 +23,14 @@ void Sprite_Initialize()
 int Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut)
 {
 	if (images_size >= MAX_IMAGE_RESOURCE) {
-		printf("Sprite::MAX_IMAGE_RESORUCE exceeded!");
+		printf("Sprite::MAX_IMAGE_RESOURCE exceeded!");
 		return -1;
 	}
+	/*if (Sprite_images_v2_size >= MAX_IMAGE_RESOURCE) {
+		printf("Sprite::MAX_IMAGE_RESOURCE exceeded!");
+		return -1;
+	}*/
+	//images_v2[Sprite_images_v2_size++] = CP_Image_Load(path);
 	//CP_Image* image_array = malloc(frame * sizeof(CP_Image));
 	CP_Image sheet = CP_Image_Load(path);
 	// generate sub images - maybe temp solution
@@ -63,13 +71,14 @@ int Sprite_AddSprite(const CP_Vector position, const float width, const float he
 		}
 	}
 	sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f / (float)col,1.0f / (float)row,1,frame,1.0f / (float)fps,0.0f,images_size,1,1,optOut };
+	//sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f / (float)col,1.0f / (float)row,1,frame,1.0f / (float)fps,0.0f,Sprite_images_v2_size-1,1,1,optOut };
 	++images_size;
 	return sprites_size - 1;
 }
 
-int Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int image)
+int Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int sprite)
 {
-	if (image >= sprites_size) {
+	if (sprite >= sprites_size) {
 		printf("Sprite::sprites_size exceeded!");
 		return -1;
 	}
@@ -87,11 +96,11 @@ int Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, cons
 			printf("Sprite_AddSprite :: realloc returned null");
 		}
 	}
-	sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,sprites[image]._columns,sprites[image]._rows,sprites[image]._subwidth,sprites[image]._subheight,1,sprites[image]._number_of_frames,sprites[image]._frame_second,0.0f,image,1,1,sprites[image]._optOut };
+	sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,sprites[sprite]._columns,sprites[sprite]._rows,sprites[sprite]._subwidth,sprites[sprite]._subheight,1,sprites[sprite]._number_of_frames,sprites[sprite]._frame_second,0.0f,sprites[sprite]._image_resource,1,1,sprites[sprite]._optOut };
 	return sprites_size - 1;
 }
 
-int Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int image, const int col, const int row, const int frame, const int fps, const int optOut)
+int Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int sprite, const int col, const int row, const int frame, const int fps, const int optOut)
 {
 	if (images_size >= MAX_IMAGE_RESOURCE) {
 		printf("Sprite::MAX_IMAGE_RESORUCE exceeded!");
@@ -107,7 +116,7 @@ int Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, co
 			printf("Sprite_AddSprite :: realloc returned null");
 		}
 	}
-	sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f / (float)col,1.0f / (float)row,1,frame,1.0f / (float)fps,0.0f,image,1,1,optOut };
+	sprites[sprites_size++] = (Sprite){ position,0.0f,1.0f,1.0f,1.0f,255,0,width,height,col,row,1.0f / (float)col,1.0f / (float)row,1,frame,1.0f / (float)fps,0.0f,sprites[sprite]._image_resource,1,1,optOut };
 	return sprites_size - 1;
 }
 
@@ -140,8 +149,16 @@ void Sprite_RenderSprite(const float dt, const int id)
 	width *= sprites[id]._scale * sprites[id]._scale_x;
 	float height = sprites[id]._height * sprites[id]._scale * sprites[id]._scale_y;
 	CP_Vector cam_translated_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), sprites[id]._position);
+	
+	//CP_Image_Draw(images[sprites[id]._image_resource][0], CP_Input_GetMouseX(), CP_Input_GetMouseY(), 100.0f, 100.0f, 255);
+	////CP_Image_DrawSubImage()
+	//printf("id:%d\n", sprites[id]._image_resource);
+	//printf("sprites_size%d", sprites_size);
+
 	CP_Image_DrawAdvanced(images[sprites[id]._image_resource][sprites[id]._current_frame-1], cam_translated_pos.x, cam_translated_pos.y,
-		width, height, sprites[id]._alpha, sprites[id]._rotation);
+		width, height, (int)sprites[id]._alpha, sprites[id]._rotation);
+	/*CP_Image_DrawAdvanced(images_v2[sprites[id]._image_resource], cam_translated_pos.x, cam_translated_pos.y,
+		width, height, sprites[id]._alpha, sprites[id]._rotation);*/
 }
 
 void Sprite_Render(const float dt)
@@ -166,7 +183,10 @@ CP_Image Sprite_GenerateSubImage(const float u0, const float v0, const float u1,
 	int y_end = (int)(v1 * pixel_height);
 	int sub_width = (x_end - x_start);
 	int sub_height = (y_end - y_start);
-	unsigned char* sub_buffer = malloc(pixel_width * pixel_height * 4 * sizeof(char));
+	unsigned char* sub_buffer = malloc(size);
+	if (!buffer || !sub_buffer) {
+		printf("Buffers not allocated.");
+	}
 	// create the sub image buffer
 	for (int y = 0; y < sub_height; y++) {
 		for (int x = 0; x < sub_width; x++) {
@@ -179,6 +199,7 @@ CP_Image Sprite_GenerateSubImage(const float u0, const float v0, const float u1,
 		}
 	}
 	CP_Image image = CP_Image_CreateFromData(sub_width, sub_height, sub_buffer);
+	free(buffer);
 	free(sub_buffer);
 	return image;
 }
@@ -189,7 +210,7 @@ void Sprite_Free()
 	free(sprites);
 }
 
-void Sprite_SetFlip(const int id, const int flip)
+void Sprite_SetFlip(const int id, const int flip)															
 {
 	if (id < sprites_size) {
 		sprites[id]._flip = flip;
@@ -279,7 +300,7 @@ float Sprite_GetScaleY(const int id)
 	return -1.0f;
 }
 
-int Sprite_GetAlpha(const int id)
+float Sprite_GetAlpha(const int id)
 {
 	if (id < sprites_size) {
 		return sprites[id]._alpha;
@@ -335,6 +356,14 @@ int Sprite_GetImageResource(const int id)
 	return -1;
 }
 
+Sprite* Sprite_GetSprite(const int id)
+{
+	if (id < sprites_size) {
+		return &(sprites[id]);
+	}
+	return NULL;
+}
+
 void Sprite_SetPosition(const int id, const CP_Vector pos)
 {
 	if (id < sprites_size) {
@@ -370,7 +399,7 @@ void Sprite_SetScaleY(const int id, const float scaley)
 	}
 }
 
-void Sprite_SetAlpha(const int id, const int alpha)
+void Sprite_SetAlpha(const int id, const float alpha)
 {
 	if (id < sprites_size) {
 		sprites[id]._alpha = alpha;

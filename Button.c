@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "TestScene1.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int Button_Initialize_Default()
 {
@@ -27,20 +28,6 @@ int Button_Initialize_Default()
 		"Text Not Set",
 		1
 	);
-
-	/*
-	return Button_Initialize(
-		default_pos,
-		default_size,
-		default_text_pos,
-		CP_Color_Create(255, 240, 255, 255),
-		CP_Color_Create(0, 0, 0, 255),
-		50.0f,
-		"Text Not Set",
-		1
-	);
-	*/
-
 }
 
 int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_position, CP_Color button_color, CP_Color text_color, float text_size, char* text, char visible)
@@ -82,6 +69,9 @@ int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_positio
 
 	// Set Text
 	sprintf_s(new_button.Text, 127, text);
+
+	// Set Name
+	sprintf_s(new_button.Name, 127, text);
 
 	// Set Scale
 	new_button.Scale = 1.0f;
@@ -172,6 +162,31 @@ char Button_Text_Set(int id, char* new_text)
 	return 1;
 }
 
+char Button_Color_Set(int id, int r, int g, int b, int a)
+{
+	CP_Color new_color = CP_Color_Create(r, g, b, a);
+	button_list[scene_id][id].Button_Color = new_color;
+	
+	// Set Hover Color
+	int nr = (r + 100 > 255) ? 255 : r + 100;
+	int ng = (g + 100 > 255) ? 255 : g + 100;
+	int nb = (b + 100 > 255) ? 255 : b + 100;
+	button_list[scene_id][id].Hover_Color = CP_Color_Create(nr, ng, nb, a);
+
+	// Set Darken Color
+	nr = (r - 100 < 0) ? 0 : r - 100;
+	ng = (g - 100 < 0) ? 0 : g - 100;
+	nb = (b - 100 < 0) ? 0 : b - 100;
+	button_list[scene_id][id].Darken_Color = CP_Color_Create(nr, ng, nb, a);
+	return 1;
+}
+
+char Button_Name_Set(int id, char* new_text)
+{
+	sprintf_s(button_list[scene_id][id].Name, 127, new_text);
+	return 1;
+}
+
 int Button_List_Add(struct Button* add_button)
 {
 	for (int i = 0; i < 127; i++)
@@ -254,6 +269,7 @@ int Button_GetID_By_Name(char* text)
 
 void Button_Mouse_Collision_Click_ById(int id)
 {
+	printf("Button Pressed: Scene %d, ID: %d, \"%s\"\n", Scene_GetCurrentID(), id, button_list[Scene_GetCurrentID()][id].Text);
 	switch (Scene_GetCurrentID())
 	{
 		case 0:
@@ -264,6 +280,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 				{
 					TestScene1_BtnManager();
 					//go next case
+					break;
 				}
 				case 5:
 				{
@@ -271,6 +288,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 					break;
 				}
 			}
+			break;
 		}
 		case 3:
 		{
@@ -278,13 +296,21 @@ void Button_Mouse_Collision_Click_ById(int id)
 			{
 				case 0:		// Start
 				{
-					Scene_ChangeScene(0); 
+					Scene_ChangeScene(2); //0 - testScene 1
+					//Scene_ChangeScene(0); 
 					//0 - testScene 1
 					//2 - zac testbed
 					break;
 				}
 				case 1:		// Setting
 				{
+					#ifdef _WIN32 
+						system("start https://forms.gle/wiLHNBcqdAMYVNKY9");
+					#elif __APPLE__ 
+						system("open https://forms.gle/wiLHNBcqdAMYVNKY9");
+					#elif __linux__ 
+						system("xdg-open https://forms.gle/wiLHNBcqdAMYVNKY9");
+					#endif
 					break;
 				}
 				case 2:		// Credits
@@ -297,6 +323,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 					break;
 				}
 			}
+			break;
 		}
 	}
 }
@@ -311,7 +338,7 @@ void Button_Render_All()
 {
 	for (int i = 0; i < 127; i++)
 	{
-		if (button_list[scene_id][i].Active == 0)
+		if (button_list[scene_id][i].Id == -1)
 		{
 			return;
 		}
@@ -370,4 +397,21 @@ void Button_SpecialEffects_Set(int id, char x)
 {
 	button_list[scene_id][id].Enable_SpecialEffects = x;
 	return;
+}
+
+char Button_Active_Set(int id, char x)
+{
+	button_list[scene_id][id].Active = x;
+	return x;
+}
+
+void Button_Class_Init()
+{
+	for (int i = 0; i < 63; i++)
+	{
+		for (int j = 0; j < 127; j++)
+		{
+			button_list[i][j].Id = -1;
+		}
+	}
 }
