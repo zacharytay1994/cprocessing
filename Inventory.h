@@ -28,6 +28,7 @@ float inventory_slot_width;
 int inventory[64];
 char inventory_is_visible;
 //char is_dragging;
+char hover_display[255];
 
 void Inventory_Init();
 void Inventory_Open();
