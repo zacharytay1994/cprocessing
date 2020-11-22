@@ -52,15 +52,16 @@ int tb_check = 0;
 int particle_hold = 0;
 
 // Wave Temp - (RAY)
+// Display stuff
 char curr_Timer[127];
 char wave_status[127];
 char wave_display[127];
 double timer;
-double interval_counter;
+double interval_counter;	// interval means "day time"
 double wave_timer;
-const double wave_duration = 15;
-const double interval_delay = 10;
-int is_interval;
+const double wave_duration = 15;	//night time duration
+const double interval_delay = 10;	//day time duration
+int is_interval;	// 1 - no enemy spawn, 0 - start spawn enemies
 int is_wave;
 int wave_count;
 double spawndelay = 2;
@@ -98,7 +99,8 @@ void TestBed_Init()
 	Inventory_Add_Item_Name("poop");
 	Inventory_Item_Set_Image("poop", "demo_test.png");
 	Particle_Initialize();
-	Enemy_Initialize(); // - (RAY)
+
+	Enemy_Initialize(); // Initialize enemy sprites and values- (RAY)
 
 	/*Sprite_InitData s_data = { (CP_Vector) { 100.0f,100.0f },100.0f,100.0f,"dirt_block.png",1,1,1,1,1 };
 	int parent = GUI_AddRootContainer((CP_Vector) { 100.0f, 100.0f }, CP_Vector_Set(30.0f, 30.0f), s_data);
@@ -135,14 +137,14 @@ void TestBed_Update(const float dt)
 	DayNightManager(dt);
 	UpdateEnemy(dt);
 
-	if(is_interval == 0)
+	if(is_interval == 0) // if not day time, spawn enemies
 	{
-		if (spawndelay <= 0.0)
+		if (spawndelay <= 0.0)	// gap between each enemy spawn
 		{
 			CreateEnemy(10.f,
 				tb_zombie_spawn_position,
 				(CP_Vector){200.f,200.f},
-				100.f, 3);
+				100.f, 3);	//spawn type 3 enemy(toothpaste guy)
 
 			spawndelay = CP_Random_RangeFloat(0.5f,3.f);
 		}
@@ -244,7 +246,7 @@ void DayNightManager(float dt)
 
 		// Display if NIGHT
 		sprintf_s(wave_status, 127, "(NIGHT) time left: %.0f", wave_timer);
-		CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
+		CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
 		CP_Font_DrawText(wave_status, 1150, 50);
 	}
 
