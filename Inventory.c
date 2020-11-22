@@ -74,10 +74,7 @@ int Inventory_Add_Item_Name(char* name)
 
 void Inventory_Update()
 {
-	if (inventory_is_visible)
-	{
-		Inventory_Item_Update();
-	}
+	Inventory_Item_Update();
 }
 
 void Inventory_Render()
@@ -103,6 +100,17 @@ void Inventory_Render()
 						inventory_position.y + (i * inventory_slot_width) + inventory_slot_width * 0.1f);
 				}
 			}
+		}
+
+		if (CP_Input_GetMouseWorldX() > inventory_position.x && CP_Input_GetMouseWorldX() < inventory_position.x + inventory_width
+			&& CP_Input_GetMouseWorldY() > inventory_position.y && CP_Input_GetMouseWorldY() < inventory_position.y + inventory_height)
+		{
+			CP_Settings_Fill(TRANSLUCENT_WHITE);
+			CP_Graphics_DrawRect(CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY() - 28, (float)strlen(hover_display) * 18 + 10, 30);
+
+			CP_Settings_Fill(BLACK);
+			CP_Settings_TextSize(40);
+			CP_Font_DrawText(hover_display, CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY());
 		}
 	}
 }
@@ -173,14 +181,31 @@ void Inventory_Item_Create(char* name)
 
 void Inventory_Item_Update()
 {
-	if (CP_Input_MouseClicked())
+	if (inventory_is_visible)
 	{
-		if (CP_Input_GetMouseWorldX() > inventory_position.x && CP_Input_GetMouseWorldX() < inventory_position.x + inventory_width
-			&& CP_Input_GetMouseWorldY() > inventory_position.y && CP_Input_GetMouseWorldY() < inventory_position.y + inventory_height)
+		if (CP_Input_MouseClicked())
 		{
-			int local_selection_x = (int)((CP_Input_GetMouseWorldX() - inventory_position.x) / inventory_slot_width);
-			int local_selection_y = (int)((CP_Input_GetMouseWorldY() - inventory_position.y) / inventory_slot_width);		
-			Inventory_Item_Use_ID(inventory[local_selection_x + (local_selection_y * 8)]);
+			if (CP_Input_GetMouseWorldX() > inventory_position.x && CP_Input_GetMouseWorldX() < inventory_position.x + inventory_width
+				&& CP_Input_GetMouseWorldY() > inventory_position.y && CP_Input_GetMouseWorldY() < inventory_position.y + inventory_height)
+			{
+				int local_selection_x = (int)((CP_Input_GetMouseWorldX() - inventory_position.x) / inventory_slot_width);
+				int local_selection_y = (int)((CP_Input_GetMouseWorldY() - inventory_position.y) / inventory_slot_width);
+				Inventory_Item_Use_ID(inventory[local_selection_x + (local_selection_y * 8)]);
+			}
+		}
+		else
+		{
+			if (CP_Input_GetMouseWorldX() > inventory_position.x && CP_Input_GetMouseWorldX() < inventory_position.x + inventory_width
+				&& CP_Input_GetMouseWorldY() > inventory_position.y && CP_Input_GetMouseWorldY() < inventory_position.y + inventory_height)
+			{
+				int local_selection_x = (int)((CP_Input_GetMouseWorldX() - inventory_position.x) / inventory_slot_width);
+				int local_selection_y = (int)((CP_Input_GetMouseWorldY() - inventory_position.y) / inventory_slot_width);
+				sprintf_s(hover_display, 255, "%s", Inventory_Stock_Get_Struct_By_ID(inventory[local_selection_x + (local_selection_y * 8)]).item_name);
+			}
+			else
+			{
+				sprintf_s(hover_display, 255, "");
+			}
 		}
 	}
 }
@@ -243,12 +268,12 @@ void Inventory_Item_Use_Name(char* name)
 		Inventory_Add_Item_Name("trash");
 		Inventory_Add_Item_Name("trash");
 	}
-	else if (!strcmp(name, "AddHealthFlower"))
+	else if (!strcmp(name, "Add Health Flower"))
 	{
 		Player_Add_Health(1);
 		Inventory_Item_Remove_Name(name);
 	}
-	else if (!strcmp(name, "AddMaxHealthFlower"))
+	else if (!strcmp(name, "Add MaxHealth Flower"))
 	{
 		Player_Add_MaxHealth(1);
 		Inventory_Item_Remove_Name(name);
@@ -258,7 +283,7 @@ void Inventory_Item_Use_Name(char* name)
 		Player_Lose_Health(1);
 		Inventory_Item_Remove_Name(name);
 	}
-	else if (!strcmp(name, "RadioThorns"))
+	else if (!strcmp(name, "Radioactive Thorns"))
 	{
 		Player_Lose_MaxHealth(1);
 		Inventory_Item_Remove_Name(name);

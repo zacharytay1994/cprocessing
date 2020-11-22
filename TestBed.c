@@ -99,21 +99,21 @@ void TestBed_Init()
 	Inventory_Add_Item_Name("poop");
 	Inventory_Item_Set_Image("poop", "demo_test.png");
 
-	Inventory_Item_Create("AddHealthFlower");
-	Inventory_Item_Set_Image("AddHealthFlower", "Assets/Items/AddHealthFlower.png");
-	Inventory_Add_Item_Name("AddHealthFlower");
+	Inventory_Item_Create("Add Health Flower");
+	Inventory_Item_Set_Image("Add Health Flower", "Assets/Items/AddHealthFlower.png");
+	Inventory_Add_Item_Name("Add Health Flower");
 
-	Inventory_Item_Create("AddMaxHealthFlower");
-	Inventory_Item_Set_Image("AddMaxHealthFlower", "Assets/Items/AddMaxHealthFlower.png");
-	Inventory_Add_Item_Name("AddMaxHealthFlower");
+	Inventory_Item_Create("Add MaxHealth Flower");
+	Inventory_Item_Set_Image("Add MaxHealth Flower", "Assets/Items/AddMaxHealthFlower.png");
+	Inventory_Add_Item_Name("Add MaxHealth Flower");
 
 	Inventory_Item_Create("Thorns");
 	Inventory_Item_Set_Image("Thorns", "Assets/Items/Thorns.png");
 	Inventory_Add_Item_Name("Thorns");
 
-	Inventory_Item_Create("RadioThorns");
-	Inventory_Item_Set_Image("RadioThorns", "Assets/Items/RadioThorns.png");
-	Inventory_Add_Item_Name("RadioThorns");
+	Inventory_Item_Create("Radioactive Thorns");
+	Inventory_Item_Set_Image("Radioactive Thorns", "Assets/Items/RadioThorns.png");
+	Inventory_Add_Item_Name("Radioactive Thorns");
 	Particle_Initialize();
 
 	Enemy_Initialize(); // Initialize enemy sprites and values- (RAY)

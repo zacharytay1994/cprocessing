@@ -4,9 +4,11 @@
 #include "Button.h"
 #include "Player.h"
 
-#define		 BROWN	CP_Color_Create(150, 75, 0, 255)
-#define DARK_BROWN	CP_Color_Create(125, 50, 0, 255)
-#define	     BLUE   CP_Color_Create(0, 0, 255, 255)
+#define				BROWN	CP_Color_Create(150, 75, 0, 255)
+#define			DARK_BROWN	CP_Color_Create(125, 50, 0, 255)
+#define				BLUE	CP_Color_Create(0, 0, 255, 255)
+#define				BLACK	CP_Color_Create(0, 0, 0, 255)
+#define	TRANSLUCENT_WHITE	CP_Color_Create(255, 255, 255, 200)
 
 struct inventory_item
 {
