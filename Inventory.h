@@ -2,6 +2,7 @@
 #include <cprocessing.h>
 #include <stdio.h>
 #include "Button.h"
+#include "Player.h"
 
 #define		 BROWN	CP_Color_Create(150, 75, 0, 255)
 #define DARK_BROWN	CP_Color_Create(125, 50, 0, 255)
