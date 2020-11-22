@@ -243,6 +243,26 @@ void Inventory_Item_Use_Name(char* name)
 		Inventory_Add_Item_Name("trash");
 		Inventory_Add_Item_Name("trash");
 	}
+	else if (!strcmp(name, "AddHealthFlower"))
+	{
+		Player_Add_Health(1);
+		Inventory_Item_Remove_Name(name);
+	}
+	else if (!strcmp(name, "AddMaxHealthFlower"))
+	{
+		Player_Add_MaxHealth(1);
+		Inventory_Item_Remove_Name(name);
+	}
+	else if (!strcmp(name, "Thorns"))
+	{
+		Player_Lose_Health(1);
+		Inventory_Item_Remove_Name(name);
+	}
+	else if (!strcmp(name, "RadioThorns"))
+	{
+		Player_Lose_MaxHealth(1);
+		Inventory_Item_Remove_Name(name);
+	}
 }
 
 void Inventory_Item_Use_ID(int id)

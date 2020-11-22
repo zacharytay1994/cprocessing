@@ -2,8 +2,8 @@
 
 #include "CProcessing/inc/cprocessing.h"
 
-#define MAX_SPRITES 100
-#define SPRITES_INITIAL_SIZE 2
+#define MAX_SPRITES 500
+#define SPRITES_INITIAL_SIZE 200
 #define MAX_IMAGE_RESOURCE 100
 #define MAX_SPRITE_FRAMES 32
 #define SPRITE_MAX_PATH_LENGTH 50
@@ -14,7 +14,7 @@ typedef struct Sprite {
 	float		_scale;					// scales both width and height
 	float		_scale_x;				// scales width
 	float		_scale_y;				// scales height
-	int			_alpha;
+	float		_alpha;
 	int			_flip;					// flips the sprite horizontally
 	float		_width;
 	float		_height;
@@ -55,8 +55,8 @@ extern int images_size;
 /*____________________________________________________________________________________________________________________________________*/
 void	Sprite_Initialize();
 int		Sprite_AddSprite(const CP_Vector position, const float width, const float height, const char* path, const int col, const int row, const int frame, const int fps, const int optOut);
-int		Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int image);
-int		Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int image, const int col, const int row, const int frame, const int fps, const int optOut);
+int		Sprite_AddSpriteRepeatAuto(const CP_Vector position, const float width, const float height, const int sprite);
+int		Sprite_AddSpriteRepeatManual(const CP_Vector position, const float width, const float height, const int sprite, const int col, const int row, const int frame, const int fps, const int optOut);
 int		Sprite_AddSpriteInitData(const Sprite_InitData data);
 void	Sprite_RenderSprite(const float dt, const int id);
 void	Sprite_Render(const float dt);
@@ -71,7 +71,7 @@ void Sprite_SetRotation(const int id, const float rot);
 void Sprite_SetScale(const int id, const float scale);
 void Sprite_SetScaleX(const int id, const float scalex);
 void Sprite_SetScaleY(const int id, const float scaley);
-void Sprite_SetAlpha(const int id, const int alpha);
+void Sprite_SetAlpha(const int id, const float alpha);
 void Sprite_SetFlip(const int id, const int flip);
 void Sprite_SetWidth(const int id, const float width);
 void Sprite_SetHeight(const int id, const float height);
@@ -85,10 +85,11 @@ float		Sprite_GetRotation(const int id);
 float		Sprite_GetScale(const int id);
 float		Sprite_GetScaleX(const int id);
 float		Sprite_GetScaleY(const int id);
-int			Sprite_GetAlpha(const int id);
+float		Sprite_GetAlpha(const int id);
 int			Sprite_GetFlip(const int id);
 float		Sprite_GetWidth(const int id);
 float		Sprite_GetHeight(const int id);
 int			Sprite_GetFPS(const int id);
 int			Sprite_GetVisible(const int id);
 int			Sprite_GetImageResource(const int id);
+Sprite*		Sprite_GetSprite(const int id);

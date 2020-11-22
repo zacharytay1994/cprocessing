@@ -6,6 +6,19 @@
 
 PhyObjBoundingCircle* test_circle;
 
+//char curr_Timer[127];
+//char wave_status[127];
+//char wave_display[127];
+//double timer;
+//double interval_counter;
+//double wave_timer;
+//const double wave_duration = 10;
+//const double interval_delay = 10;
+//float YspawnRange;
+//int is_interval;
+//int is_wave;
+//int wave_count;
+
 void TestScene1_Init()
 {
 	printf("Scene1 Initialized\n");
@@ -19,7 +32,7 @@ void TestScene1_Init()
 	Sprite_Initialize();
 
 	//Inventory_Init();
-
+	CP_Font_DrawText("Wave Timer: ", wind_Width + 50.f, wind_Height - 50.f);
 
 	Enemy_Initialize();
 	PhyObj_Initialize();
@@ -34,7 +47,14 @@ void TestScene1_Init()
 	test_circle = PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 0.f, 30.f, 1.f);
 	test_circle->super._visible = 1;
 
+	//Temp Gameplay vars
 	houseHP = 100.f;
+	/*timer = 0;
+	interval_counter = 0;
+	wave_timer = 0;
+	is_interval = 1;
+	is_wave = 0;
+	wave_count = 0;*/
 
 	tempHouseHP_spriteId = Sprite_AddSprite(
 		(CP_Vector) {house_posX - 250.f, house_posY-130},
@@ -88,8 +108,83 @@ void TestScene1_Update(const float dt)
 			}
 		}
 	}
+
+	//Auto Spawn Enemy
+	{
+		/*WAVE SYSTEM:
+			CreateWave 1 :
+				- Spawn enemy type 1 every N seconds		   time X ---->
+				- Spawn for X duration.						   x   x   x   x   x   x
+					- When X duration up, end wave
+				
+			CreateWave 2 : 
+				- Spawn enemy type 1 every N seconds		   time X ---->
+				- Spawn enemy type 2 every P seconds		   x   xY   x   xY   x   xY
+					- When X duration up, end wave
+			
+			CreateWave 3 :
+				- Spawn enemy type 1 every N seconds		   time X ---->
+				- Spawn enemy type 2 every P seconds		   x   xY   x   xY   x   xY
+				- After 'A' secs, begin type 3 spawning		           Z
+				- Enemy type 3 spawn randomly 				   ------->
+					- btwn v - u range of secs					'A' secs
+					- When X duration up, end wave
+
+			*/
+
+	}
+
+	// if DAY time
+	/*if (is_interval == 1)
+	{
+		interval_counter -= dt;
+		
+		// once DAY time is over
+		if (interval_counter <= 0)
+		{
+			interval_counter = interval_delay;
+			is_interval = 0;	// Set to NIGHT time
+		}
+
+		// Display if DAY
+		sprintf_s(wave_status, 127, "(DAY) time left: %.0f", interval_counter);
+		CP_Font_DrawText(wave_status, 350, 50);
+	}
+	else	// not interval, spawning enemy waves
+	{
+		wave_timer -= dt;
+		
+		// if NIGHT is over
+		if (wave_timer <= 0)
+		{
+			wave_timer = wave_duration;
+			is_interval = 1;	// set to DAY time
+			wave_count++;		// set next WAVE
+		}
+
+		// Display if NIGHT
+		sprintf_s(wave_status, 127, "(NIGHT) time left: %.0f", wave_timer);
+		CP_Font_DrawText(wave_status, 350, 50);
+	}
+
+	// Time (jus an ordinary counter)
+	timer += dt;
+	sprintf_s(curr_Timer, 127, "Time: %.0f", timer);
+	CP_Font_DrawText(curr_Timer, 20, 50);
+
+	// Simple wave count (nothing much)
+	sprintf_s(wave_display, 127, "WAVE %d", wave_count);
+	CP_Settings_Fill((CP_Color) { 10, 20, 255, 255 });
+	CP_Font_DrawText(wave_display, 400, 100);
+	*/
+
 	// Misc Updates
 	UpdateEnemy(dt);
+
+	//Spawn Enemy Waves
+	//YspawnRange = CP_Random_RangeFloat((wind_Height / 2) + 200.f, (wind_Height / 2) - 200.f);
+	SpawnEnemyWaves(dt);
+
 	//printf("Scene1 updating\n");
 	Button_Update();
 	Sprite_RenderSprite(dt, tempHouseSprite_id);
@@ -103,12 +198,12 @@ void TestScene1_Update(const float dt)
 
 void KeyInputAssign()
 {
-	float YspawnRange = CP_Random_RangeFloat((wind_Height/2)+200.f, (wind_Height / 2) - 200.f);
+	
 	//float lowYspawn = CP_Random_RangeFloat();
 	// Debug Spawn VitC
 	if (CP_Input_KeyReleased(KEY_I)) {
 		CreateEnemy(10.f,
-			(CP_Vector){wind_Width/1.1f,YspawnRange},
+			(CP_Vector){wind_Width/1.1f,wind_Height/2.f},
 			(CP_Vector){100.f,100.f},
 			100.f, 0);
 	}
@@ -116,7 +211,7 @@ void KeyInputAssign()
 	if (CP_Input_KeyReleased(KEY_O))
 	{
 		CreateEnemy(50.f,
-			(CP_Vector){wind_Width / 1.1f,YspawnRange},
+			(CP_Vector){wind_Width / 1.1f,wind_Height/2.f},
 			(CP_Vector){100.f,100.f},
 			50.f, 1);
 	}
@@ -124,7 +219,7 @@ void KeyInputAssign()
 	if (CP_Input_KeyReleased(KEY_P))
 	{
 		CreateEnemy(10.f,
-			(CP_Vector){wind_Width / 1.1f, YspawnRange},
+			(CP_Vector){wind_Width / 1.1f, wind_Height/2.f},
 			(CP_Vector){100.f,100.f},
 			200.f, 2);
 	}
@@ -154,6 +249,42 @@ void KeyInputAssign()
 		//test_circle->super._visible = 1;
 		//PhyObj_AddCircle(CP_Input_GetMouseX(), CP_Input_GetMouseY(), 30.f, 30.f, 1.f)->super._visible = 1;
 	}
+}
+
+//Gameplay Nonsense
+void SpawnEnemyWaves(const float dt)
+{
+	//if(is_interval == 0)
+		//SpawnWave_1(dt);
+	//SpawnWave_2(dt);
+	//SpawnWave_3(dt);
+}
+
+//double spawndelay = 2;
+void SpawnWave_1(const float dt)
+{
+	
+	/*if (spawndelay <= 0.0)
+	{
+		CreateEnemy(10.f,
+			(CP_Vector){wind_Width/1.1f,YspawnRange},
+			(CP_Vector){100.f,100.f},
+			100.f, 0);
+
+		spawndelay = 2;
+	}
+	spawndelay -= dt;*/
+
+}
+
+void SpawnWave_2(const float dt)
+{
+
+}
+
+void SpawnWave_3(const float dt)
+{
+
 }
 
 // in-Game UI Stuffs

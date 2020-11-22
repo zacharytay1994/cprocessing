@@ -14,6 +14,7 @@ struct Button
 	float		Text_Size;
 	float		Scale;
 	int			Id;
+	char		Name[127];
 	char		Text[127];
 	char		Active;
 	char		Visible;
@@ -39,6 +40,7 @@ char Button_Text_Translate(int id, float displacement_x, float displacement_y);
 char Button_Text_SetPosition(int id, float new_x, float new_y);
 char Button_Text_Scale(int id, float scale);
 char Button_Text_Set(int id, char* new_text);
+char Button_Color_Set(int id, int r, int g, int b, int a);
 char Button_Image_Set(int id, char* img);
 char Button_Image_Set_Override(int id, char* img);
 int Button_GetID_By_Name(char* text);
