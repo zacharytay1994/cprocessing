@@ -5,6 +5,7 @@ int not_init = 1;
 int enemy_one;
 int enemy_two;
 int enemy_three;
+int enemy_four;
 int enemyhp_Sprite;
 
 //float HP_maxSpriteSize;
@@ -29,6 +30,12 @@ void Enemy_Initialize()
 		1.f,1.f,
 		"demo_player.png",
 		8,1,8,50, 1);
+
+	enemy_four = Sprite_AddSprite(
+		(CP_Vector) { -100, -100 }, 
+		200.0f, 200.0f, 
+		"./Sprites/slime1.png",
+		2, 3, 6, 5, 0);
 
 	enemyhp_Sprite = Sprite_AddSprite(
 		(CP_Vector) {-100,-100},
@@ -90,6 +97,21 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		enem_sprite_row = 1;
 		enem_sprite_frames = 8;
 		enem_sprite_animate_speed = 50;
+		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+
+		break;
+	}
+	case 3:	// toothpaste
+	{
+		path_id = enemy_four;
+		new_enemy.ene_dmg = 3;
+		new_enemy.enem_Size.x = size.x;
+		new_enemy.enem_Size.y = size.y;
+		enem_sprite_col = 2;
+		enem_sprite_row = 3;
+		enem_sprite_frames = 6;
+		enem_sprite_animate_speed = 5;
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
 

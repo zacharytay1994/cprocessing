@@ -18,6 +18,7 @@ int Player_initialized = 0;
 int Player_health;
 int Player_max_health = 10;
 CP_Image Player_heart;
+CP_Image Player_blackheart;
 float Player_heart_offset_x = 50.0f;
 float Player_heart_offset_y = 50.0f;
 float Player_heart_spacing = 60.0f;
@@ -48,6 +49,7 @@ void Player_Initialize()
 
 	Player_health = Player_max_health;
 	Player_heart = CP_Image_Load("demo_heart.png");
+	Player_blackheart = CP_Image_Load("demo_blackheart.png");
 
 	// initialize weapon
 	Player_weapon_offset = (CP_Vector){ 0.0f,-100.0f };
@@ -142,8 +144,13 @@ void Player_Update(const float dt)
 	Player_Input(dt);
 
 	// temp render player ui
-	for (int j = 0; j < Player_health; j++) {
+	int j = 0;
+	for (j = 0; j < Player_health; j++) {
 		CP_Image_Draw(Player_heart, Player_heart_offset_x + j * Player_heart_spacing, Player_heart_offset_y, 60.0f, 60.0f, 255);
+	}
+	for (j; j < Player_max_health; j++)
+	{
+		CP_Image_Draw(Player_blackheart, Player_heart_offset_x + j * Player_heart_spacing, Player_heart_offset_y, 60.0f, 60.0f, 255);
 	}
 	Player_WeaponUpdate(dt);
 }
@@ -457,5 +464,42 @@ void Player_RenderProjectileArc(const CP_Vector position, const CP_Vector direct
 			pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), pos);
 			CP_Image_Draw(Player_projectile_arc_resource, pos.x, pos.y, 30.0f, 30.0f, 255);
 		}
+	}
+}
+
+void Player_Add_Health(int x)
+{
+	Player_health += x;
+	if (Player_health > Player_max_health)
+	{
+		Player_health = Player_max_health;
+	}
+}
+
+void Player_Lose_Health(int x)
+{
+	Player_health -= x;
+	if (Player_health < 0)
+	{
+		Player_health = 0;
+	}
+}
+
+void Player_Add_MaxHealth(int x)
+{
+	Player_max_health += x;
+	Player_health += x;
+}
+
+void Player_Lose_MaxHealth(int x)
+{
+	Player_max_health -= x;
+	if (Player_max_health < 1)
+	{
+		Player_max_health = 1;
+	}
+	if (Player_health > Player_max_health)
+	{
+		Player_health = Player_max_health;
 	}
 }
