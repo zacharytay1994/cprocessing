@@ -421,7 +421,7 @@ void Player_SpawnProjectile(const float dt)
 		}
 		Player_projectile_fire = 0;
 	}
-	Player_RenderProjectileArc(spawn_position, direction, 10, 9.81f, dt);
+	//Player_RenderProjectileArc(spawn_position, direction, 10, 9.81f, dt);
 }
 
 void Player_ProjectileUpdate(const float dt)
@@ -446,9 +446,14 @@ void Player_RenderProjectileArc(const CP_Vector position, const CP_Vector direct
 {
 	if (Player_initialized) {
 		float arc_dt = dt;
+		arc_dt = 0.02f;
+		float frames = 80.0f;
+		CP_Vector velocity = CP_Vector_Set(0.0f, 0.0f);
+		CP_Vector pos = position;
 		for (int i = 0; i < 10; ++i) {
-			CP_Vector pos = CP_Vector_Add(position, CP_Vector_Scale(direction, i*30.0f* arc_dt));
-			pos.y += fallOff * i * 30.0f * arc_dt;
+			velocity = CP_Vector_Scale(direction, frames * arc_dt * i);
+			velocity.y += fallOff * i * frames * arc_dt;
+			pos = CP_Vector_Add(pos, velocity);
 			pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), pos);
 			CP_Image_Draw(Player_projectile_arc_resource, pos.x, pos.y, 30.0f, 30.0f, 255);
 		}
