@@ -47,6 +47,9 @@ void MainMenu_Initialize()
 	Button_Text_Translate(button_exit, 0, 240);
 	printf("%d", Scene_GetCurrentID());
 	
+	custom_font = CP_Font_Load("Assets/Fonts/zrnic rg.ttf");
+	CP_Font_Set(custom_font);
+
 	return;
 }
 
@@ -83,6 +86,7 @@ void Background_Render()
 
 void MainMenu_Exit()
 {
+	CP_Font_Set(CP_Font_GetDefault());
 	/*CP_Image_Free(&logo_farmology);
 	CP_Image_Free(&house);*/
 }

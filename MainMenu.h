@@ -15,6 +15,8 @@ int button_credits;
 int button_settings;
 int button_exit;
 
+CP_Font custom_font;
+
 CP_Image	logo_farmology;
 float		logo_farmology_size_x;
 float		logo_farmology_size_y;
