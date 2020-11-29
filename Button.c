@@ -302,7 +302,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 					//2 - zac testbed
 					break;
 				}
-				case 1:		// Setting
+				case 1:		// Survey
 				{
 					#ifdef _WIN32 
 						system("start https://forms.gle/wiLHNBcqdAMYVNKY9");
@@ -315,6 +315,7 @@ void Button_Mouse_Collision_Click_ById(int id)
 				}
 				case 2:		// Credits
 				{
+					Scene_ChangeScene(6);
 					break;
 				}
 				case 3:		// Exit

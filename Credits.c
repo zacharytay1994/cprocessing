@@ -22,12 +22,26 @@ void Credits_Init()
 	sprintf_s(subtitle3, 127, "President");
 	sprintf_s(line7, 127, "Claude Comair");
 
+	time_buffer = 2;
+
 	custom_font = CP_Font_Load("Assets/Fonts/zrnic rg.ttf");
 	CP_Font_Set(custom_font);
 }
 
 void Credits_Update(const float dt)
 {
+	if (time_buffer > 0)
+	{
+		time_buffer -= dt;
+	}
+	else
+	{
+		if (CP_Input_MouseClicked())
+		{
+			Scene_ChangeScene(4);
+		}
+	}
+
 	Credits_Render();
 }
 

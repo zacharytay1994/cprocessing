@@ -20,6 +20,7 @@ char subtitle3[127];
 char line7[127];
 int Credits_WindowWidth;
 int Credits_WindowHeight;
+float time_buffer;
 CP_Font custom_font;
 
 void Credits_Init();

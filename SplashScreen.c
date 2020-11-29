@@ -13,13 +13,12 @@ void SplashScreen_Init()
 
 	splashscreen_window_width = (float)CP_System_GetWindowWidth();
 	splashscreen_window_height = (float)CP_System_GetWindowHeight();
-	//return;
 }
 
 void SplashScreen_Update(const float dt)
 {
 	splashscreen_timer += dt *10;
-	if (splashscreen_fade_toggle == 0 && splashscreen_timer > 0.001f)
+	if (splashscreen_fade_toggle == 0 && splashscreen_timer > 0.01f)
 	{
 		splashscreen_timer -= 0.001f * 10.0f;
 		splashscreen_fade_amount_white += 2 * 10;
@@ -29,12 +28,12 @@ void SplashScreen_Update(const float dt)
 			splashscreen_timer = 0;
 		}
 	}
-	else if (splashscreen_fade_toggle == 1 && splashscreen_timer > 3)
+	else if (splashscreen_fade_toggle == 1 && splashscreen_timer > 30)
 	{
 		splashscreen_fade_toggle = 2;
 		splashscreen_timer = 0;
 	}
-	else if (splashscreen_fade_toggle == 2 && splashscreen_timer > 0.001f)
+	else if (splashscreen_fade_toggle == 2 && splashscreen_timer > 0.01f)
 	{
 		splashscreen_timer -= 0.001f * 10.0f;
 		splashscreen_fade_amount_white -= 3 * 10;
