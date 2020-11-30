@@ -225,6 +225,11 @@ void Button_Mouse_Collision_Check_All()
 				}
 				else if (button_list[scene_id][i].Darken)
 				{
+					if (button_click == NULL)
+					{
+						button_click = CP_Sound_Load("Assets/Cowbell.wav");
+					}
+					CP_Sound_Play(button_click);
 					Button_Mouse_Collision_Click_ById(i);
 					button_list[scene_id][i].Darken = 0;
 				}
