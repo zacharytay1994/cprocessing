@@ -106,7 +106,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	{
 		path_id = enemy_four;
 		new_enemy.ene_dmg = 3;
-		new_enemy.enem_Size.x = size.x;
+		new_enemy.enem_Size.x = -size.x;
 		new_enemy.enem_Size.y = size.y;
 		enem_sprite_col = 2;
 		enem_sprite_row = 3;

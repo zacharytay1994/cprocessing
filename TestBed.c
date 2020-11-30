@@ -76,7 +76,7 @@ void TestBed_Init()
 	house_position = (CP_Vector){ 1000.0f,1065.0f };
 	House_health = House_max_health;
 	// temp zombie
-	tb_zombie_spawn_position = (CP_Vector){ 2300.0f,1150.0f };
+	//tb_zombie_spawn_position = (CP_Vector){ 2300.0f,1150.0f };
 
 	// Wave Init - (RAY)
 	timer = 0;
@@ -191,7 +191,7 @@ void TestBed_Update(const float dt)
 		//TestBed_SpawnZombie();
 		//Sprite_AddSprite(tb_zombie_spawn_position, 200.0f, 200.0f, "./Sprites/slime1.png", 2, 3, 6, 5, 0);
 	}
-	TestBed_UpdateZombies(dt);
+	//TestBed_UpdateZombies(dt);
 	//TestBed_UpdateBombs(dt);
 	//TestBed_CheckBombOnZomb();
 	/*if (CP_Input_MouseClicked()) {
@@ -199,13 +199,13 @@ void TestBed_Update(const float dt)
 		TestBed_SpawnBomb(position);
 	}*/
 	Inventory_Render();
-	if (tb_zombie_spawn < 0.0f) {
+	/*if (tb_zombie_spawn < 0.0f) {
 		TestBed_SpawnZombie();
 		tb_zombie_spawn = 3.0f;
 	}
 	else {
 		tb_zombie_spawn -= dt;
-	}
+	}*/
 	if (tb_temp < 0.0f) {
 		if (!tb_check) {
 			Player_temp();
