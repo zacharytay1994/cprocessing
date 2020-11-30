@@ -6,7 +6,6 @@
 @brief      Contains the button struct and stores all of them for easy updating and rendering
 *//*__________________________________________________________________________
 _*/
-
 #pragma once
 #include <cprocessing.h>
 
