@@ -76,7 +76,7 @@ void TestBed_Init()
 	house_position = (CP_Vector){ 1000.0f,1065.0f };
 	House_health = House_max_health;
 	// temp zombie
-	//tb_zombie_spawn_position = (CP_Vector){ 2300.0f,1150.0f };
+	tb_zombie_spawn_position = (CP_Vector){ 3300.0f,1150.0f };
 
 	// Wave Init - (RAY)
 	timer = 0;
@@ -162,7 +162,7 @@ void TestBed_Update(const float dt)
 		if (spawndelay <= 0.0)	// gap between each enemy spawn
 		{
 			CreateEnemy(10.f,
-				tb_zombie_spawn_position,
+				(CP_Vector){ 2300.0f,1150.0f },
 				(CP_Vector){200.f,200.f},
 				100.f, 3);	//spawn type 3 enemy(toothpaste guy)
 
@@ -191,7 +191,7 @@ void TestBed_Update(const float dt)
 		//TestBed_SpawnZombie();
 		//Sprite_AddSprite(tb_zombie_spawn_position, 200.0f, 200.0f, "./Sprites/slime1.png", 2, 3, 6, 5, 0);
 	}
-	//TestBed_UpdateZombies(dt);
+	TestBed_UpdateZombies(dt);
 	//TestBed_UpdateBombs(dt);
 	//TestBed_CheckBombOnZomb();
 	/*if (CP_Input_MouseClicked()) {
@@ -301,17 +301,17 @@ void TestBed_SpawnZombie()
 
 void TestBed_UpdateZombies(const float dt)
 {
-	for (int i = 0; i < tb_zombies_size; i++) {
-		if (tb_zombies[i]._dead) {
+	for (int i = 0; i < sizeof(enemy_list)-1; i++) {
+		if (CheckEnemyAlive(i) == 0) {
 			continue;
 		}
-		CP_Vector position = Sprite_GetPosition(tb_zombies[i]._id);
-		if (tb_zombies[i]._moving) {
+		//CP_Vector position = Sprite_GetPosition(enemy_list[i].ene_id);
+		/*if (tb_zombies[i]._moving) {
 			position.x -= TESTBED_ZOMBIES_SPEED * dt;
-		}
-		Sprite_SetPosition(tb_zombies[i]._id, position);
+		}*/
+		//Sprite_SetPosition(tb_zombies[i]._id, position);
 		// check if within range of house, if within range attack
-		if (position.x - house_position.x < 120.0f) {
+		/*if (position.x - house_position.x < 120.0f) {
 			tb_zombies[i]._moving = 0;
 			if (tb_zombies[i]._attack_timer <= 0.0f) {
 				House_health -= 1;
@@ -320,6 +320,16 @@ void TestBed_UpdateZombies(const float dt)
 			else {
 				tb_zombies[i]._attack_timer -= dt;
 			}
+		}*/
+
+		//printf("HousePosition X: %f\n", house_position.x);
+		//printf("HousePosition Y: %f\n", house_position.y);
+		if (CheckEnemyCollision(house_position.x + 130, house_position.y + 130,
+			house_position.x - 130, house_position.y - 130, i) == 1)
+		{
+			House_health -= 1;
+			//SetEnemySpeed(i, 0.f);
+			SetEnemyHP(i, 0.f);
 		}
 	}
 }

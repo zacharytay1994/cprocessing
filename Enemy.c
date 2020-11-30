@@ -150,11 +150,11 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	
 
 	new_enemy.isAlive = 1;	//1 - alive, 0 - dead
-	printf("NEWeneScaleX: %2f, NEWeneScaleY: %2f\n", (new_enemy.enem_HitboxScale.x), (new_enemy.enem_HitboxScale.y));
+	//printf("NEWeneScaleX: %2f, NEWeneScaleY: %2f\n", (new_enemy.enem_HitboxScale.x), (new_enemy.enem_HitboxScale.y));
 	// Add enemy to list
 	new_enemy.ene_id = Add_Enem_toList(&new_enemy);
 	//Debug
-	printf("Enemy created at x: %f, y: %f\n", new_enemy.position.x, new_enemy.position.y);
+	//printf("Enemy created at x: %f, y: %f\n", new_enemy.position.x, new_enemy.position.y);
 }
 
 int Add_Enem_toList(struct Enemy* add_enem)
