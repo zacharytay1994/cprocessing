@@ -117,6 +117,23 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 
 		break;
 	}
+
+	case 4:	// COLD-GATE
+	{
+		path_id = enemy_four;
+		new_enemy.ene_dmg = 3;
+		new_enemy.enem_Size.x = -size.x * 7;
+		new_enemy.enem_Size.y = size.y * 7;
+		new_enemy.position.y -= 400;
+		enem_sprite_col = 2;
+		enem_sprite_row = 3;
+		enem_sprite_frames = 2;
+		enem_sprite_animate_speed = 2;
+		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 100,5000 };
+
+		break;
+	}
 	default:	// jus some random fall thru in case something happens
 	{
 		path_id = enemy_one;

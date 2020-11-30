@@ -159,6 +159,10 @@ void TestBed_Update(const float dt)
 
 	if(is_interval == 0) // if not day time, spawn enemies
 	{
+		if (wave_count % 10 == 0 && wave_count != 0)
+		{
+		//	printf("is 10th wave\n");
+		}
 		if (spawndelay <= 0.0)	// gap between each enemy spawn
 		{
 			CreateEnemy(10.f,
@@ -242,7 +246,7 @@ void DayNightManager(float dt)
 		// once DAY time is over
 		if (interval_counter <= 0)
 		{
-			interval_counter = interval_delay;
+			interval_counter = interval_delay + wave_count;
 			is_interval = 0;	// Set to NIGHT time
 		}
 
@@ -268,6 +272,13 @@ void DayNightManager(float dt)
 		sprintf_s(wave_status, 127, "(NIGHT) time left: %.0f", wave_timer);
 		CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
 		CP_Font_DrawText(wave_status, 1150, 50);
+
+		/*if (wave_count % 10 == 0 && wave_count != 0)
+		{
+			sprintf_s(wave_status, 127, "WARNING!");
+			CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
+			CP_Font_DrawText(wave_status, 1150, 150);
+		}*/
 	}
 
 	// Time (jus an ordinary counter)
