@@ -166,7 +166,7 @@ int Add_Enem_toList(struct Enemy* add_enem)
 			enemy_list[i] = *add_enem;
 			enemy_list[i].ene_id = i;
 			// Debug
-			printf("Enemy added\n");
+			//printf("Enemy added\n");
 			return i;
 		}
 	}

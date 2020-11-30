@@ -166,7 +166,7 @@ void TestBed_Update(const float dt)
 				(CP_Vector){200.f,200.f},
 				100.f, 3);	//spawn type 3 enemy(toothpaste guy)
 
-			spawndelay = CP_Random_RangeFloat(0.5f,3.f);
+			spawndelay = CP_Random_RangeFloat(3.f/((float)wave_count*0.5f),7.f/ ((float)wave_count * 0.5f));
 		}
 		spawndelay -= dt;
 	}
@@ -310,7 +310,6 @@ void TestBed_UpdateZombies(const float dt)
 			position.x -= TESTBED_ZOMBIES_SPEED * dt;
 		}*/
 		//Sprite_SetPosition(tb_zombies[i]._id, position);
-		// check if within range of house, if within range attack
 		/*if (position.x - house_position.x < 120.0f) {
 			tb_zombies[i]._moving = 0;
 			if (tb_zombies[i]._attack_timer <= 0.0f) {
@@ -322,8 +321,9 @@ void TestBed_UpdateZombies(const float dt)
 			}
 		}*/
 
-		//printf("HousePosition X: %f\n", house_position.x);
-		//printf("HousePosition Y: %f\n", house_position.y);
+		
+
+		// check if within range of house, if within range attack
 		if (CheckEnemyCollision(house_position.x + 130, house_position.y + 130,
 			house_position.x - 130, house_position.y - 130, i) == 1)
 		{
