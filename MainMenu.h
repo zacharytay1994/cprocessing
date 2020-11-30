@@ -3,7 +3,7 @@
 @author     Noel Ho Sing Nam (s.ho)
 @course     CSD1400
 @section    A
-@brief      Contains the data and functiosn for rendering the main menu
+@brief      Contains the data and functions for rendering the main menu
 *//*__________________________________________________________________________
 _*/
 #pragma once

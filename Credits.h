@@ -1,3 +1,11 @@
+/*!
+@file       Credits.h
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Contains the data and functions for rendering the credits
+*//*__________________________________________________________________________
+_*/
 #pragma once
 #include <cprocessing.h>
 #include "Scene.h"
