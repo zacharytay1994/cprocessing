@@ -154,8 +154,8 @@ void TestBed_Update(const float dt)
 	Inventory_Update();
 	Particle_Update(dt);
 	// Enemy Functions - (RAY)
-	DayNightManager(dt);
-	UpdateEnemy(dt);
+	/*DayNightManager(dt);
+	UpdateEnemy(dt);*/
 
 	if(is_interval == 0) // if not day time, spawn enemies
 	{

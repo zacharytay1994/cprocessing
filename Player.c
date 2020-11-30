@@ -42,6 +42,15 @@ int Player_projectile_fire = 0;
 
 float Player_dust_timer = PLAYER_DUST_TIMER;
 
+int Player_weapon_charge = -1;
+CP_Image Player_weapon_charge_bar;
+int Player_weapon_max_charge = 10;
+float Player_weapon_charge_gap = 27.0f;
+float Player_weapon_charge_height = 25.0f;
+float Player_weapon_charge_width = 15.0f;
+float Player_weapon_angle = 0.0f;
+float Player_weapon_charge_interval = 0.7f;
+float Player_weapon_charge_timer = 0.0f;
 
 void Player_Initialize()
 {
@@ -50,6 +59,7 @@ void Player_Initialize()
 	Player_health = Player_max_health;
 	Player_heart = CP_Image_Load("demo_heart.png");
 	Player_blackheart = CP_Image_Load("demo_blackheart.png");
+	Player_weapon_charge_bar = CP_Image_Load("./Sprites/charge.png");
 
 	// initialize weapon
 	Player_weapon_offset = (CP_Vector){ 0.0f,-100.0f };
@@ -357,6 +367,7 @@ void Player_ShowWeapon()
 			Sprite_Reset(Player_weapon);
 			Sprite_SetVisible(Player_weapon, 1);
 			Player_weapon_out = 1;
+			Player_weapon_charge = 0;
 		}
 		//Particle_EmitOut(PT_Star, Player_weapon_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
 	}
@@ -373,6 +384,7 @@ void Player_HideWeapon(const float dt)
 			Sprite_SetVisible(Player_weapon, 0);
 			Player_weapon_out = 0;
 		}
+		Player_weapon_charge = -1;
 	}
 }
 
@@ -397,6 +409,7 @@ void Player_WeaponUpdate(const float dt)
 		else {
 			Sprite_SetFlip(Player_weapon, 0);
 		}
+		Player_weapon_angle = angle;
 		Sprite_SetRotation(Player_weapon, angle);
 		Player_ProjectileUpdate(dt);
 	}
@@ -408,7 +421,7 @@ void Player_SpawnProjectile(const float dt)
 	CP_Vector start_position = Player_weapon_position;
 	// calculate direction
 	CP_Vector direction = CP_Vector_Normalize(CP_Vector_Subtract(position, start_position));
-	direction = CP_Vector_Scale(direction, Player_max_weapon_strength);
+	direction = CP_Vector_Scale(direction, Player_weapon_strength);
 	CP_Vector spawn_position = CP_Vector_Add(start_position, CP_Vector_Scale(direction, 5.0f));
 	if (Player_projectile_fire) {
 		if (!Player_projectiles_init) {
@@ -429,6 +442,9 @@ void Player_SpawnProjectile(const float dt)
 		Player_projectile_fire = 0;
 	}
 	//Player_RenderProjectileArc(spawn_position, direction, 10, 9.81f, dt);
+	if (Player_weapon_charge >= 0) {
+		Player_RenderProjectileCharge(start_position, direction, dt);
+	}
 }
 
 void Player_ProjectileUpdate(const float dt)
@@ -454,15 +470,42 @@ void Player_RenderProjectileArc(const CP_Vector position, const CP_Vector direct
 	if (Player_initialized) {
 		float arc_dt = dt;
 		arc_dt = 0.02f;
-		float frames = 80.0f;
+		float frames = 20.0f;
 		CP_Vector velocity = CP_Vector_Set(0.0f, 0.0f);
 		CP_Vector pos = position;
 		for (int i = 0; i < 10; ++i) {
-			velocity = CP_Vector_Scale(direction, frames * arc_dt * i);
+			CP_Vector store = velocity;
+			velocity = CP_Vector_Add(velocity, CP_Vector_Scale(direction, frames * arc_dt * i));
+			CP_Graphics_DrawLine(pos.x + store.x, pos.y + store.y, pos.x + store.x + velocity.x, pos.y + store.y + velocity.y);
 			velocity.y += fallOff * i * frames * arc_dt;
 			pos = CP_Vector_Add(pos, velocity);
 			pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), pos);
 			CP_Image_Draw(Player_projectile_arc_resource, pos.x, pos.y, 30.0f, 30.0f, 255);
+		}
+	}
+}
+
+void Player_RenderProjectileCharge(const CP_Vector position, const CP_Vector direction, const float dt)
+{
+	if (Player_initialized) {
+		if (Player_weapon_charge_timer > 0.0f) {
+			Player_weapon_charge_timer -= dt;
+		}
+		else if (Player_weapon_charge < Player_weapon_max_charge) {
+			Player_weapon_charge++;
+			Player_weapon_charge_timer = Player_weapon_charge_interval;
+			Player_weapon_strength = ((float)Player_weapon_charge/(float)Player_weapon_max_charge) * Player_max_weapon_strength;
+		}
+
+		CP_Vector offset = CP_Vector_Set(0.0f, 0.0f);
+		CP_Vector pos;
+		for (int i = 0; i < Player_weapon_charge; ++i) {
+			offset = CP_Vector_Set(0.0f, 0.0f);
+			offset = CP_Vector_Add(offset, CP_Vector_Scale(CP_Vector_Normalize(direction), (i+1) * Player_weapon_charge_gap));
+			pos = CP_Vector_Add(position, offset);
+			pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), pos);
+			//CP_Image_Draw(Player_weapon_charge_bar, pos.x, pos.y, Player_weapon_width, Player_weapon_height, 255);
+			CP_Image_DrawAdvanced(Player_weapon_charge_bar, pos.x, pos.y, Player_weapon_charge_width, (1+0.5f*i)*Player_weapon_charge_height, 255, Player_weapon_angle);
 		}
 	}
 }
