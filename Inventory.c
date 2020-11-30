@@ -359,7 +359,9 @@ void Inventory_Item_Use_Name(char* name)
 {
 	if (!strcmp(name, "poop"))
 	{
-		Inventory_Add_Item_Name("poop");
+		//Inventory_Add_Item_Name("poop");
+		Player_Add_Powerup(1, 10);
+		Inventory_Item_Remove_Name(name);
 	}
 	else if (!strcmp(name, "trash"))
 	{
