@@ -65,6 +65,7 @@ int is_interval;	// 1 - no enemy spawn, 0 - start spawn enemies
 int is_wave;
 int wave_count;
 double spawndelay = 2;
+int biggus = 0;
 
 
 void TestBed_Init()
@@ -85,6 +86,7 @@ void TestBed_Init()
 	is_interval = 1;
 	is_wave = 0;
 	wave_count = 0;
+	biggus = 0;
 
 
 	// Setting up tilemaps -
@@ -159,11 +161,21 @@ void TestBed_Update(const float dt)
 
 	if(is_interval == 0) // if not day time, spawn enemies
 	{
-		if (wave_count % 10 == 0 && wave_count != 0)
+		if (wave_count % 10 == 0 && wave_count != 0 && biggus == 0)
 		{
-		//	printf("is 10th wave\n");
+			// if wave 10 and 30% of wave duration left(cloes to end of wave)
+			if (wave_timer <= (wave_duration / 10 * 3))
+			{
+				// spawn miniboss
+				CreateEnemy(50.f,
+				(CP_Vector){ 2300.0f,1150.0f },
+				(CP_Vector){200.f,200.f},
+				50.f, 4);	
+
+				biggus = 1;
+			}
 		}
-		if (spawndelay <= 0.0)	// gap between each enemy spawn
+		if (spawndelay <= 0.0)	// delay between each enemy spawn
 		{
 			CreateEnemy(10.f,
 				(CP_Vector){ 2300.0f,1150.0f },
@@ -242,7 +254,8 @@ void DayNightManager(float dt)
 	if (is_interval == 1)
 	{
 		interval_counter -= dt;
-
+		if(biggus == 1)
+			biggus = 0;
 		// once DAY time is over
 		if (interval_counter <= 0)
 		{
@@ -273,12 +286,12 @@ void DayNightManager(float dt)
 		CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
 		CP_Font_DrawText(wave_status, 1150, 50);
 
-		/*if (wave_count % 10 == 0 && wave_count != 0)
+		if (wave_count % 10 == 0 && wave_count != 0)
 		{
 			sprintf_s(wave_status, 127, "WARNING!");
 			CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
 			CP_Font_DrawText(wave_status, 1150, 150);
-		}*/
+		}
 	}
 
 	// Time (jus an ordinary counter)
