@@ -38,7 +38,7 @@ void Credits_Update(const float dt)
 	{
 		if (CP_Input_MouseClicked())
 		{
-			Scene_ChangeScene(4);
+			Scene_ChangeScene(3);
 		}
 	}
 
