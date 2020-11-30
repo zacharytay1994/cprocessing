@@ -76,7 +76,7 @@ void TestBed_Init()
 	house_position = (CP_Vector){ 1000.0f,1065.0f };
 	House_health = House_max_health;
 	// temp zombie
-	tb_zombie_spawn_position = (CP_Vector){ 2300.0f,1150.0f };
+	tb_zombie_spawn_position = (CP_Vector){ 3300.0f,1150.0f };
 
 	// Wave Init - (RAY)
 	timer = 0;
@@ -159,14 +159,18 @@ void TestBed_Update(const float dt)
 
 	if(is_interval == 0) // if not day time, spawn enemies
 	{
+		if (wave_count % 10 == 0 && wave_count != 0)
+		{
+		//	printf("is 10th wave\n");
+		}
 		if (spawndelay <= 0.0)	// gap between each enemy spawn
 		{
 			CreateEnemy(10.f,
-				tb_zombie_spawn_position,
+				(CP_Vector){ 2300.0f,1150.0f },
 				(CP_Vector){200.f,200.f},
 				100.f, 3);	//spawn type 3 enemy(toothpaste guy)
 
-			spawndelay = CP_Random_RangeFloat(0.5f,3.f);
+			spawndelay = CP_Random_RangeFloat(3.f/((float)wave_count*0.5f),7.f/ ((float)wave_count * 0.5f));
 		}
 		spawndelay -= dt;
 	}
@@ -199,13 +203,13 @@ void TestBed_Update(const float dt)
 		TestBed_SpawnBomb(position);
 	}*/
 	Inventory_Render();
-	if (tb_zombie_spawn < 0.0f) {
+	/*if (tb_zombie_spawn < 0.0f) {
 		TestBed_SpawnZombie();
 		tb_zombie_spawn = 3.0f;
 	}
 	else {
 		tb_zombie_spawn -= dt;
-	}
+	}*/
 	if (tb_temp < 0.0f) {
 		if (!tb_check) {
 			Player_temp();
@@ -242,7 +246,7 @@ void DayNightManager(float dt)
 		// once DAY time is over
 		if (interval_counter <= 0)
 		{
-			interval_counter = interval_delay;
+			interval_counter = interval_delay + wave_count;
 			is_interval = 0;	// Set to NIGHT time
 		}
 
@@ -268,6 +272,13 @@ void DayNightManager(float dt)
 		sprintf_s(wave_status, 127, "(NIGHT) time left: %.0f", wave_timer);
 		CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
 		CP_Font_DrawText(wave_status, 1150, 50);
+
+		/*if (wave_count % 10 == 0 && wave_count != 0)
+		{
+			sprintf_s(wave_status, 127, "WARNING!");
+			CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
+			CP_Font_DrawText(wave_status, 1150, 150);
+		}*/
 	}
 
 	// Time (jus an ordinary counter)
@@ -301,17 +312,16 @@ void TestBed_SpawnZombie()
 
 void TestBed_UpdateZombies(const float dt)
 {
-	for (int i = 0; i < tb_zombies_size; i++) {
-		if (tb_zombies[i]._dead) {
+	for (int i = 0; i < sizeof(enemy_list)-1; i++) {
+		if (CheckEnemyAlive(i) == 0) {
 			continue;
 		}
-		CP_Vector position = Sprite_GetPosition(tb_zombies[i]._id);
-		if (tb_zombies[i]._moving) {
+		//CP_Vector position = Sprite_GetPosition(enemy_list[i].ene_id);
+		/*if (tb_zombies[i]._moving) {
 			position.x -= TESTBED_ZOMBIES_SPEED * dt;
-		}
-		Sprite_SetPosition(tb_zombies[i]._id, position);
-		// check if within range of house, if within range attack
-		if (position.x - house_position.x < 120.0f) {
+		}*/
+		//Sprite_SetPosition(tb_zombies[i]._id, position);
+		/*if (position.x - house_position.x < 120.0f) {
 			tb_zombies[i]._moving = 0;
 			if (tb_zombies[i]._attack_timer <= 0.0f) {
 				House_health -= 1;
@@ -320,6 +330,17 @@ void TestBed_UpdateZombies(const float dt)
 			else {
 				tb_zombies[i]._attack_timer -= dt;
 			}
+		}*/
+
+		
+
+		// check if within range of house, if within range attack
+		if (CheckEnemyCollision(house_position.x + 130, house_position.y + 130,
+			house_position.x - 130, house_position.y - 130, i) == 1)
+		{
+			House_health -= 1;
+			//SetEnemySpeed(i, 0.f);
+			SetEnemyHP(i, 0.f);
 		}
 	}
 }

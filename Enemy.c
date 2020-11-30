@@ -106,7 +106,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	{
 		path_id = enemy_four;
 		new_enemy.ene_dmg = 3;
-		new_enemy.enem_Size.x = size.x;
+		new_enemy.enem_Size.x = -size.x;
 		new_enemy.enem_Size.y = size.y;
 		enem_sprite_col = 2;
 		enem_sprite_row = 3;
@@ -114,6 +114,23 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		enem_sprite_animate_speed = 5;
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+
+		break;
+	}
+
+	case 4:	// COLD-GATE
+	{
+		path_id = enemy_four;
+		new_enemy.ene_dmg = 3;
+		new_enemy.enem_Size.x = -size.x * 7;
+		new_enemy.enem_Size.y = size.y * 7;
+		new_enemy.position.y -= 400;
+		enem_sprite_col = 2;
+		enem_sprite_row = 3;
+		enem_sprite_frames = 2;
+		enem_sprite_animate_speed = 2;
+		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 100,5000 };
 
 		break;
 	}
@@ -150,11 +167,11 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	
 
 	new_enemy.isAlive = 1;	//1 - alive, 0 - dead
-	printf("NEWeneScaleX: %2f, NEWeneScaleY: %2f\n", (new_enemy.enem_HitboxScale.x), (new_enemy.enem_HitboxScale.y));
+	//printf("NEWeneScaleX: %2f, NEWeneScaleY: %2f\n", (new_enemy.enem_HitboxScale.x), (new_enemy.enem_HitboxScale.y));
 	// Add enemy to list
 	new_enemy.ene_id = Add_Enem_toList(&new_enemy);
 	//Debug
-	printf("Enemy created at x: %f, y: %f\n", new_enemy.position.x, new_enemy.position.y);
+	//printf("Enemy created at x: %f, y: %f\n", new_enemy.position.x, new_enemy.position.y);
 }
 
 int Add_Enem_toList(struct Enemy* add_enem)
@@ -166,7 +183,7 @@ int Add_Enem_toList(struct Enemy* add_enem)
 			enemy_list[i] = *add_enem;
 			enemy_list[i].ene_id = i;
 			// Debug
-			printf("Enemy added\n");
+			//printf("Enemy added\n");
 			return i;
 		}
 	}
