@@ -25,6 +25,7 @@ struct Button
 
 int scene_id;
 struct Button button_list[63][127];
+CP_Sound button_click;
 int Button_List_Add(struct Button* add_button);
 void Button_Update();
 void Button_Render_All();

@@ -1,9 +1,22 @@
+/*!
+@file       button.c
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Handles button display properties and their functions
+*//*__________________________________________________________________________
+_*/
 #include "Button.h"
 #include "Scene.h"
 #include "TestScene1.h"
 #include <stdio.h>
 #include <stdlib.h>
 
+/*!
+@brief Initializes a button with default settings
+@return the ID of the button
+*//*________________________________________________________________________
+_*/
 int Button_Initialize_Default()
 {
 	CP_Vector default_pos;
@@ -30,6 +43,19 @@ int Button_Initialize_Default()
 	);
 }
 
+/*!
+@brief Initializes a button with set data
+@param  position		- The position of the button
+		size			- The size ofthe button
+		text_position   - The position of the text
+		button_color	- The colour of the button
+		text_color		- The colour of the text
+		text_size		- The size of the text
+		text			- The text
+		visible			- Is the button visible?
+@return the ID of the button
+*//*________________________________________________________________________
+_*/
 int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_position, CP_Color button_color, CP_Color text_color, float text_size, char* text, char visible)
 {
 	struct Button new_button;
@@ -101,6 +127,14 @@ int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_positio
 	return new_button.Id;
 }
 
+/*!
+@brief Moves a button's position
+@param  id				- The ID of the button
+		displacement_x	- The x-distance to translate
+		displacement_y	- The y-distance to translate
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Translate(int id, float displacement_x, float displacement_y)
 {
 	button_list[scene_id][id].Position.x += displacement_x;
@@ -108,6 +142,14 @@ char Button_Translate(int id, float displacement_x, float displacement_y)
 	return 1;
 }
 
+/*!
+@brief Sets a button's position
+@param  id				- The ID of the button
+		new_x			- The x-position to set
+		new_y			- The y-position to set
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Position_Set(int id, float new_x, float new_y)
 {
 	button_list[scene_id][id].Position.x = new_x;
@@ -115,6 +157,14 @@ char Button_Position_Set(int id, float new_x, float new_y)
 	return 1;
 }
 
+/*!
+@brief Sets a button's size
+@param  id				- The ID of the button
+		new_x			- The x-size to set
+		new_y			- The y-size to set
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Size_Set(int id, float new_x, float new_y)
 {
 	button_list[scene_id][id].Size.x = new_x;
@@ -122,6 +172,14 @@ char Button_Size_Set(int id, float new_x, float new_y)
 	return 1;
 }
 
+/*!
+@brief Scales a button's size
+@param  id				- The ID of the button
+		scale_x			- The amount to scale the x-size by
+		scale_y			- The amount to scale the y-size by
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Size_Scale(int id, float scale_x, float scale_y)
 {
 	button_list[scene_id][id].Size.x *= scale_x;
@@ -129,12 +187,26 @@ char Button_Size_Scale(int id, float scale_x, float scale_y)
 	return 1;
 }
 
+/*!
+@brief Sets the Scene ID for the button class, used for accessing different functions
+@param  id				- The ID of the scene to set
+@return the id after compete
+*//*________________________________________________________________________
+_*/
 char Button_SceneID_Set(int id)
 {
 	scene_id = id;
 	return (char)id;
 }
 
+/*!
+@brief Moves a button's text position
+@param  id				- The ID of the button
+		displacement_x	- The x-distance to translate
+		displacement_y	- The y-distance to translate
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Text_Translate(int id, float displacement_x, float displacement_y)
 {
 	button_list[scene_id][id].Text_Position.x += displacement_x;
@@ -142,13 +214,28 @@ char Button_Text_Translate(int id, float displacement_x, float displacement_y)
 	return 1;
 }
 
+/*!
+@brief Scales a button's text size
+@param  id				- The ID of the button
+		scale_x			- The amount to scale the x-size by
+		scale_y			- The amount to scale the y-size by
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Text_Scale(int id, float scale)
 {
 	button_list[scene_id][id].Text_Size *= scale;
 	return 1;
 }
 
-
+/*!
+@brief Sets a button's text position
+@param  id				- The ID of the button
+		new_x			- The x-position to set
+		new_y			- The y-position to set
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Text_SetPosition(int id, float new_x, float new_y)
 {
 	button_list[scene_id][id].Text_Position.x = new_x;
@@ -156,12 +243,29 @@ char Button_Text_SetPosition(int id, float new_x, float new_y)
 	return 1;
 }
 
+/*!
+@brief Sets a button's text
+@param  id				- The ID of the button
+		new_text		- The text to set
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Text_Set(int id, char* new_text)
 {
 	sprintf_s(button_list[scene_id][id].Text, 127, new_text);
 	return 1;
 }
 
+/*!
+@brief Sets a button's colour
+@param  id				- The ID of the button
+		r				- The red value
+		g				- The green value
+		b				- The blue value
+		a				- The alpha value
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Color_Set(int id, int r, int g, int b, int a)
 {
 	CP_Color new_color = CP_Color_Create(r, g, b, a);
@@ -181,12 +285,25 @@ char Button_Color_Set(int id, int r, int g, int b, int a)
 	return 1;
 }
 
+/*!
+@brief Sets a button's name (not for display)
+@param  id				- The ID of the button
+		new_text		- The name to set
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Name_Set(int id, char* new_text)
 {
 	sprintf_s(button_list[scene_id][id].Name, 127, new_text);
 	return 1;
 }
 
+/*!
+@brief Adds a button into button class, required as the code loops through the list
+@param  add_button		- The button to add
+@return the id if complete, 0 if there is no more memory space
+*//*________________________________________________________________________
+_*/
 int Button_List_Add(struct Button* add_button)
 {
 	for (int i = 0; i < 127; i++)
@@ -201,11 +318,19 @@ int Button_List_Add(struct Button* add_button)
 	return 0;
 }
 
+/*!
+@brief Update function for button class
+*//*________________________________________________________________________
+_*/
 void Button_Update()
 {
 	Button_Mouse_Collision_Check_All();
 }
 
+/*!
+@brief Loops through all the buttons, checks if the mouse is touching any
+*//*________________________________________________________________________
+_*/
 void Button_Mouse_Collision_Check_All()
 {
 	for (int i = 0; i < 127; i++)
@@ -221,10 +346,10 @@ void Button_Mouse_Collision_Check_All()
 				if (CP_Input_MouseDown(MOUSE_BUTTON_1))
 				{
 					button_list[scene_id][i].Darken = 1;
-					//Button_Mouse_Collision_Click_ById(i);
 				}
 				else if (button_list[scene_id][i].Darken)
 				{
+					CP_Sound_Play(button_click);
 					Button_Mouse_Collision_Click_ById(i);
 					button_list[scene_id][i].Darken = 0;
 				}
@@ -237,6 +362,12 @@ void Button_Mouse_Collision_Check_All()
 	}
 }
 
+/*!
+@brief Checks if a mouse is hovering over a button
+@param  id				- The ID of the button
+@return 1 if mouse is over button, 0 if otherwise
+*//*________________________________________________________________________
+_*/
 char Button_Mouse_Collision_Check(int id)
 {
 	if (CP_Input_GetMouseWorldX() > button_list[scene_id][id].Position.x
@@ -255,6 +386,12 @@ char Button_Mouse_Collision_Check(int id)
 	return 0;
 }
 
+/*!
+@brief Gets a button's ID via name
+@param  text			- The name of the button (not displayed)
+@return the ID of the button, -1 if it doesn't exist
+*//*________________________________________________________________________
+_*/
 int Button_GetID_By_Name(char* text)
 {
 	for (int i = 0; i < 127; i++)
@@ -267,6 +404,11 @@ int Button_GetID_By_Name(char* text)
 	return -1;
 }
 
+/*!
+@brief Functions deciding what happens after button is clicked
+@param  id				- The ID of the button
+*//*________________________________________________________________________
+_*/
 void Button_Mouse_Collision_Click_ById(int id)
 {
 	printf("Button Pressed: Scene %d, ID: %d, \"%s\"\n", Scene_GetCurrentID(), id, button_list[Scene_GetCurrentID()][id].Text);
@@ -329,12 +471,21 @@ void Button_Mouse_Collision_Click_ById(int id)
 	}
 }
 
+/*!
+@brief Checks for mouse collission with specific button via name
+@param  text			- The name of the button (not displayed)
+*//*________________________________________________________________________
+_*/
 void Button_Mouse_Collision_Click_ByText(char* text)
 {
 	Button_Mouse_Collision_Click_ById(Button_GetID_By_Name(text));
 	return;
 }
 
+/*!
+@brief Renders all the buttons
+*//*________________________________________________________________________
+_*/
 void Button_Render_All()
 {
 	for (int i = 0; i < 127; i++)
@@ -350,6 +501,11 @@ void Button_Render_All()
 	}
 }
 
+/*!
+@brief Renders a specific button by id
+@param  id				- The ID of the button
+*//*________________________________________________________________________
+_*/
 void Button_Render(int id)
 {
 	CP_Settings_Fill(button_list[scene_id][id].Button_Color);
@@ -380,6 +536,13 @@ void Button_Render(int id)
 	CP_Font_DrawText(button_list[scene_id][id].Text, button_list[scene_id][id].Text_Position.x, button_list[scene_id][id].Text_Position.y);
 }
 
+/*!
+@brief Sets a button's image, replace button size with image size
+@param  id				- The ID of the button
+		img				- The image to set
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Image_Set_Override(int id, char* img)
 {
 	button_list[scene_id][id].Image = CP_Image_Load(img);
@@ -388,24 +551,48 @@ char Button_Image_Set_Override(int id, char* img)
 	return 1;
 }
 
+/*!
+@brief Sets a button's image, size stays te same
+@param  id				- The ID of the button
+		img				- The image to set
+@return 1 after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Image_Set(int id, char* img)
 {
 	button_list[scene_id][id].Image = CP_Image_Load(img);
 	return 1;
 }
 
+/*!
+@brief Sets a button's special effects level
+@param  id				- The ID of the button
+		x				- The level of special effects to set
+*//*________________________________________________________________________
+_*/
 void Button_SpecialEffects_Set(int id, char x)
 {
 	button_list[scene_id][id].Enable_SpecialEffects = x;
 	return;
 }
 
+/*!
+@brief Sets a button to active
+@param  id				- The ID of the button
+		x				- Toggle for button active
+@return x after function is complete
+*//*________________________________________________________________________
+_*/
 char Button_Active_Set(int id, char x)
 {
 	button_list[scene_id][id].Active = x;
 	return x;
 }
 
+/*!
+@brief Initializes the button class
+*//*________________________________________________________________________
+_*/
 void Button_Class_Init()
 {
 	for (int i = 0; i < 63; i++)
@@ -415,4 +602,6 @@ void Button_Class_Init()
 			button_list[i][j].Id = -1;
 		}
 	}
+
+	button_click = CP_Sound_Load("Assets/Cowbell.wav");
 }
