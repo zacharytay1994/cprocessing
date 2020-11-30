@@ -1,6 +1,18 @@
+/*!
+@file       Inventory.c
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Inventory system for the game
+*//*__________________________________________________________________________
+_*/
 #include "Inventory.h"
 #include <string.h>
 
+/*!
+@brief Initializes the Inventory class
+*//*________________________________________________________________________
+_*/
 void Inventory_Init()
 {
 	inventory_window_width = (float)CP_System_GetWindowWidth();
@@ -35,16 +47,30 @@ void Inventory_Init()
 	return;
 }
 
+/*!
+@brief Opens the inventory
+*//*________________________________________________________________________
+_*/
 void Inventory_Open()
 {
 	inventory_is_visible = 1;
 }
 
+/*!
+@brief Closes the inventory
+*//*________________________________________________________________________
+_*/
 void Inventory_Close()
 {
 	inventory_is_visible = 0;
 }
 
+/*!
+@brief Adds an item into inventory by ID
+@param  id				- The ID of the item to add
+@return the slot the item is stored, -1 if there is no space
+*//*________________________________________________________________________
+_*/
 int Inventory_Add_Item_ID(int id)
 {
 	for (int i = 0; i < 64; i++)
@@ -58,6 +84,12 @@ int Inventory_Add_Item_ID(int id)
 	return -1;
 }
 
+/*!
+@brief Adds an item into inventory by name
+@param  name			- The name of the item to add
+@return the slot the item is stored, -1 if there is no space
+*//*________________________________________________________________________
+_*/
 int Inventory_Add_Item_Name(char* name)
 {
 	int id = Inventory_Stock_Get_Struct_By_Name(name).item_id;
@@ -72,11 +104,19 @@ int Inventory_Add_Item_Name(char* name)
 	return -1;
 }
 
+/*!
+@brief Update function for inventory class
+*//*________________________________________________________________________
+_*/
 void Inventory_Update()
 {
 	Inventory_Item_Update();
 }
 
+/*!
+@brief Renders the inventory
+*//*________________________________________________________________________
+_*/
 void Inventory_Render()
 {
 	if (inventory_is_visible)
@@ -126,7 +166,13 @@ void Inventory_Render()
 	}
 }
 
-// Inventory Stock
+///////// Inventory Stock
+/*!
+@brief Gets an item by name
+@param  name			- The name of the item to get
+@return the struct of the item
+*//*________________________________________________________________________
+_*/
 struct inventory_item Inventory_Stock_Get_Struct_By_Name(char* name)
 {
 	for (int i = 0; i < 127; i++)
@@ -139,6 +185,12 @@ struct inventory_item Inventory_Stock_Get_Struct_By_Name(char* name)
 	return inventory_stock[126];
 }
 
+/*!
+@brief Gets an item by id
+@param  id				- The ID of the item to get
+@return the struct of the item
+*//*________________________________________________________________________
+_*/
 struct inventory_item Inventory_Stock_Get_Struct_By_ID(int id)
 {
 	for (int i = 0; i < 127; i++)
@@ -152,7 +204,12 @@ struct inventory_item Inventory_Stock_Get_Struct_By_ID(int id)
 	return inventory_stock[126];
 }
 
-// Inventory Item
+///////// Inventory Item
+/*!
+@brief Creates a new item
+@param  name			- The name of the item to create
+*//*________________________________________________________________________
+_*/
 void Inventory_Item_Create(char* name)
 {
 	struct inventory_item new_item;
@@ -190,6 +247,10 @@ void Inventory_Item_Create(char* name)
 	return;
 }
 
+/*!
+@brief Update function for individual item, handles clicking on items
+*//*________________________________________________________________________
+_*/
 void Inventory_Item_Update()
 {
 	if (inventory_is_visible)
@@ -223,6 +284,13 @@ void Inventory_Item_Update()
 	}
 }
 
+/*!
+@brief Renders an item in the inventory
+@param  id				- The ID of the item to render
+		x				- The x-position of the item
+		y				- the y-position of the item
+*//*________________________________________________________________________
+_*/
 void Inventory_Item_Render(int id, float x, float y)
 {
 	if (inventory_stock[id].item_image != NULL)
@@ -243,6 +311,12 @@ void Inventory_Item_Render(int id, float x, float y)
 	}
 }
 
+/*!
+@brief Removes an item from inventory by name
+@param  name			- The name of the item to remove
+@return the slot where the item was removed, -1 if not found
+*//*________________________________________________________________________
+_*/
 int Inventory_Item_Remove_Name(char* name)
 {
 	int id = Inventory_Stock_Get_Struct_By_Name(name).item_id;
@@ -257,6 +331,12 @@ int Inventory_Item_Remove_Name(char* name)
 	return -1;
 }
 
+/*!
+@brief Removes an item from inventory by ID
+@param  id				- The ID of the item to remove
+@return the slot where the item was removed, -1 if not found
+*//*________________________________________________________________________
+_*/
 int Inventory_Item_Remove_ID(int id)
 {
 	for (int i = 63; i >= 0; i--)
@@ -270,6 +350,11 @@ int Inventory_Item_Remove_ID(int id)
 	return -1;
 }
 
+/*!
+@brief Handles all the item specific function after it is used
+@param  name			- The name of the item to use
+*//*________________________________________________________________________
+_*/
 void Inventory_Item_Use_Name(char* name)
 {
 	if (!strcmp(name, "poop"))
@@ -303,23 +388,46 @@ void Inventory_Item_Use_Name(char* name)
 	}
 }
 
+/*!
+@brief Uses an item in the inventory, calls function by item ID
+@param  id				- The ID of the item to use
+*//*________________________________________________________________________
+_*/
 void Inventory_Item_Use_ID(int id)
 {
 	Inventory_Item_Use_Name(inventory_stock[id].item_name);
 }
 
+/*!
+@brief Sets the image of an item, get item via name
+@param  name			- The name of the item to set
+		image			- The image to set
+@return 1 after function completes
+*//*________________________________________________________________________
+_*/
 int Inventory_Item_Set_Image(char* name, char* image)
 {
 	inventory_stock[Inventory_Stock_Get_Struct_By_Name(name).item_id].item_image = CP_Image_Load(image);
 	return 1;
 }
 
+/*!
+@brief Sets the description of an item, get item via name
+@param  name			- The name of the item to set
+		text			- The text to set
+@return 1 after function completes
+*//*________________________________________________________________________
+_*/
 int Inventory_Item_Set_Description(char* name, char* text)
 {
 	sprintf_s(inventory_stock[Inventory_Stock_Get_Struct_By_Name(name).item_id].item_description, 127, "%s", text);
 	return 1;
 }
 
+/*!
+@brief Frees the memory used for images by the inventory
+*//*________________________________________________________________________
+_*/
 void Inventory_Item_Free()
 {
 	for (int i = 0; i < 127; i++)
@@ -329,7 +437,7 @@ void Inventory_Item_Free()
 			inventory_stock[i].item_id = -1;
 			if (inventory_stock[i].item_image != NULL)
 			{
-				//FREE CODE
+				//FREE CODE not here, due to causing errors
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 /*!
-@file       button.c
+@file       Button.c
 @author     Noel Ho Sing Nam (s.ho)
 @course     CSD1400
 @section    A
