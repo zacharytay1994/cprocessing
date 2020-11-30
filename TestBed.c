@@ -54,6 +54,7 @@ int particle_hold = 0;
 // Wave Temp - (RAY)
 // Display stuff
 char curr_Timer[127];
+char money_display[127];
 char wave_status[127];
 char wave_display[127];
 double timer;
@@ -66,6 +67,7 @@ int is_wave;
 int wave_count;
 double spawndelay = 2;
 int biggus = 0;
+int souls_money = 0;
 
 
 void TestBed_Init()
@@ -87,6 +89,8 @@ void TestBed_Init()
 	is_wave = 0;
 	wave_count = 0;
 	biggus = 0;
+
+	souls_money = 0;
 
 
 	// Setting up tilemaps -
@@ -300,6 +304,10 @@ void DayNightManager(float dt)
 	CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
 	CP_Font_DrawText(curr_Timer, 20, 170);
 
+	sprintf_s(money_display, 127, "Souls: %d", souls_money);
+	CP_Settings_Fill((CP_Color) { 175, 205, 255, 255 });
+	CP_Font_DrawText(money_display, 20, 230);
+
 	// Simple wave count (nothing much)
 	sprintf_s(wave_display, 127, "WAVE %d", wave_count);
 	CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
@@ -351,9 +359,19 @@ void TestBed_UpdateZombies(const float dt)
 		if (CheckEnemyCollision(house_position.x + 130, house_position.y + 130,
 			house_position.x - 130, house_position.y - 130, i) == 1)
 		{
-			House_health -= 1;
 			//SetEnemySpeed(i, 0.f);
 			SetEnemyHP(i, 0.f);
+
+			if (enemy_list[i].ene_Type == 3)
+			{
+				House_health -= 1;
+				souls_money += 30;
+			}
+			else
+			{
+				House_health -= 3;
+				souls_money += 1000;
+			}
 		}
 	}
 }

@@ -64,6 +64,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	new_enemy.position = position;
 	new_enemy.speed = speed;
 	new_enemy.enem_Size = size;
+	new_enemy.ene_Type = enemy_type;
 
 	switch (enemy_type)
 	{
