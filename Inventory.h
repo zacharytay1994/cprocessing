@@ -1,3 +1,11 @@
+/*!
+@file       Inventory.h
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Contains the item struct and functions for creating, adding, using, removing items within inventory
+*//*__________________________________________________________________________
+_*/
 #pragma once
 #include <cprocessing.h>
 #include <stdio.h>

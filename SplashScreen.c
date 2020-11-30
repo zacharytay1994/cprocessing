@@ -1,6 +1,18 @@
+/*!
+@file       SplashScreen.c
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Handles the splashscreen fade effect and rendering
+*//*__________________________________________________________________________
+_*/
 #include "SplashScreen.h"
 #include "Scene.h"
 
+/*!
+@brief Initializes the splashscreen data
+*//*________________________________________________________________________
+_*/
 void SplashScreen_Init()
 {
 	DigiPen_Logo = CP_Image_Load("Assets/DigiPen_BLACK.png");
@@ -15,6 +27,11 @@ void SplashScreen_Init()
 	splashscreen_window_height = (float)CP_System_GetWindowHeight();
 }
 
+/*!
+@brief Update function for splashscreen
+@param  dt				- deltaTime framerate
+*//*________________________________________________________________________
+_*/
 void SplashScreen_Update(const float dt)
 {
 	splashscreen_timer += dt *10;
@@ -46,6 +63,10 @@ void SplashScreen_Update(const float dt)
 	//return;
 }
 
+/*!
+@brief Renders the splashscreen
+*//*________________________________________________________________________
+_*/
 void SplashScreen_Render()
 {
 	CP_Settings_Background(CP_Color_Create(splashscreen_fade_amount_white, splashscreen_fade_amount_white, splashscreen_fade_amount_white, 255));
@@ -53,6 +74,10 @@ void SplashScreen_Render()
 	//return;
 }
 
+/*!
+@brief Exits the splashscreen
+*//*________________________________________________________________________
+_*/
 void SplashScreen_Exit()
 {
 	//CP_Image_Free(&DigiPen_Logo);

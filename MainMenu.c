@@ -1,3 +1,11 @@
+/*!
+@file       MainMenu.c
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Handles the main menu and the button rendering in the mainmenu
+*//*__________________________________________________________________________
+_*/
 #include <stdlib.h>
 #include <stdio.h>
 #include "MainMenu.h"
@@ -12,7 +20,7 @@ void MainMenu_Initialize()
 	logo_farmology_size_x	= (float)CP_Image_GetWidth(logo_farmology);
 	logo_farmology_size_y	= (float)CP_Image_GetHeight(logo_farmology);
 
-	house			= CP_Image_Load("demo_house.png");
+	house			= CP_Image_Load("Sprites/house.png");
 	house_size_x	= (float)CP_Image_GetWidth(house)	* 0.2f;
 	house_size_y	= (float)CP_Image_GetHeight(house)	* 0.2f;
 
