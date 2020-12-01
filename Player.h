@@ -21,6 +21,8 @@
 #define PLAYER_DECCELERATION		900.0f	// horizontal decceleration applied
 #define PLAYER_DECCELERATION_THRES	20.0f
 
+#define PLAYER_MAX_PROJECTILES 200
+
 typedef enum PlayerAnimationState {
 	Player_Anim_Idle,
 	Player_Anim_Run,
@@ -69,6 +71,13 @@ CP_Vector* Player_GetPosition_P(const int id);
 
 void Player_SetCameraFocus(const int id);
 void Player_temp();
+
+// PROJECTILE CODE
+int	 Player_GetProjectilesSize();
+int	 Player_GetProjectileID(const int id);
+int  Player_ProjectileDead(const int id);
+void Player_SetProjectileDead(const int id, const int b);
+void Player_RenderProjectiles();
 
 // WEAPON CODE
 void Player_ShowWeapon();

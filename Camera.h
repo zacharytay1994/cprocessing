@@ -20,3 +20,6 @@ CP_Vector Camera_ScreenToWorld(const float x, const float y);
 void Camera_SetLimit(const int limit);
 void Camera_SetVerticalLimit(const CP_Vector limit);
 void Camera_SetHorizontalLimit(const CP_Vector limit);
+
+void Camera_Shake(const float amount);
+void Camera_Shake_Update(const float dt);

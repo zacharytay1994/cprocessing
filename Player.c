@@ -7,7 +7,7 @@
 #include <math.h>
 
 #define PLAYER_DUST_TIMER 0.2f
-#define PLAYER_MAX_PROJECTILES 200
+#define PLAYER_GROUND_LEVEL 1200
 
 PlayerData Player_players[PLAYER_MAX_PLAYERS] = { 0 };
 int Player_players_size = 0;
@@ -32,6 +32,7 @@ CP_Vector Player_weapon_offset;
 int Player_weapon_out = 0;
 float Player_max_weapon_strength = 30.0f;
 float Player_weapon_strength = 0.0f;
+int Player_weapon_down = 0;
 
 Player_Projectile Player_projectiles[PLAYER_MAX_PROJECTILES];
 int Player_projectiles_size = 0;
@@ -44,13 +45,16 @@ float Player_dust_timer = PLAYER_DUST_TIMER;
 
 int Player_weapon_charge = -1;
 CP_Image Player_weapon_charge_bar;
-int Player_weapon_max_charge = 10;
-float Player_weapon_charge_gap = 27.0f;
-float Player_weapon_charge_height = 25.0f;
-float Player_weapon_charge_width = 15.0f;
+CP_Image Player_weapon_charge_bar2;
+int Player_weapon_max_charge = 16;
+float Player_weapon_charge_gap = 10.0f;
+float Player_weapon_charge_height = 20.0f;
+float Player_weapon_charge_width = 5.0f;
 float Player_weapon_angle = 0.0f;
-float Player_weapon_charge_interval = 0.7f;
+float Player_weapon_charge_interval = 0.06f;
 float Player_weapon_charge_timer = 0.0f;
+int	  Player_weapon_charge_min_bar = 6;
+float Player_weapon_charge_bar_increment = 0.1f;
 
 void Player_Initialize()
 {
@@ -60,6 +64,7 @@ void Player_Initialize()
 	Player_heart = CP_Image_Load("demo_heart.png");
 	Player_blackheart = CP_Image_Load("demo_blackheart.png");
 	Player_weapon_charge_bar = CP_Image_Load("./Sprites/charge.png");
+	Player_weapon_charge_bar2 = CP_Image_Load("./Sprites/charge2.png");
 
 	// initialize weapon
 	Player_weapon_offset = (CP_Vector){ 0.0f,-100.0f };
@@ -85,6 +90,8 @@ void Player_Initialize()
 		"./Sprites/p_jump.png", 2, 3, 6, 25,
 		KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
 	Player_SetCameraFocus(0);
+	Player_projectiles_init = 1;
+	Player_projectiles_resource = Sprite_AddSprite(CP_Vector_Set(-1000,-1000), 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 1);
 	Player_initialized = 1;
 }
 
@@ -169,6 +176,7 @@ void Player_Render()
 {
 	// nothing to render yet as sprite.c handles rendering of sprites,
 	// even player sprites
+	Player_RenderProjectiles();
 }
 
 void Player_Input(const float dt)
@@ -248,9 +256,17 @@ void Player_Input(const float dt)
 		}
 
 		if (CP_Input_MouseDown(0)) {
+			if (!Player_weapon_down) {
+				Player_weapon_down = 1;
+				Player_weapon_charge = 0;
+			}
 			Player_ShowWeapon();
 		}
 		else {
+			if (Player_weapon_down) {
+				Player_weapon_charge = -1;
+				Player_weapon_down = 0;
+			}
 			Player_HideWeapon(dt);
 		}
 	}
@@ -359,6 +375,43 @@ void Player_temp()
 	shape->_position = CP_Vector_Set(200.0f, 20.0f);
 }
 
+int Player_GetProjectilesSize()
+{
+	return Player_projectiles_size;
+}
+
+int Player_GetProjectileID(const int id)
+{
+	if (id < Player_projectiles_size) {
+		return Player_projectiles[id]._id;
+	}
+	return -1;
+}
+
+int Player_ProjectileDead(const int id)
+{
+	if (id < Player_projectiles_size) {
+		return Player_projectiles[id]._dead;
+	}
+	return -1;
+}
+
+void Player_SetProjectileDead(const int id, const int b)
+{
+	if (id < Player_projectiles_size) {
+		Player_projectiles[id]._dead = b;
+	}
+}
+
+void Player_RenderProjectiles()
+{
+	for (int i = 0; i < Player_projectiles_size; ++i) {
+		if (!Player_projectiles[i]._dead) {
+			Sprite_RenderSprite(CP_System_GetDt(), Player_projectiles[i]._id);
+		}
+	}
+}
+
 void Player_ShowWeapon()
 {
 	if (Player_initialized) {
@@ -367,7 +420,7 @@ void Player_ShowWeapon()
 			Sprite_Reset(Player_weapon);
 			Sprite_SetVisible(Player_weapon, 1);
 			Player_weapon_out = 1;
-			Player_weapon_charge = 0;
+			//Player_weapon_charge = 0;
 		}
 		//Particle_EmitOut(PT_Star, Player_weapon_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
 	}
@@ -384,7 +437,6 @@ void Player_HideWeapon(const float dt)
 			Sprite_SetVisible(Player_weapon, 0);
 			Player_weapon_out = 0;
 		}
-		Player_weapon_charge = -1;
 	}
 }
 
@@ -425,7 +477,7 @@ void Player_SpawnProjectile(const float dt)
 	CP_Vector spawn_position = CP_Vector_Add(start_position, CP_Vector_Scale(direction, 5.0f));
 	if (Player_projectile_fire) {
 		if (!Player_projectiles_init) {
-			Player_projectiles_resource = Sprite_AddSprite(spawn_position, 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 0);
+			Player_projectiles_resource = Sprite_AddSprite(spawn_position, 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 1);
 			Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
 			Player_projectiles_init = 1;
 			if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
@@ -439,11 +491,12 @@ void Player_SpawnProjectile(const float dt)
 				Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
 			}
 		}
+		Camera_Shake(5.0f);
 		Player_projectile_fire = 0;
 	}
 	//Player_RenderProjectileArc(spawn_position, direction, 10, 9.81f, dt);
 	if (Player_weapon_charge >= 0) {
-		Player_RenderProjectileCharge(start_position, direction, dt);
+		Player_RenderProjectileCharge(CP_Vector_Add(start_position,CP_Vector_Scale(CP_Vector_Normalize(direction),30.0f)), direction, dt);
 	}
 }
 
@@ -460,8 +513,14 @@ void Player_ProjectileUpdate(const float dt)
 		if (Player_projectiles[i]._dead) { continue; }
 		Player_projectiles[i]._velocity.y += 9.81f * dt;
 		// apply velocity
-		CP_Vector new_pos = CP_Vector_Add(Sprite_GetPosition(Player_projectiles[i]._id), Player_projectiles[i]._velocity);
+		CP_Vector pos = Sprite_GetPosition(Player_projectiles[i]._id);
+		CP_Vector new_pos = CP_Vector_Add(pos, Player_projectiles[i]._velocity);
 		Sprite_SetPosition(Player_projectiles[i]._id, new_pos);
+		// check if below ground lvl destroy self and emit particles
+		if (new_pos.y > PLAYER_GROUND_LEVEL) {
+			Player_projectiles[i]._dead = 1;
+			Particle_EmitOut(PT_Star, pos, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+		}
 	}
 }
 
@@ -504,8 +563,13 @@ void Player_RenderProjectileCharge(const CP_Vector position, const CP_Vector dir
 			offset = CP_Vector_Add(offset, CP_Vector_Scale(CP_Vector_Normalize(direction), (i+1) * Player_weapon_charge_gap));
 			pos = CP_Vector_Add(position, offset);
 			pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), pos);
-			//CP_Image_Draw(Player_weapon_charge_bar, pos.x, pos.y, Player_weapon_width, Player_weapon_height, 255);
-			CP_Image_DrawAdvanced(Player_weapon_charge_bar, pos.x, pos.y, Player_weapon_charge_width, (1+0.5f*i)*Player_weapon_charge_height, 255, Player_weapon_angle);
+			// if above certain limit use charge bar2
+			if (i > Player_weapon_charge_min_bar-1) {
+				CP_Image_DrawAdvanced(Player_weapon_charge_bar2, pos.x, pos.y, Player_weapon_charge_width, (1 + Player_weapon_charge_bar_increment * i) * Player_weapon_charge_height, 255, Player_weapon_angle);
+			}
+			else {
+				CP_Image_DrawAdvanced(Player_weapon_charge_bar, pos.x, pos.y, Player_weapon_charge_width, (1 + Player_weapon_charge_bar_increment * i) * Player_weapon_charge_height, 255, Player_weapon_angle);
+			}
 		}
 	}
 }

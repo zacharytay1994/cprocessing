@@ -118,9 +118,9 @@ void TestBed_Init()
 	Inventory_Item_Set_Image("Radioactive Thorns", "Assets/Items/RadioThorns.png");
 	Inventory_Item_Set_Description("Radioactive Thorns", "Lose 1 maximum health");
 	Inventory_Add_Item_Name("Radioactive Thorns");
-	Particle_Initialize();
 
 	Enemy_Initialize(); // Initialize enemy sprites and values- (RAY)
+	Particle_Initialize();
 
 	/*Sprite_InitData s_data = { (CP_Vector) { 100.0f,100.0f },100.0f,100.0f,"dirt_block.png",1,1,1,1,1 };
 	int parent = GUI_AddRootContainer((CP_Vector) { 100.0f, 100.0f }, CP_Vector_Set(30.0f, 30.0f), s_data);
@@ -141,21 +141,24 @@ void TestBed_Init()
 	//CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 	//TestBed_SpawnBomb(position);
 	TestBed_SpawnZombie();
-
-
 }
 
 void TestBed_Update(const float dt)
 {
 	//// UPDATES
 	PB_Update(dt);
+	// temp
+	// render house in the middle
+	CP_Vector TestBed_house_position = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), house_position);
+	CP_Image_Draw(TestBed_house, TestBed_house_position.x, TestBed_house_position.y, 300.0f, 300.0f, 255);
+	for (int j = 0; j < House_health; j++) {
+		CP_Image_Draw(TestBed_house, House_heart_offset_x + j * House_heart_spacing, House_heart_offset_y, 45.0f, 45.0f, 255);
+	}
 	Player_Update(dt);
 	GUI_Update(dt);
 	Inventory_Update();
-	Particle_Update(dt);
 	// Enemy Functions - (RAY)
-	/*DayNightManager(dt);
-	UpdateEnemy(dt);*/
+	DayNightManager(dt);
 
 	if(is_interval == 0) // if not day time, spawn enemies
 	{
@@ -177,19 +180,13 @@ void TestBed_Update(const float dt)
 
 	//// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
+	UpdateEnemy(dt);
 	//Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
 	Player_Render();
 
 	/*Camera_SetCameraX(cam_x);
 	Camera_SetCameraY(cam_y);*/
 
-	// temp
-	// render house in the middle
-	CP_Vector TestBed_house_position = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), house_position);
-	CP_Image_Draw(TestBed_house, TestBed_house_position.x, TestBed_house_position.y, 300.0f, 300.0f, 255);
-	for (int j = 0; j < House_health; j++) {
-		CP_Image_Draw(TestBed_house, House_heart_offset_x + j * House_heart_spacing, House_heart_offset_y, 45.0f, 45.0f, 255);
-	}
 
 	if (CP_Input_KeyReleased(KEY_P)) {
 		//TestBed_SpawnZombie();
@@ -197,11 +194,12 @@ void TestBed_Update(const float dt)
 	}
 	TestBed_UpdateZombies(dt);
 	//TestBed_UpdateBombs(dt);
-	//TestBed_CheckBombOnZomb();
+	TestBed_CheckBombOnZomb();
 	/*if (CP_Input_MouseClicked()) {
 		CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 		TestBed_SpawnBomb(position);
 	}*/
+	Particle_Update(dt);
 	Inventory_Render();
 	/*if (tb_zombie_spawn < 0.0f) {
 		TestBed_SpawnZombie();
@@ -380,34 +378,21 @@ void TestBed_UpdateZombies(const float dt)
 
 void TestBed_CheckBombOnZomb()
 {
-	//CP_Vector zombs_pos;
-	//CP_Vector bombs_pos;
-	//float zomb_half_x = 80.0f;
-	//float zomb_half_y = 80.0f;
-	//float bomb_half_x = 25.0f;
-	//float bomb_half_y = 25.0f;
-	//for (int i = 0; i < tb_bombs_size; i++) {
-	//	if (!tb_bombs[i]._dead) {
-	//		for (int j = 0; j < tb_zombies_size; j++) {
-	//			if (!tb_zombies[j]._dead && !tb_bombs[i]._dead) {
-	//				zombs_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), Sprite_GetPosition(tb_zombies[j]._id));
-	//				bombs_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), Sprite_GetPosition(tb_bombs[i]._id));
-	//				// do aabb
-	//				if (!(zombs_pos.x - zomb_half_x > bombs_pos.x + bomb_half_x ||
-	//					zombs_pos.x + zomb_half_x < bombs_pos.x - bomb_half_x ||
-	//					zombs_pos.y - zomb_half_y > bombs_pos.y + bomb_half_y ||
-	//					zombs_pos.y + zomb_half_y < bombs_pos.y - bomb_half_y)) {
-	//					// hit, minus zombs health by 1 turn bomb dead
-	//					tb_zombies[j]._health -= 1;
-	//					if (tb_zombies[j]._health <= 0) {
-	//						tb_zombies[j]._dead = 1;
-	//						Sprite_SetVisible(tb_zombies[j]._id, 0);
-	//					}
-	//					tb_bombs[i]._dead = 1;
-	//					Sprite_SetVisible(tb_bombs[i]._id, 0);
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+	for (int i = 0; i < Player_GetProjectilesSize(); ++i) {
+		if (!Player_ProjectileDead(i)) {
+			//int tt_sprite = Player_GetProjectileID(i);
+			//printf("Projectile: %d, pos: %f, %f\n", i, Sprite_GetPosition(tt_sprite).x, Sprite_GetPosition(tt_sprite).y);
+			for (int j = 0; j < ENEMY_MAX_ENEMIES; ++j) {
+				if (enemy_list[j]._initialized && enemy_list[j].isAlive) {
+					CP_Vector projectile_position = Sprite_GetPosition(Player_GetProjectileID(i));
+					if (CheckEnemyCollision(projectile_position.x + 25.0f, projectile_position.y + 25.0f,
+						projectile_position.x - 25.0f, projectile_position.y - 25.0f, j)) {
+						EnemyTakeDamage(j, 1);
+						Player_SetProjectileDead(i, 1);
+						Particle_EmitOut(PT_Star, projectile_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+					}
+				}
+			}
+		}
+	}
 }

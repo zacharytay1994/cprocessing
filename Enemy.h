@@ -2,6 +2,7 @@
 #include "Sprite.h"
 #include <stdio.h>
 
+#define ENEMY_MAX_ENEMIES 127
 
 typedef struct Enemy
 {
@@ -20,6 +21,7 @@ typedef struct Enemy
 	int			ene_dmg;
 	const char* sprite_path;
 	char		isAlive;
+	int			_initialized;
 }Enemy;
 
 // General "Makes-life-easy" stuff part 2 lol
@@ -27,7 +29,7 @@ float wind_Width;
 float wind_Height;
 
 // Enemy Stuff
-Enemy enemy_list[127];
+Enemy enemy_list[ENEMY_MAX_ENEMIES];
 
 void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int enemy_type);
 int Add_Enem_toList(struct Enemy* add_enem);
@@ -40,6 +42,7 @@ void SetEnemyHP(int id, float newHP);
 float GetEnemyHP(int id);
 int GetEnemyDMG(int id);
 void SetEnemyDie(int id);
+void EnemyTakeDamage(int id, int dmg);
 
 void Enemy_Initialize();
 
