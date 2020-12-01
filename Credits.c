@@ -1,6 +1,18 @@
+/*!
+@file       Credits.c
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Renders the credits
+*//*__________________________________________________________________________
+_*/
 #include "Credits.h"
 #include <stdio.h>
 
+/*!
+@brief Initializes the Credits
+*//*________________________________________________________________________
+_*/
 void Credits_Init()
 {
 	Credits_WindowWidth = CP_System_GetWindowWidth();
@@ -28,6 +40,10 @@ void Credits_Init()
 	CP_Font_Set(custom_font);
 }
 
+/*!
+@brief Update function for Credits
+*//*________________________________________________________________________
+_*/
 void Credits_Update(const float dt)
 {
 	if (time_buffer > 0)
@@ -38,13 +54,17 @@ void Credits_Update(const float dt)
 	{
 		if (CP_Input_MouseClicked())
 		{
-			Scene_ChangeScene(4);
+			Scene_ChangeScene(3);
 		}
 	}
 
 	Credits_Render();
 }
 
+/*!
+@brief Renders the Credits
+*//*________________________________________________________________________
+_*/
 void Credits_Render()
 {
 	CP_Settings_Background(BLACK);
@@ -74,6 +94,10 @@ void Credits_Render()
 	CP_Font_DrawText(line7, Credits_WindowWidth * 0.61f + 25, Credits_WindowHeight * 0.76f);
 }
 
+/*!
+@brief Exits the Credits
+*//*________________________________________________________________________
+_*/
 void Credits_Exit()
 {
 	CP_Font_Set(CP_Font_GetDefault());

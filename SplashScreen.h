@@ -1,3 +1,11 @@
+/*!
+@file       SplahScreen.h
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Contains the data and functions needed to render the splashscreen and transition
+*//*__________________________________________________________________________
+_*/
 #pragma once
 #include <cprocessing.h>
 

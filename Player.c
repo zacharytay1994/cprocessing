@@ -66,6 +66,14 @@ void Player_Initialize()
 	Player_weapon_charge_bar = CP_Image_Load("./Sprites/charge.png");
 	Player_weapon_charge_bar2 = CP_Image_Load("./Sprites/charge2.png");
 
+	// initialize powerup
+	speed_multiplier = 1.0f;
+	for (int i = 0; i < 99; i++)
+	{
+		powerup_timer[i] = 0.0f;
+		powerup_type[i] = 0;
+	}
+
 	// initialize weapon
 	Player_weapon_offset = (CP_Vector){ 0.0f,-100.0f };
 	Player_weapon_position = (CP_Vector){ 0.0f,0.0f };
@@ -195,7 +203,7 @@ void Player_Input(const float dt)
 		if (CP_Input_KeyDown(Player_players[i]._right) || CP_Input_KeyDown(KEY_D)) {
 			// check if horizontal velocity has not exceeded velocity limit
 			if (shape->_velocity.x < PLAYER_MAX_HVELOCITY) {
-				PhyObj_AddVelocity(shape, CP_Vector_Set(PLAYER_APPLIED_HVELOCITY * dt, 0.0f));
+				PhyObj_AddVelocity(shape, CP_Vector_Set(PLAYER_APPLIED_HVELOCITY * dt * speed_multiplier, 0.0f));
 			}
 			// if not in air, switch animation
 			if (Player_players[i]._grounded) {
@@ -214,7 +222,7 @@ void Player_Input(const float dt)
 		}
 		if (CP_Input_KeyDown(Player_players[i]._left) || CP_Input_KeyDown(KEY_A)) {
 			if (shape->_velocity.x > -PLAYER_MAX_HVELOCITY) {
-				PhyObj_AddVelocity(shape, CP_Vector_Set(-PLAYER_APPLIED_HVELOCITY * dt, 0.0f));
+				PhyObj_AddVelocity(shape, CP_Vector_Set(-PLAYER_APPLIED_HVELOCITY * dt * speed_multiplier, 0.0f));
 			}
 			if (Player_players[i]._grounded) {
 				Player_SwitchAnimationState(i,Player_Anim_Run);
@@ -608,5 +616,53 @@ void Player_Lose_MaxHealth(int x)
 	if (Player_health > Player_max_health)
 	{
 		Player_health = Player_max_health;
+	}
+}
+
+void Player_Add_Powerup(int x, float duration)
+{
+	for (int i = 0; i < 99; i++)
+	{
+		if (powerup_type[i] == 0)
+		{
+			powerup_type[i] = x;
+			powerup_timer[i] = duration;
+			switch (x)
+			{
+				case 1:			// SPEED UP
+				{
+					speed_multiplier = 5.0f;
+					break;
+				}
+			}
+		}
+	}
+}
+
+void Player_Powerup_Update(const float dt)
+{
+	for (int i = 0; i < 99; i++)
+	{
+		if (powerup_type[i] == 0)
+		{
+			continue;
+		}
+		else
+		{
+			powerup_timer[i] -= dt;
+			if (powerup_timer[i] <= 0)
+			{
+				switch (powerup_type[i])
+				{
+					case 1:			// SPEED UP
+					{
+						speed_multiplier = 1.0f;
+						break;
+					}
+				}
+				powerup_timer[i] = 0.0f;
+				powerup_type[i] = 0;
+			}
+		}
 	}
 }

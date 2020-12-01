@@ -1,3 +1,11 @@
+/*!
+@file       Button.h
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Contains the button struct and stores all of them for easy updating and rendering
+*//*__________________________________________________________________________
+_*/
 #pragma once
 #include <cprocessing.h>
 
@@ -48,9 +56,6 @@ int Button_GetID_By_Name(char* text);
 char Button_SceneID_Set(int id);
 void Button_SpecialEffects_Set(int id,char x);
 char Button_Active_Set(int id, char x);
-
-//struct Button Button_Initialize_Default();
-//struct Button Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_position, CP_Color button_color, CP_Color text_color, float text_size, char* text, char visible);
 
 void Button_Class_Init();
 

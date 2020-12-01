@@ -95,3 +95,10 @@ void Player_Add_Health(int x);
 void Player_Lose_Health(int x);
 void Player_Add_MaxHealth(int x);
 void Player_Lose_MaxHealth(int x);
+
+// POWERUP CODE
+float speed_multiplier;
+float powerup_timer[99];
+int powerup_type[99];
+void Player_Powerup_Update(const float dt);
+void Player_Add_Powerup(int x, float duration);

@@ -1,8 +1,20 @@
+/*!
+@file       MainMenu.c
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Handles the main menu and the button rendering in the mainmenu
+*//*__________________________________________________________________________
+_*/
 #include <stdlib.h>
 #include <stdio.h>
 #include "MainMenu.h"
 #include "Scene.h"
 
+/*!
+@brief Initializes the Main Menu
+*//*________________________________________________________________________
+_*/
 void MainMenu_Initialize()
 {
 	window_width	= (float)CP_System_GetWindowWidth();
@@ -12,7 +24,7 @@ void MainMenu_Initialize()
 	logo_farmology_size_x	= (float)CP_Image_GetWidth(logo_farmology);
 	logo_farmology_size_y	= (float)CP_Image_GetHeight(logo_farmology);
 
-	house			= CP_Image_Load("demo_house.png");
+	house			= CP_Image_Load("Sprites/house.png");
 	house_size_x	= (float)CP_Image_GetWidth(house)	* 0.2f;
 	house_size_y	= (float)CP_Image_GetHeight(house)	* 0.2f;
 
@@ -53,6 +65,11 @@ void MainMenu_Initialize()
 	return;
 }
 
+/*!
+@brief Update function for mainmenu
+@param  dt				- deltaTime framerate
+*//*________________________________________________________________________
+_*/
 void MainMenu_Update(const float dt)
 {
 	CP_Settings_Background(CP_Color_Create(255, 255, 255, 255));
@@ -63,6 +80,10 @@ void MainMenu_Update(const float dt)
 	return;
 }
 
+/*!
+@brief Renders the mainmenu
+*//*________________________________________________________________________
+_*/
 void MainMenu_Render()
 {
 	Background_Render();
@@ -73,6 +94,10 @@ void MainMenu_Render()
 	return;
 }
 
+/*!
+@brief Renders the background
+*//*________________________________________________________________________
+_*/
 void Background_Render()
 {
 	CP_Settings_Fill(LIGHT_BLUE);
@@ -84,6 +109,10 @@ void Background_Render()
 	CP_Image_Draw(house, window_width * 0.25f, window_height * 0.6f, house_size_x, house_size_y, 255);
 }
 
+/*!
+@brief Exits the mainmenu
+*//*________________________________________________________________________
+_*/
 void MainMenu_Exit()
 {
 	CP_Font_Set(CP_Font_GetDefault());
