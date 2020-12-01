@@ -10,6 +10,7 @@
 #include "Inventory.h"
 #include "Particles.h"
 #include "Enemy.h"
+#include "LightStage.h"
 
 #include <stdio.h>
 
@@ -147,6 +148,7 @@ void TestBed_Init()
 	//CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
 	//TestBed_SpawnBomb(position);
 	TestBed_SpawnZombie();
+	LightStage_Initialize();
 }
 
 void TestBed_Update(const float dt)
@@ -241,6 +243,8 @@ void TestBed_Update(const float dt)
 	if (CP_Input_KeyReleased(KEY_K)) {
 		//Particle_Reset(particle_hold);
 	}
+	LightStage_Render();
+	LightStage_Update(dt);
 }
 
 void TestBed_Exit()
@@ -248,6 +252,7 @@ void TestBed_Exit()
 	printf("Exited TestBed.");
 	Tilemap_Free();
 	PB_Exit();
+	LightStage_Exit();
 }
 
 void DayNightManager(float dt)
@@ -420,6 +425,8 @@ void TestBed_CheckBombOnZomb()
 						projectile_position.x - 25.0f, projectile_position.y - 25.0f, j)) {
 						EnemyTakeDamage(j, 1);
 						Player_SetProjectileDead(i, 1);
+						LightStage_DeactivateLight(Player_GetProjectileLight(i));
+						LightStage_AddLight(projectile_position, 300.0f, 1600.0f, 200.0f, 0, 100);
 						Particle_EmitOut(PT_Star, projectile_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
 					}
 				}

@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Inventory.h"
 #include "Particles.h"
+#include "LightStage.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -404,6 +405,14 @@ int Player_ProjectileDead(const int id)
 	return -1;
 }
 
+int Player_GetProjectileLight(const int id)
+{
+	if (id < Player_projectiles_size) {
+		return Player_projectiles[id]._light_id;
+	}
+	return -1;
+}
+
 void Player_SetProjectileDead(const int id, const int b)
 {
 	if (id < Player_projectiles_size) {
@@ -487,15 +496,19 @@ void Player_SpawnProjectile(const float dt)
 		if (!Player_projectiles_init) {
 			Player_projectiles_resource = Sprite_AddSprite(spawn_position, 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 1);
 			Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+			LightStage_AddLight(spawn_position, 500.0f, 1600.0f, 300.0f, 0, 100);
 			Player_projectiles_init = 1;
 			if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
-				Player_projectiles[Player_projectiles_size++] = (Player_Projectile){ Player_projectiles_resource, 0, direction };
+				Player_projectiles[Player_projectiles_size++] = (Player_Projectile){ Player_projectiles_resource, 0, direction,
+				LightStage_AddLight(spawn_position, 100.0f, 1600.0f, -1.0f, 0, 100) };
 			}
 		}
 		else {
 			if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
+				LightStage_AddLight(spawn_position, 500.0f, 1600.0f, 300.0f, 0, 100);
 				Player_projectiles[Player_projectiles_size++] = (Player_Projectile){
-					Sprite_AddSpriteRepeatAuto(spawn_position, 50.0f, 50.0f, Player_projectiles_resource), 0, direction };
+					Sprite_AddSpriteRepeatAuto(spawn_position, 50.0f, 50.0f, Player_projectiles_resource), 0, direction,
+					LightStage_AddLight(spawn_position, 100.0f, 600.0f, -1.0f, 0, 150) };
 				Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
 			}
 		}
@@ -524,9 +537,12 @@ void Player_ProjectileUpdate(const float dt)
 		CP_Vector pos = Sprite_GetPosition(Player_projectiles[i]._id);
 		CP_Vector new_pos = CP_Vector_Add(pos, Player_projectiles[i]._velocity);
 		Sprite_SetPosition(Player_projectiles[i]._id, new_pos);
+		LightStage_SetPosition(Player_projectiles[i]._light_id, new_pos);
 		// check if below ground lvl destroy self and emit particles
 		if (new_pos.y > PLAYER_GROUND_LEVEL) {
 			Player_projectiles[i]._dead = 1;
+			LightStage_DeactivateLight(Player_projectiles[i]._light_id);
+			LightStage_AddLight(new_pos, 300.0f, 200.0f, 200.0f, 0, 100);
 			Particle_EmitOut(PT_Star, pos, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
 		}
 	}

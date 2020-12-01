@@ -33,6 +33,7 @@ typedef struct Player_Projectile {
 	int _id;
 	int _dead;
 	CP_Vector _velocity;
+	int _light_id;
 } Player_Projectile;
 
 typedef struct PlayerData {
@@ -76,6 +77,7 @@ void Player_temp();
 int	 Player_GetProjectilesSize();
 int	 Player_GetProjectileID(const int id);
 int  Player_ProjectileDead(const int id);
+int Player_GetProjectileLight(const int id);
 void Player_SetProjectileDead(const int id, const int b);
 void Player_RenderProjectiles();
 
