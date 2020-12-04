@@ -496,7 +496,7 @@ void Player_SpawnProjectile(const float dt)
 		if (!Player_projectiles_init) {
 			Player_projectiles_resource = Sprite_AddSprite(spawn_position, 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 1);
 			Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
-			LightStage_AddLight(spawn_position, 500.0f, 1600.0f, 300.0f, 0, 100);
+			LightStage_AddLight(spawn_position, 500.0f, 1000.0f, 600.0f, 0, 100);
 			Player_projectiles_init = 1;
 			if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
 				Player_projectiles[Player_projectiles_size++] = (Player_Projectile){ Player_projectiles_resource, 0, direction,
@@ -505,7 +505,7 @@ void Player_SpawnProjectile(const float dt)
 		}
 		else {
 			if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
-				LightStage_AddLight(spawn_position, 500.0f, 1600.0f, 300.0f, 0, 100);
+				LightStage_AddLight(spawn_position, 500.0f, 1000.0f, 600.0f, 0, 100);
 				Player_projectiles[Player_projectiles_size++] = (Player_Projectile){
 					Sprite_AddSpriteRepeatAuto(spawn_position, 50.0f, 50.0f, Player_projectiles_resource), 0, direction,
 					LightStage_AddLight(spawn_position, 100.0f, 600.0f, -1.0f, 0, 150) };

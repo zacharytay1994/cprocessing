@@ -113,14 +113,13 @@ void PB_Update(const float dt)
 			else {
 				// purple sky increase
 				BG_Alpha_Background += 10.0f * CP_System_GetDt();
-				LightStage_SetAmbient((int)BG_Alpha_Background);
 				if (BG_Alpha_Background > 255.0f) {
 					BG_sun_set = 1;
 				}
 			}
 			BG_light_ambient = (BG_Alpha_Background1 - BG_Alpha_Background + 255.0f) / 2.0f;
 		}
-		LightStage_SetAmbient((int)BG_light_ambient);
+		LightStage_SetAmbient((int)BG_light_ambient - 100);
 
 		t1_x += 125.0f * CP_System_GetDt();
 		CP_Image_Draw(BG_Pic_PurpleSky_1, t1_x, BG_WindowHeight / 2.0f, BG_WindowWidth, BG_WindowHeight, (int)BG_Alpha_Background);

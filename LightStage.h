@@ -16,3 +16,11 @@ void LightStage_SetAmbient(const int ambient);
 
 void LightStage_SetPosition(const int id, const CP_Vector position);
 void LightStage_DeactivateLight(const int id);
+
+void LightStage_ApplyNormalMap(	void* data, void* normal_data, void* og_data, 
+								CP_Vector topLeftPosition, const float width, const float height,
+								const float pixelWidth, const float pixelHeight,
+								CP_Vector* lightPositions, int numberOfLights);
+
+CP_Vector* LightStage_GetLightPositionsArray();
+int LightStage_GetLightPositionsSize();

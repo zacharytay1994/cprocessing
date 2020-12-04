@@ -13,6 +13,7 @@
 #include "LightStage.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define TESTBED_ZOMBIES_MAX 100
 #define TESTBED_ZOMBIES_HEALTH 5
@@ -28,7 +29,13 @@ int tilemap;
 
 // temp
 CP_Image TestBed_house;
+//CP_Image TestBed_house_modified;
+//CP_Image TestBed_house_normal_map;
+//void* TestBed_house_data;
+//void* TestBed_house_modified_data;
+//void* TestBed_house_normal_data;
 CP_Vector house_position;
+//CP_Vector house_top_left_pos;
 int House_health;
 int House_max_health = 10;
 float House_heart_offset_x = 50.0f;
@@ -77,7 +84,19 @@ void TestBed_Init()
 
 	// temp
 	TestBed_house = CP_Image_Load("./Sprites/house.png");
-	house_position = (CP_Vector){ 1000.0f,1065.0f };
+	/*TestBed_house_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house));
+	CP_Image_GetPixelData(TestBed_house, TestBed_house_data);
+
+	TestBed_house_modified = CP_Image_CreateFromData(160, 160, TestBed_house_data);
+	TestBed_house_modified_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house_modified));
+	CP_Image_GetPixelData(TestBed_house_modified, TestBed_house_modified_data);
+
+	TestBed_house_normal_map = CP_Image_Load("./Sprites/house_normal.png");
+	TestBed_house_normal_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house_normal_map));
+	CP_Image_GetPixelData(TestBed_house_normal_map, TestBed_house_normal_data);*/
+
+	house_position = (CP_Vector){ 1000.0f,1045.0f };
+	//house_top_left_pos = CP_Vector_Subtract(house_position, (CP_Vector) { 300.0f, 300.0f });
 	House_health = House_max_health;
 	// temp zombie
 	tb_zombie_spawn_position = (CP_Vector){ 3300.0f,1150.0f };
@@ -153,12 +172,22 @@ void TestBed_Init()
 
 void TestBed_Update(const float dt)
 {
+	//CP_Image_Draw(TestBed_house, (float)CP_Input_GetMouseX(), (float)CP_Input_GetMouseY(), 100.0f, 100.0f, 255);
 	//// UPDATES
 	PB_Update(dt);
 	// temp
 	// render house in the middle
 	CP_Vector TestBed_house_position = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), house_position);
+	//CP_Vector mouse_pos = (CP_Vector){ (float)CP_Input_GetMouseX(), (float)CP_Input_GetMouseY() };
+	/*LightStage_ApplyNormalMap(TestBed_house_modified_data, TestBed_house_normal_data, TestBed_house_data, house_top_left_pos,
+		300.0f, 300.0f, 160, 160, &mouse_pos, 1);
+	CP_Image_UpdatePixelData(TestBed_house_modified, TestBed_house_modified_data);*/
+	//// RENDERS
+	Tilemap_Render(tilemap, Camera_GetCameraTransform());
 	CP_Image_Draw(TestBed_house, TestBed_house_position.x, TestBed_house_position.y, 300.0f, 300.0f, 255);
+	UpdateEnemy(dt);
+	//Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
+	Player_Render();
 	for (int j = 0; j < House_health; j++) {
 		CP_Image_Draw(TestBed_house, House_heart_offset_x + j * House_heart_spacing, House_heart_offset_y, 45.0f, 45.0f, 255);
 	}
@@ -195,12 +224,6 @@ void TestBed_Update(const float dt)
 		}
 		spawndelay -= dt;
 	}
-
-	//// RENDERS
-	Tilemap_Render(tilemap, Camera_GetCameraTransform());
-	UpdateEnemy(dt);
-	//Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
-	Player_Render();
 
 	/*Camera_SetCameraX(cam_x);
 	Camera_SetCameraY(cam_y);*/

@@ -1,8 +1,22 @@
 #include "LightStage.h"
 #include "Camera.h"
+#include <math.h>
 #include <stdio.h>
 
 #define LIGHTSTAGE_MAX_LIGHTS 50
+#define LIGHTSTAGE_LIGHT_RADIUS 1500
+
+typedef struct Vec3 {
+	float x, y, z;
+} Vec3;
+
+float	Vec3_Dot(Vec3 lhs, Vec3 rhs) { return (lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z); }
+float	Vec3_Mag(Vec3 vec) { return (float)sqrt((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z)); }
+Vec3	Vec3_Normalize(Vec3 vec) {
+	float mag = Vec3_Mag(vec);
+	return (Vec3) { vec.x / mag, vec.y / mag, vec.z / mag };
+}
+Vec3	Vec3_Sub(Vec3 lhs, Vec3 rhs) { return (Vec3) { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z }; }
 
 struct LightStage_Light {
 	CP_Vector	_position;
@@ -23,6 +37,9 @@ CP_Vector LightStage_screen_center;
 
 int LightStage_ambient = 0;
 LightStage_Light LightStage_lights[LIGHTSTAGE_MAX_LIGHTS] = { 0 };
+
+CP_Vector LightStage_positions[LIGHTSTAGE_MAX_LIGHTS] = { 0 };
+int LightStage_positions_size = 0;
 
 void LightStage_Initialize() {
 	LightStage_light = CP_Image_Load("./Sprites/test_light.png");
@@ -83,6 +100,7 @@ void LightStage_UpdateAndRenderLights(const float dt)
 					}
 				}
 				else {
+					LightStage_lights[i]._initialAlpha = LightStage_lights[i]._midAlpha;
 					LightStage_lights[i]._faded_up = 1;
 				}
 			}
@@ -130,4 +148,70 @@ void LightStage_DeactivateLight(const int id)
 	if (id < LIGHTSTAGE_MAX_LIGHTS) {
 		LightStage_lights[id]._active = 0;
 	}
+}
+
+void LightStage_ApplyNormalMap(void* data, void* normal_data, void* og_data, CP_Vector topLeftPosition, const float width, const float height, const float pixelWidth, const float pixelHeight, CP_Vector* lightPositions, int numberOfLights)
+{
+	unsigned char* array = (unsigned char*)data;
+	unsigned char* normal = (unsigned char*)normal_data;
+	unsigned char* og_array = (unsigned char*)og_data;
+
+	int r, g, b;
+	float intensity = 0.0f;
+	float ambient = 0.2f;
+	ambient = ambient < 0.3f ? 0.3f : ambient;
+	float normal_scale;
+	float distance_scale;
+	//CP_Vector light_vector = CP_Vector_Set(0.0f, 0.0f);
+	Vec3 normal_vec3 = (Vec3){ 0.0f,0.0f,0.0f };
+	Vec3 light_vec3 = (Vec3){ 0.0f,0.0f,0.0f };
+	Vec3 light_pos = (Vec3){ 0.0f,0.0f,0.0f };
+	Vec3 pixel_pos = (Vec3){ 0.0f,0.0f,0.0f };
+
+	for (int i = 0; i < pixelWidth * pixelHeight; ++i) {
+		intensity = 0.0f;
+		pixel_pos.x = topLeftPosition.x + width * ((float)(i % (int)pixelWidth) / pixelWidth);
+		pixel_pos.y = topLeftPosition.y + height * ((float)(i / (int)pixelHeight) / pixelHeight);
+		pixel_pos.z = 0.0f;
+		normal_vec3.x = ((float)(normal[i * 4] - 127) / 128.0f);
+		normal_vec3.y = ((float)(normal[i * 4 + 1] - 127) / 128.0f);
+		normal_vec3.z = ((float)(normal[i * 4 + 2] - 127) / 128.0f);
+
+		for (int j = 0; j < numberOfLights; ++j) {
+			light_pos = (Vec3){lightPositions[j].x, lightPositions[j].y, 300.0f};
+			light_vec3 = Vec3_Sub(light_pos, pixel_pos);
+			normal_scale = Vec3_Dot(Vec3_Normalize(light_vec3), Vec3_Normalize(normal_vec3));
+			distance_scale = (LIGHTSTAGE_LIGHT_RADIUS - Vec3_Mag(light_vec3)) / LIGHTSTAGE_LIGHT_RADIUS;
+			// mod intensity
+			if (normal_scale < 0.0f) { normal_scale *= -1.0f; }
+			if (distance_scale < 0.0f) { distance_scale = 0.0f; }
+			intensity += distance_scale * normal_scale + ambient;
+		}
+		intensity = intensity > 1.0f ? 1.0f : intensity;
+		intensity = intensity < 0.0f ? 0.0f : intensity;
+
+		r = (int)((int)og_array[i * 4] * intensity);
+		g = (int)((int)og_array[i * 4 + 1] * intensity);
+		b = (int)((int)og_array[i * 4 + 2] * intensity);
+
+		array[i * 4] = (unsigned char)r;
+		array[i * 4 + 1] = (unsigned char)g;
+		array[i * 4 + 2] = (unsigned char)b;
+	}
+}
+
+CP_Vector* LightStage_GetLightPositionsArray()
+{
+	LightStage_positions_size = 0;
+	for (int i = 0; i < LIGHTSTAGE_MAX_LIGHTS; ++i) {
+		if (LightStage_lights[i]._active) {
+			LightStage_positions[LightStage_positions_size++] = LightStage_lights[i]._position;
+		}
+	}
+	return LightStage_positions;
+}
+
+int LightStage_GetLightPositionsSize()
+{
+	return LightStage_positions_size;
 }
