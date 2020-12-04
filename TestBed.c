@@ -249,6 +249,7 @@ void TestBed_Update(const float dt)
 void TestBed_Exit()
 {
 	printf("Exited TestBed.");
+	CP_Sound_StopAll();
 	Tilemap_Free();
 	PB_Exit();
 }
