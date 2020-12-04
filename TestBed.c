@@ -125,6 +125,9 @@ void TestBed_Init()
 	Inventory_Item_Set_Description("Radioactive Thorns", "Lose 1 maximum health");
 	Inventory_Add_Item_Name("Radioactive Thorns");
 
+	BGM = CP_Sound_LoadMusic("Assets/Music/ShortLoopHalf.wav");
+	CP_Sound_PlayMusic(BGM);
+
 	Enemy_Initialize(); // Initialize enemy sprites and values- (RAY)
 	Particle_Initialize();
 
