@@ -151,6 +151,7 @@ void LightStage_ApplyNormalMap(void* data, void* normal_data, void* og_data, CP_
 	// some spicy variables
 	int r, g, b;
 	float intensity = 0.0f;
+	float interim_intensity = 0.0f;
 	float ambient = 0.2f;
 	ambient = ambient < 0.3f ? 0.3f : ambient;
 	float normal_scale;
@@ -177,9 +178,11 @@ void LightStage_ApplyNormalMap(void* data, void* normal_data, void* og_data, CP_
 			normal_scale = Vec3_Dot(Vec3_Normalize(light_vec3), Vec3_Normalize(normal_vec3));
 			distance_scale = (LIGHTSTAGE_LIGHT_RADIUS - Vec3_Mag(light_vec3)) / LIGHTSTAGE_LIGHT_RADIUS;
 			// mod intensity
-			if (normal_scale < 0.0f) { normal_scale *= -1.0f; }
 			if (distance_scale < 0.0f) { distance_scale = 0.0f; }
-			intensity += distance_scale * normal_scale + ambient;
+			interim_intensity = distance_scale * normal_scale + ambient;
+			if (interim_intensity >= 0.0f) {
+				intensity += interim_intensity;
+			}
 		}
 		intensity = intensity > 1.0f ? 1.0f : intensity;
 		intensity = intensity < 0.0f ? 0.0f : intensity;
