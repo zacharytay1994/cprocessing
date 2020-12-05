@@ -162,7 +162,7 @@ void LightStage_ApplyNormalMap(void* data, void* normal_data, void* og_data, CP_
 	Vec3 pixel_pos = (Vec3){ 0.0f,0.0f,0.0f };
 
 	// calculating intensity based on distance and angle from light source, OoO dot product
-	// ghetto way of doing, forgot the actual formula
+	// ghetto way of doing, forgot the actual formula, take some distance some angle and ambient piak tgt
 	for (int i = 0; i < pixelWidth * pixelHeight; ++i) {
 		intensity = 0.0f;
 		pixel_pos.x = topLeftPosition.x + width * ((float)(i % (int)pixelWidth) / pixelWidth);

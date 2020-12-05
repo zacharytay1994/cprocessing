@@ -11,6 +11,7 @@
 #include "Particles.h"
 #include "Enemy.h"
 #include "LightStage.h"
+#include "LePlant.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,7 +77,6 @@ int wave_count;
 double spawndelay = 2;
 int biggus = 0;
 int souls_money = 0;
-
 
 void TestBed_Init()
 {
@@ -171,6 +171,8 @@ void TestBed_Init()
 	//TestBed_SpawnBomb(position);
 	TestBed_SpawnZombie();
 	LightStage_Initialize();
+	LePlant_Init();
+	LePlant_BindTilemap(tilemap);
 }
 
 void TestBed_Update(const float dt)
@@ -269,8 +271,11 @@ void TestBed_Update(const float dt)
 	if (CP_Input_KeyReleased(KEY_K)) {
 		//Particle_Reset(particle_hold);
 	}
+	LePlant_Render(dt);
 	LightStage_Render();
 	LightStage_Update(dt);
+	LePlant_Update(dt);
+	Tilemap_HighlightMouseTile(tilemap);
 }
 
 void TestBed_Exit()
@@ -280,6 +285,7 @@ void TestBed_Exit()
 	Tilemap_Free();
 	PB_Exit();
 	LightStage_Exit();
+	LePlant_Exit();
 }
 
 void DayNightManager(float dt)

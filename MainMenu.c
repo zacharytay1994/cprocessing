@@ -166,7 +166,7 @@ void Background_Render()
 _*/
 void MainMenu_Exit()
 {
-	CP_Image_Free(&menu_background);
-	CP_Image_Free(&menu_logo_farmology);
+	/*CP_Image_Free(&menu_background);
+	CP_Image_Free(&menu_logo_farmology);*/
 	CP_Font_Set(CP_Font_GetDefault());
 }

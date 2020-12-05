@@ -30,6 +30,9 @@ CP_Image* tilemap_image_array;
 int normal_initialized = 0;
 int normal_count = 0;
 
+CP_Image tilemap_highlight_cursor;
+CP_Vector tilemap_highlight_position;
+
 void Tilemap_Initialize()
 {
 	// loading tilesheets
@@ -45,6 +48,9 @@ void Tilemap_Initialize()
 	CP_Image_GetPixelData(tilemap_ground, (unsigned char*)tilemap_og_data);
 	tilemap_test_light = LightStage_AddLight(CP_Vector_Set(0.0f,0.0f), 500.0f, 1000.0f, -1.0f, 0, 100);
 	LightStage_SetPosition(tilemap_test_light, (CP_Vector) { 1400.0f, 0.0f });
+
+	tilemap_highlight_cursor = CP_Image_Load("./Sprites/cursor.png");
+	tilemap_highlight_position = (CP_Vector){ 0.0f, 0.0f };
 }
 
 void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
@@ -124,15 +130,15 @@ int Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int widt
 		tilemap._offset_x = offsetx;
 		tilemap._offset_y = offsety;
 
-		// initialize array of tiles
-		int size = width * height;
-		tilemap._tiles = malloc((unsigned long long)size * sizeof(int));
-		for (int i = 0; i < size; i++) {
-			tilemap._tiles[i] = -1;
-		}
-		tilemaps[tilemaps_size] = tilemap;
-		tilemaps_size++;
-		return tilemaps_size - 1;
+// initialize array of tiles
+int size = width * height;
+tilemap._tiles = malloc((unsigned long long)size * sizeof(int));
+for (int i = 0; i < size; i++) {
+	tilemap._tiles[i] = -1;
+}
+tilemaps[tilemaps_size] = tilemap;
+tilemaps_size++;
+return tilemaps_size - 1;
 	}
 	return -1;
 }
@@ -140,7 +146,7 @@ int Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int widt
 int Tilemap_LoadTileSheet(const char* path, const int row, const int col, const int frames)
 {
 	if (tilesheets_size < MAX_TILESHEETS) {
-		tilesheets[tilesheets_size] = (Tilemap_TileSheet) { tilesheets_size,frames,{0} };
+		tilesheets[tilesheets_size] = (Tilemap_TileSheet){ tilesheets_size,frames,{0} };
 	}
 	else {
 		printf("Tilemap_LoadTileSheet :: Amount of tilesheets exceeded!");
@@ -200,6 +206,41 @@ void Tilemap_SetTileToBrush(const int id, const int x, const int y)
 	if (id < tilemaps_size && x < tilemaps[id]._width && y < tilemaps[id]._height) {
 		tilemaps[id]._tiles[y * tilemaps[id]._width + x] = tilemap_active_tilesheet_cell;
 	}
+}
+
+void Tilemap_HighlightMouseTile(const int id)
+{
+	if (id < tilemaps_size) {
+		CP_Vector mouse = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+		//mouse = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), mouse);
+		tilemap_highlight_position = Tilemap_WorldToGrid(id, mouse.x, mouse.y);
+		mouse.x = tilemaps[id]._tile_width * tilemap_highlight_position.x + ((float)tilemaps[id]._tile_width / 2.0f);
+		mouse.y = tilemaps[id]._tile_height * tilemap_highlight_position.y + ((float)tilemaps[id]._tile_height / 2.0f);
+		mouse = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), mouse);
+		CP_Image_Draw(tilemap_highlight_cursor, mouse.x,
+			mouse.y, (float)tilemaps[id]._tile_width, (float)tilemaps[id]._tile_width, 150);
+	}
+}
+
+int Tilemap_GetValidGroundTiles(const int id, CP_Vector* container)
+{
+	int i = 0;
+	if (id < tilemaps_size) {
+		for (int y = tilemaps[id]._height - 1; y >= 0; y--) {
+			for (int x = 0; x < tilemaps[id]._width; x++) {
+				// check if cell is empty
+				if (tilemaps[id]._tiles[y * tilemaps[id]._width + x] == -1) {
+					// bottom has thing
+					if (y + 1 < tilemaps[id]._height) {
+						if (tilemaps[id]._tiles[(y + 1) * tilemaps[id]._width + x] != -1) {
+							container[i++] = (CP_Vector){ (float)x,(float)y };
+						}
+					}
+				}
+			}
+		}
+	}
+	return i;
 }
 
 CP_Vector Tilemap_WorldToGrid(const int id, const float x, const float y)
