@@ -15,7 +15,7 @@ void Particle_Initialize()
 	// initializing types
 	Particle_AddParticleType("./Sprites/part_smoke.png", 2, 3, 6, 3);
 	Particle_AddParticleType("./Sprites/effect1.png", 2, 3, 6, 3);
-	Particle_AddParticleType("./Photos/Plants-01.png", 4, 2, 7, 1);
+	Particle_AddParticleType("./Photos/Smoke-02.png", 4, 2, 8, 1);
 
 	// initialize particle pool
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
