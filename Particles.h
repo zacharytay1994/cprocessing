@@ -8,7 +8,8 @@
 typedef enum ParticleType {
 	//PT_Nothing,
 	PT_Dust,
-	PT_Star
+	PT_Star,
+	PT_Bean
 } ParticleType;
 
 typedef enum ParticleSystemType {

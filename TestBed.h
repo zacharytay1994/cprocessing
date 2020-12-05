@@ -9,6 +9,8 @@ typedef struct TB_Zombie {
 	int _dead;
 } TB_Zombie;
 
+CP_Sound BGM;
+
 void TestBed_Init();
 void TestBed_Update(const float dt);
 void TestBed_Exit();

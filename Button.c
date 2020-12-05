@@ -65,7 +65,7 @@ int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_positio
 	new_button.Position.y = position.y;
 
 	// Set Size
-	new_button.Size.x = (float)(strlen(text) * 20) + 8;
+	new_button.Size.x = (float)(strlen(text)*20) ;
 	new_button.Size.y = size.y;
 
 	// Set Text Position
@@ -508,6 +508,9 @@ void Button_Render_All()
 _*/
 void Button_Render(int id)
 {
+
+	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+
 	CP_Settings_Fill(button_list[scene_id][id].Button_Color);
 	if (button_list[scene_id][id].Darken)
 	{
@@ -519,12 +522,12 @@ void Button_Render(int id)
 	}
 	if (button_list[scene_id][id].Image == NULL || button_list[scene_id][id].Enable_SpecialEffects)
 	{
-		CP_Graphics_DrawRect(button_list[scene_id][id].Position.x, button_list[scene_id][id].Position.y, button_list[scene_id][id].Size.x * button_list[scene_id][id].Scale, button_list[scene_id][id].Size.y * button_list[scene_id][id].Scale);
+		CP_Graphics_DrawRect(button_list[scene_id][id].Position.x - (button_list[scene_id][id].Size.x / 2), button_list[scene_id][id].Position.y, button_list[scene_id][id].Size.x * button_list[scene_id][id].Scale, button_list[scene_id][id].Size.y * button_list[scene_id][id].Scale);
 	}
 	if (button_list[scene_id][id].Image != NULL)
 	{
 		CP_Image_Draw(button_list[scene_id][id].Image, 
-			button_list[scene_id][id].Position.x + (button_list[scene_id][id].Size.x / 2),
+			button_list[scene_id][id].Position.x,
 			button_list[scene_id][id].Position.y + (button_list[scene_id][id].Size.y / 2),
 			button_list[scene_id][id].Size.x,
 			button_list[scene_id][id].Size.y,
