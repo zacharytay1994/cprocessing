@@ -53,7 +53,6 @@ void		Tilemap_SetTileToBrush(const int id, const int x, const int y);
 int			Tilemap_LoadTileSheet(const char* path, const int row, const int col, const int frames);
 void		Tilemap_SetActiveTileSheet(const int id);
 void		Tilemap_SetTileSheetBrush(const int id);
-void		Tilemap_ApplyNormalMap(void* data, void* normal_map_data, void* og_tilemap_data, CP_Vector tilePosition, const float width, const float height);
 
 /*____________________________________________________________________________________________________________________________________*/
 // LOADING AND SAVING

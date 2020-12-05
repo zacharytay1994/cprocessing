@@ -30,18 +30,6 @@ CP_Image* tilemap_image_array;
 int normal_initialized = 0;
 int normal_count = 0;
 
-//typedef struct Vec3 {
-//	float x, y, z;
-//} Vec3;
-//
-//float	Vec3_Dot(Vec3 lhs, Vec3 rhs) { return ( lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z ); }
-//float	Vec3_Mag(Vec3 vec) { return (float)sqrt((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z)); }
-//Vec3	Vec3_Normalize(Vec3 vec) {
-//	float mag = Vec3_Mag(vec); 
-//	return (Vec3) { vec.x / mag, vec.y / mag, vec.z / mag };
-//}
-//Vec3	Vec3_Sub(Vec3 lhs, Vec3 rhs) { return (Vec3) { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z }; }
-
 void Tilemap_Initialize()
 {
 	// loading tilesheets
@@ -55,9 +43,6 @@ void Tilemap_Initialize()
 	CP_Image_GetPixelData(tilemap_ground_normal_map, (unsigned char*)tilemap_ground_normal_map_data);
 	CP_Image_GetPixelData(tilesheets[tilemap_active_tilesheet]._images[0], (unsigned char*)tilemap_tile_data);
 	CP_Image_GetPixelData(tilemap_ground, (unsigned char*)tilemap_og_data);
-	/*for (int i = 0; i < 400; ++i) {
-		printf("%d,",((unsigned char*)tilemap_ground_normal_map_data)[i]);
-	}*/
 	tilemap_test_light = LightStage_AddLight(CP_Vector_Set(0.0f,0.0f), 500.0f, 1000.0f, -1.0f, 0, 100);
 	LightStage_SetPosition(tilemap_test_light, (CP_Vector) { 1400.0f, 0.0f });
 }
@@ -74,9 +59,6 @@ void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
 
 	int tile_width = tilemaps[id]._tile_width;
 	int tile_height = tilemaps[id]._tile_height;
-
-	/*int offset_x = tilemaps[id]._offset_x;
-	int offset_y = tilemaps[id]._offset_y;*/
 
 	float screen_width = (float)CP_System_GetWindowWidth();
 	float screen_height = (float)CP_System_GetWindowHeight();
@@ -240,10 +222,6 @@ void Tilemap_Render(const int id, const CP_Matrix cam)
 	float half_offset_x = (float)tilemaps[id]._offset_x / 2.0f;
 	float half_offset_y = (float)tilemaps[id]._offset_y / 2.0f;
 	CP_Vector tile_position = CP_Vector_Set(-1.0f, -1.0f);
-	/*CP_Vector mouse_pos = (CP_Vector){ (float)CP_Input_GetMouseX(), (float)CP_Input_GetMouseY() };
-	mouse_pos = Camera_ScreenToWorld(mouse_pos.x, mouse_pos.y);
-	tilemap_test_light_position = mouse_pos;
-	LightStage_SetPosition(tilemap_test_light, mouse_pos);*/
 	int count = 0;
 	if (id < tilemaps_size) {
 		for (int y = tilemaps[id]._height-1; y >= 0; y--) {
@@ -256,15 +234,11 @@ void Tilemap_Render(const int id, const CP_Matrix cam)
 						printf("TILEMAPX: %f, TILEMAPY: %f\n", tile_position.x, tile_position.y);
 					}
 					if (normal_initialized) {
-						//unsigned char* array = tilemap_tile_data_array[count];
-						//array[count*4] = (unsigned char)128;
-						//printf("Address %p\n", tilemap_tile_data_array[count]);
 						CP_Vector* pos = LightStage_GetLightPositionsArray();
 						int pos_size = LightStage_GetLightPositionsSize();
 						LightStage_ApplyNormalMap(tilemap_tile_data_array[count], tilemap_ground_normal_map_data,
 							tilemap_og_data, tile_position, (float)tilemaps[id]._tile_width, (float)tilemaps[id]._tile_height,
 							10.0f,10.0f,pos, pos_size);
-						//printf("%d\n", count);
 						CP_Image_UpdatePixelData(tilemap_image_array[count], (unsigned char*)(tilemap_tile_data_array[count]));
 						tile_position = CP_Vector_MatrixMultiply(cam, tile_position);
 						if (CP_Input_KeyDown(KEY_L)) {
@@ -296,15 +270,6 @@ void Tilemap_Render(const int id, const CP_Matrix cam)
 		if (tilemap_tile_data_array && tilemap_image_array) {
 			for (int i = 0; i < count; ++i) {
 				tilemap_tile_data_array[i] = malloc(400);
-				/*if (i % 2 == 0) {
-					tilemap_image_array[i] = CP_Image_Load("./Sprites/ground.png");
-				}
-				else {
-					tilemap_image_array[i] = CP_Image_Load("./Sprites/ground2.png");
-				}*/
-				/*char path[50] = { 0 };
-				sprintf_s(path, 50, "%s%d.png", "./Sprites/Ground/ground", i);
-				printf("%s\n", path);*/
 				tilemap_image_array[i] = CP_Image_CreateFromData(10,10, tilemap_og_data);
 			}
 			normal_initialized = 1;
@@ -388,82 +353,6 @@ void Tilemap_SetTileSheetBrush(const int id)
 	if (id < MAX_TILESHEET_CELLS) {
 		tilemap_active_tilesheet_cell = id;
 	}
-}
-
-void Tilemap_ApplyNormalMap(void* data, void* normal_map_data, void* og_tilemap_data, CP_Vector tilePosition, const float width, const float height)
-{
-	//// get pixel data of img
-	////CP_Image_GetPixelData(img, tilemap_tile_data);
-	//unsigned char* array = (unsigned char*)data;
-	//unsigned char* normal = (unsigned char*)normal_map_data;
-	//unsigned char* og_array = (unsigned char*)og_tilemap_data;
-	//// manipulate data based on normal map
-	///*for (int i = 0; i < 100; ++i) {
-	//	printf("%d: r:%-5dg:%-5db:%-5da:%-5d\n", i, normal[i*4], normal[i*4 + 1], normal[i*4 + 2], normal[i*4 + 3]);
-	//}*/
-	//float intensity = 0.0f;
-	////CP_Vector normal_vector = CP_Vector_Set(0.0f, 0.0f);
-	////CP_Vector pixel_position = CP_Vector_Set(0.0f, 0.0f);
-	//CP_Vector light_vector = CP_Vector_Set(0.0f, 0.0f);
-	//int r, g, b;
-	//if (CP_Input_KeyDown(KEY_P)) {
-	//	printf("TILEMAPX: %f, TILEMAPY: %f\n", tilePosition.x, tilePosition.y);
-	//}
-	//Vec3 normal_vec3 = (Vec3){ 0.0f,0.0f,0.0f };
-	//Vec3 light_vec3 = (Vec3){ 0.0f,0.0f,0.0f };
-	//Vec3 light_pos = (Vec3){ tilemap_test_light_position.x,tilemap_test_light_position.y,300.0f };
-	//Vec3 pixel_pos = (Vec3){ 0.0f,0.0f,0.0f };
-	//float ambient = 0.3f;
-	//for (int i = 0; i < 100; ++i) {
-	//	pixel_pos.x = tilePosition.x + width * ((float)(i % 10)/10.0f);
-	//	pixel_pos.y = tilePosition.y + height * ((float)(i / 10)/10.0f);
-	//	pixel_pos.z = 0.0f;
-	//	normal_vec3.x = ((float)(normal[i * 4] - 127) / 128.0f);
-	//	normal_vec3.y = ((float)(normal[i * 4 + 1] - 127) / 128.0f);
-	//	normal_vec3.z = ((float)(normal[i * 4 + 2] - 127) / 128.0f);
-	//	//printf("p: %f, %f\n", pixel_position.x, pixel_position.y);
-	//	// calculate vector 
-	//	light_vec3 = Vec3_Sub(light_pos, pixel_pos);
-	//	//light_vec3 = (Vec3){ light_vector.x, light_vector.y, 500.0f };
-	//	float n_scale = Vec3_Dot(Vec3_Normalize(light_vec3), Vec3_Normalize(normal_vec3));
-	//	float d_scale = (2000.0f - Vec3_Mag(light_vec3)) / 2000.0f;
-	//	//intensity = CP_Vector_Length(light_vector) * 0.1f;
-	//	if (CP_Input_KeyDown(KEY_P)) {
-	//		printf("%f, %f, i: %f |", light_vector.x, light_vector.y, intensity);
-	//	}
-	//	// mod intensity
-	//	if (n_scale < 0.0f) { n_scale *= -1.0f; }
-	//	if (d_scale < 0.0f) { d_scale = 0.0f; }
-	//	intensity = d_scale * n_scale + ambient;
-	//	intensity = intensity > 1.0f ? 1.0f : intensity;
-	//	intensity = intensity < 0.0f ? 0.0f : intensity;
-	//	/*intensity = d_scale * n_scale + ambient > 1.0f ? 1.0f : d_scale * n_scale + ambient;
-	//	intensity = d_scale * n_scale + ambient < 0.0f ? 0.0f : d_scale * n_scale + ambient;*/
-	//	/*if (CP_Input_MouseDown(0)) {
-	//		printf("%d: %f, normal_vec3: %-4.2f,%-4.2f,%-4.2f\n", i, n_scale, normal_vec3.x, normal_vec3.y, normal_vec3.z);
-	//	}*/
-	//	/*normal_vector.x = normal[i * 4];
-	//	normal_vector.y = (float)(normal[i * 4 + 1] - 200);
-	//	intensity = CP_Vector_DotProduct(CP_Vector_Normalize(light_vector), normal_vector);*/
-	//	// add value from normal data to image data, rgb
-	//	r = (int)((int)og_array[i * 4] * intensity);
-	//	g = (int)((int)og_array[i * 4 + 1] * intensity);
-	//	b = (int)((int)og_array[i * 4 + 2] * intensity);
-	//	array[i * 4] = (unsigned char)r;
-	//	//printf("%d,", og_array[i * 4]);
-	//	array[i * 4 + 1] = (unsigned char)g;
-	//	array[i * 4 + 2] = (unsigned char)b;
-	//	// calculate light strength, light
-	//}
-	//if (CP_Input_KeyDown(KEY_P)) {
-	//	printf("--------------------------------------- Start Entry ---------------------------------------\n");
-	//	for (int i = 0; i < 100; ++i) {
-	//		printf("R:%-4d,G:%-4d,B:%-4d,A:%-4d| ", array[i * 4], array[i * 4 + 1], array[i * 4 + 2], array[i * 4 + 3]);
-	//		if (i % 10 == 0) {
-	//			printf("\n");
-	//		}
-	//	}
-	//}
 }
 
 void Tilemap_TxtSave256(const int id, const char* file)

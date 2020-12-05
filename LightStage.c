@@ -6,6 +6,9 @@
 #define LIGHTSTAGE_MAX_LIGHTS 50
 #define LIGHTSTAGE_LIGHT_RADIUS 1500
 
+/*____________________________________________________________________________________________________________________________________*/
+// VEC3 definition, just a 3 component vector
+/*____________________________________________________________________________________________________________________________________*/
 typedef struct Vec3 {
 	float x, y, z;
 } Vec3;
@@ -18,6 +21,9 @@ Vec3	Vec3_Normalize(Vec3 vec) {
 }
 Vec3	Vec3_Sub(Vec3 lhs, Vec3 rhs) { return (Vec3) { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z }; }
 
+/*____________________________________________________________________________________________________________________________________*/
+// Definition of light "Object".
+/*____________________________________________________________________________________________________________________________________*/
 struct LightStage_Light {
 	CP_Vector	_position;
 	float		_size;
@@ -29,17 +35,17 @@ struct LightStage_Light {
 	int			_faded_up;
 };
 
-CP_Image LightStage_light;
-CP_Image LightStage_overlay;
-
-CP_Vector LightStage_screen_dimensions;
-CP_Vector LightStage_screen_center;
-
-int LightStage_ambient = 0;
-LightStage_Light LightStage_lights[LIGHTSTAGE_MAX_LIGHTS] = { 0 };
-
-CP_Vector LightStage_positions[LIGHTSTAGE_MAX_LIGHTS] = { 0 };
-int LightStage_positions_size = 0;
+/*____________________________________________________________________________________________________________________________________*/
+// Various variables (vv)
+/*____________________________________________________________________________________________________________________________________*/
+		CP_Image	LightStage_light;										// the cp_image resource to use as the light
+		CP_Image	LightStage_overlay;										// the cp_image resource to use as the blended ambient light
+	   CP_Vector	LightStage_screen_dimensions;							// cached screen dimension
+	   CP_Vector	LightStage_screen_center;								// cached screen center
+			 int	LightStage_ambient = 0;									// ambient light
+LightStage_Light	LightStage_lights[LIGHTSTAGE_MAX_LIGHTS] = { 0 };		// container to hold all the lights
+	   CP_Vector	LightStage_positions[LIGHTSTAGE_MAX_LIGHTS] = { 0 };	// container to hold light positions
+			 int	LightStage_positions_size = 0;							// size for the above container ^
 
 void LightStage_Initialize() {
 	LightStage_light = CP_Image_Load("./Sprites/test_light.png");
@@ -57,15 +63,9 @@ void LightStage_Render() {
 	CP_Settings_BlendMode(CP_BLEND_SUBTRACT);
 	CP_Image_Draw(LightStage_overlay, LightStage_screen_center.x, LightStage_screen_center.y, LightStage_screen_dimensions.x, LightStage_screen_dimensions.y, LightStage_ambient);
 	CP_Settings_BlendMode(CP_BLEND_ALPHA);
-	//// render stuff as add
-	//CP_Settings_BlendMode(CP_BLEND_ADD);
-	//CP_Image_Draw(LightStage_light, CP_Input_GetMouseX(), CP_Input_GetMouseY(), 100.0f, 100.0f, 100);
-	//CP_Settings_BlendMode(CP_BLEND_ALPHA);
 }
 
-void LightStage_Exit() {
-
-}
+void LightStage_Exit() {}
 
 int LightStage_AddLight(const CP_Vector position, const float size, const float fadeUp, const float fadeDown, const float initialAlpha, const float midAlpha)
 {
@@ -114,15 +114,6 @@ void LightStage_UpdateAndRenderLights(const float dt)
 					LightStage_lights[i]._active = 0;
 				}
 			}
-			//if (LightStage_lights[i]._alpha > 0.1f) {
-			//	//LightStage_lights[i]._alpha = CP_Math_LerpFloat(0.0f, LightStage_lights[i]._alpha, LightStage_lights[i]._fade * dt);
-			//	if (LightStage_lights[i]._fade > 0.0f) {
-			//		LightStage_lights[i]._alpha -= LightStage_lights[i]._fade * dt;
-			//	}
-			//}
-			//else {
-			//	LightStage_lights[i]._active = 0;
-			//}
 			CP_Vector position = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), LightStage_lights[i]._position);
 			CP_Image_Draw(LightStage_light, position.x, position.y,
 				LightStage_lights[i]._size, LightStage_lights[i]._size, (int)LightStage_lights[i]._initialAlpha);
@@ -152,22 +143,25 @@ void LightStage_DeactivateLight(const int id)
 
 void LightStage_ApplyNormalMap(void* data, void* normal_data, void* og_data, CP_Vector topLeftPosition, const float width, const float height, const float pixelWidth, const float pixelHeight, CP_Vector* lightPositions, int numberOfLights)
 {
+	// og_data (calculated with) normal_data => output altered data
 	unsigned char* array = (unsigned char*)data;
 	unsigned char* normal = (unsigned char*)normal_data;
 	unsigned char* og_array = (unsigned char*)og_data;
 
+	// some spicy variables
 	int r, g, b;
 	float intensity = 0.0f;
 	float ambient = 0.2f;
 	ambient = ambient < 0.3f ? 0.3f : ambient;
 	float normal_scale;
 	float distance_scale;
-	//CP_Vector light_vector = CP_Vector_Set(0.0f, 0.0f);
 	Vec3 normal_vec3 = (Vec3){ 0.0f,0.0f,0.0f };
 	Vec3 light_vec3 = (Vec3){ 0.0f,0.0f,0.0f };
 	Vec3 light_pos = (Vec3){ 0.0f,0.0f,0.0f };
 	Vec3 pixel_pos = (Vec3){ 0.0f,0.0f,0.0f };
 
+	// calculating intensity based on distance and angle from light source, OoO dot product
+	// ghetto way of doing, forgot the actual formula
 	for (int i = 0; i < pixelWidth * pixelHeight; ++i) {
 		intensity = 0.0f;
 		pixel_pos.x = topLeftPosition.x + width * ((float)(i % (int)pixelWidth) / pixelWidth);
