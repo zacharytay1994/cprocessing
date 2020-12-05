@@ -69,6 +69,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	new_enemy.speed = speed;
 	new_enemy.enem_Size = size;
 	new_enemy.ene_Type = enemy_type;
+	new_enemy.money_amount = 0;
 
 	switch (enemy_type)
 	{
@@ -113,6 +114,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		new_enemy.ene_dmg = 3;
 		new_enemy.enem_Size.x = -size.x;
 		new_enemy.enem_Size.y = size.y;
+		new_enemy.money_amount = 10;
 		enem_sprite_col = 2;
 		enem_sprite_row = 3;
 		enem_sprite_frames = 6;
@@ -130,6 +132,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		new_enemy.enem_Size.x = -size.x * 7;
 		new_enemy.enem_Size.y = size.y * 7;
 		new_enemy.position.y -= 400;
+		new_enemy.money_amount = 1000;
 		enem_sprite_col = 2;
 		enem_sprite_row = 3;
 		enem_sprite_frames = 2;
@@ -299,6 +302,12 @@ int GetEnemyDMG(int id)
 {
 	int dmg = enemy_list[id].ene_dmg;
 	return dmg;
+}
+
+int GetEnemyMoney(int id)
+{
+	int cashCough = enemy_list[id].money_amount;
+	return cashCough;
 }
 
 void SetEnemyDie(int id)

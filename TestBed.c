@@ -84,6 +84,8 @@ void TestBed_Init()
 
 	// temp
 	TestBed_house = CP_Image_Load("./Sprites/house.png");
+	wind_Width = (float)CP_System_GetWindowWidth();
+	wind_Height = (float)CP_System_GetWindowHeight();
 	/*TestBed_house_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house));
 	CP_Image_GetPixelData(TestBed_house, TestBed_house_data);
 
@@ -208,7 +210,7 @@ void TestBed_Update(const float dt)
 			if (wave_timer <= (wave_duration / 10 * 3))
 			{
 				// spawn miniboss
-				CreateEnemy(50.f,
+				CreateEnemy(30.f,
 				(CP_Vector){ 2300.0f,1150.0f },
 				(CP_Vector){200.f,200.f},
 				50.f, 4);	
@@ -218,7 +220,7 @@ void TestBed_Update(const float dt)
 		}
 		if (spawndelay <= 0.0)	// delay between each enemy spawn
 		{
-			CreateEnemy(10.f,
+			CreateEnemy(1.f,
 				(CP_Vector){ 2300.0f,1150.0f },
 				(CP_Vector){200.f,200.f},
 				100.f, 3);	//spawn type 3 enemy(toothpaste guy)
@@ -332,11 +334,11 @@ void DayNightManager(float dt)
 	timer += dt;
 	sprintf_s(curr_Timer, 127, "Time: %.0f", timer);
 	CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
-	CP_Font_DrawText(curr_Timer, 20, 170);
+	CP_Font_DrawText(curr_Timer, wind_Width/15, wind_Height/5.5f);
 
 	sprintf_s(money_display, 127, "Souls: %d", souls_money);
 	CP_Settings_Fill((CP_Color) { 175, 205, 255, 255 });
-	CP_Font_DrawText(money_display, 20, 230);
+	CP_Font_DrawText(money_display, wind_Width / 15, wind_Height / 4);
 
 	// Simple wave count (nothing much)
 	sprintf_s(wave_display, 127, "WAVE %d", wave_count);
@@ -395,12 +397,12 @@ void TestBed_UpdateZombies(const float dt)
 			if (enemy_list[i].ene_Type == 3)
 			{
 				House_health -= 1;
-				souls_money += 30;
+				//souls_money += 30;
 			}
 			else
 			{
 				House_health -= 3;
-				souls_money += 1000;
+				//souls_money += 1000;
 			}
 		}
 	}
@@ -450,6 +452,8 @@ void TestBed_CheckBombOnZomb()
 					CP_Vector projectile_position = Sprite_GetPosition(Player_GetProjectileID(i));
 					if (CheckEnemyCollision(projectile_position.x + 25.0f, projectile_position.y + 25.0f,
 						projectile_position.x - 25.0f, projectile_position.y - 25.0f, j)) {
+						if (GetEnemyHP(j) <= 1)
+							souls_money += GetEnemyMoney(j);
 						EnemyTakeDamage(j, 1);
 						Player_SetProjectileDead(i, 1);
 						LightStage_DeactivateLight(Player_GetProjectileLight(i));
