@@ -7,6 +7,7 @@ int enemy_one;
 int enemy_two;
 int enemy_three;
 int enemy_four;
+int enemy_five;
 int enemyhp_Sprite;
 
 //float HP_maxSpriteSize;
@@ -36,6 +37,12 @@ void Enemy_Initialize()
 		(CP_Vector) { -100, -100 }, 
 		200.0f, 200.0f, 
 		"./Sprites/slime1.png",
+		2, 3, 6, 5, 0);
+
+	enemy_five = Sprite_AddSprite(
+		(CP_Vector) { -100, -100 }, 
+		200.0f, 200.0f, 
+		"./Sprites/slime2.png",
 		2, 3, 6, 5, 0);
 
 	enemyhp_Sprite = Sprite_AddSprite(
@@ -111,7 +118,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	case 3:	// toothpaste
 	{
 		path_id = enemy_four;
-		new_enemy.ene_dmg = 3;
+		new_enemy.ene_dmg = 1;
 		new_enemy.enem_Size.x = -size.x;
 		new_enemy.enem_Size.y = size.y;
 		new_enemy.money_amount = 10;
@@ -125,7 +132,24 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		break;
 	}
 
-	case 4:	// COLD-GATE
+	case 4:	// strawberry jam
+	{
+		path_id = enemy_five;
+		new_enemy.ene_dmg = 2;
+		new_enemy.enem_Size.x = -size.x;
+		new_enemy.enem_Size.y = size.y;
+		new_enemy.money_amount = 50;
+		enem_sprite_col = 2;
+		enem_sprite_row = 3;
+		enem_sprite_frames = 6;
+		enem_sprite_animate_speed = 3;
+		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+
+		break;
+	}
+
+	case 5:	// COLD-GATE
 	{
 		path_id = enemy_four;
 		new_enemy.ene_dmg = 3;
