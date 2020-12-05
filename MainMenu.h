@@ -1,7 +1,13 @@
+/*!
+@file       MainMenu.h
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Contains the data and functions for rendering the main menu
+*//*__________________________________________________________________________
+_*/
 #pragma once
-
 #include <cprocessing.h>
-
 #include "Button.h"
 
 #define       GREEN	CP_Color_Create(0, 255, 0, 255)
@@ -27,6 +33,9 @@ CP_Image	menu_background;
 
 
 CP_Image	menu_logo_farmology;
+CP_Font		menu_font;
+
+CP_Image	logo_farmology;
 float		logo_farmology_size_x;
 float		logo_farmology_size_y;
 

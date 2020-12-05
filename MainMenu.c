@@ -1,3 +1,11 @@
+/*!
+@file       MainMenu.c
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Handles the main menu and the button rendering in the mainmenu
+*//*__________________________________________________________________________
+_*/
 #include <stdlib.h>
 #include <stdio.h>
 #include "MainMenu.h"
@@ -105,10 +113,18 @@ void MainMenu_Initialize()
 	Button_Color_Set(button_exit, 195, 154, 107, 255);
 	
 
+	
+	menu_font = CP_Font_Load("Assets/Fonts/zrnic rg.ttf");
+	CP_Font_Set(menu_font);
 
 	return;
 }
 
+/*!
+@brief Update function for mainmenu
+@param  dt				- deltaTime framerate
+*//*________________________________________________________________________
+_*/
 void MainMenu_Update(const float dt)
 {
 	CP_Settings_Background(CP_Color_Create(255, 255, 255, 255));
@@ -120,6 +136,10 @@ void MainMenu_Update(const float dt)
 	return;
 }
 
+/*!
+@brief Renders the mainmenu
+*//*________________________________________________________________________
+_*/
 void MainMenu_Render()
 {
 	Background_Render();
@@ -131,13 +151,22 @@ void MainMenu_Render()
 	return;
 }
 
+/*!
+@brief Renders the background
+*//*________________________________________________________________________
+_*/
 void Background_Render()
 {
 	CP_Image_Draw(menu_background, window_width * 0.5f, window_height * 0.5f, 1600.0f, 900.0f, 255);
 }
 
+/*!
+@brief Exits the mainmenu
+*//*________________________________________________________________________
+_*/
 void MainMenu_Exit()
 {
 	CP_Image_Free(&menu_background);
 	CP_Image_Free(&menu_logo_farmology);
+	CP_Font_Set(CP_Font_GetDefault());
 }

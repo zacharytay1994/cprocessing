@@ -9,7 +9,7 @@
 // documentation link:
 // https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
 //
-// Copyright � 2020 DigiPen, All rights reserved.
+// Copyright  2020 DigiPen, All rights reserved.
 //---------------------------------------------------------
 #include "cprocessing.h"
 
@@ -20,6 +20,7 @@
 #include "TestBed.h"
 #include "MainMenu.h"
 #include "SplashScreen.h"
+#include "Credits.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +31,7 @@ int test_scene_2;
 int test_bed;
 int main_menu;
 int test_scene_3;
+int credits_scene;
 
 //Button Shortcut Test
 //struct tempBtn {
@@ -79,7 +81,9 @@ void game_init(void)
 	main_menu = Scene_AddScene(MainMenu_Initialize, MainMenu_Update, MainMenu_Exit);
 	splash_screen = Scene_AddScene(SplashScreen_Init, SplashScreen_Update, SplashScreen_Exit);
 	test_scene_3 = Scene_AddScene(TestScene3_Init, TestScene3_Update, TestScene3_Exit);
+	credits_scene = Scene_AddScene(Credits_Init, Credits_Update, Credits_Exit);
 	Scene_ChangeScene(main_menu);// splash_screen);
+	// Scene_ChangeScene(splash_screen);// splash_screen);
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the update function

@@ -1,11 +1,22 @@
+/*!
+@file       Inventory.h
+@author     Noel Ho Sing Nam (s.ho)
+@course     CSD1400
+@section    A
+@brief      Contains the item struct and functions for creating, adding, using, removing items within inventory
+*//*__________________________________________________________________________
+_*/
 #pragma once
 #include <cprocessing.h>
 #include <stdio.h>
 #include "Button.h"
+#include "Player.h"
 
-#define		 BROWN	CP_Color_Create(150, 75, 0, 255)
-#define DARK_BROWN	CP_Color_Create(125, 50, 0, 255)
-#define	     BLUE   CP_Color_Create(0, 0, 255, 255)
+#define				BROWN	CP_Color_Create(150, 75, 0, 255)
+#define			DARK_BROWN	CP_Color_Create(125, 50, 0, 255)
+#define				BLUE	CP_Color_Create(0, 0, 255, 255)
+#define				BLACK	CP_Color_Create(0, 0, 0, 255)
+#define	TRANSLUCENT_WHITE	CP_Color_Create(255, 255, 255, 200)
 
 struct inventory_item
 {
@@ -27,6 +38,8 @@ float inventory_slot_width;
 int inventory[64];
 char inventory_is_visible;
 //char is_dragging;
+char hover_display[127];
+char hover_display_desc[127];
 
 void Inventory_Init();
 void Inventory_Open();
@@ -39,6 +52,7 @@ void Inventory_Render();
 struct inventory_item Inventory_Stock_Get_Struct_By_Name(char* name);
 struct inventory_item Inventory_Stock_Get_Struct_By_ID(int id);
 int Inventory_Item_Set_Image(char* name, char* image);
+int Inventory_Item_Set_Description(char* name, char* text);
 
 void Inventory_Item_Create(char* name);
 void Inventory_Item_Update();

@@ -21,6 +21,8 @@
 #define PLAYER_DECCELERATION		900.0f	// horizontal decceleration applied
 #define PLAYER_DECCELERATION_THRES	20.0f
 
+#define PLAYER_MAX_PROJECTILES 200
+
 typedef enum PlayerAnimationState {
 	Player_Anim_Idle,
 	Player_Anim_Run,
@@ -70,6 +72,13 @@ CP_Vector* Player_GetPosition_P(const int id);
 void Player_SetCameraFocus(const int id);
 void Player_temp();
 
+// PROJECTILE CODE
+int	 Player_GetProjectilesSize();
+int	 Player_GetProjectileID(const int id);
+int  Player_ProjectileDead(const int id);
+void Player_SetProjectileDead(const int id, const int b);
+void Player_RenderProjectiles();
+
 // WEAPON CODE
 void Player_ShowWeapon();
 void Player_HideWeapon(const float dt);
@@ -79,3 +88,17 @@ void Player_SpawnProjectile(const float dt);
 void Player_ProjectileUpdate(const float dt);
 
 void Player_RenderProjectileArc(const CP_Vector position, const CP_Vector direction, const int lineDensity, const float fallOff, const float dt);
+void Player_RenderProjectileCharge(const CP_Vector position, const CP_Vector direction, const float dt);
+
+// GAMEPLAY CODE
+void Player_Add_Health(int x);
+void Player_Lose_Health(int x);
+void Player_Add_MaxHealth(int x);
+void Player_Lose_MaxHealth(int x);
+
+// POWERUP CODE
+float speed_multiplier;
+float powerup_timer[99];
+int powerup_type[99];
+void Player_Powerup_Update(const float dt);
+void Player_Add_Powerup(int x, float duration);

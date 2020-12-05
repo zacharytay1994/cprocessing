@@ -14,6 +14,10 @@ CP_Vector* Camera_bound_position;
 
 float Camera_lerp_amount = 0.2f;
 
+CP_Vector Camera_screenshake_offset;
+float Camera_screenshake_amount = 0.0f;
+float Camera_screenshake_dampening = 6.0f;
+
 CP_Matrix Camera_GetCameraTransform()
 {
 	return _transform;
@@ -23,6 +27,7 @@ void Camera_Initialize()
 {
 	Camera_vertical_limit = (CP_Vector){ 0.0f, 0.0f };
 	Camera_horizontal_limit = (CP_Vector){ 0.0f, 0.0f };
+	Camera_screenshake_offset = (CP_Vector){ 0.0f,0.0f };
 }
 
 void Camera_Update(const float dt)
@@ -32,7 +37,7 @@ void Camera_Update(const float dt)
 	float half_width = (float)CP_System_GetWindowWidth() / 2.0f;
 	float half_height = (float)CP_System_GetWindowHeight() / 2.0f;
 
-	_transform = CP_Matrix_Translate(_inverse_position);
+	_transform = CP_Matrix_Translate(CP_Vector_Add(_inverse_position, Camera_screenshake_offset));
 	if (Camera_bound) {
 		Camera_SetCameraX(CP_Math_LerpFloat(_position.x, Camera_bound_position->x - half_width, Camera_lerp_amount));
 		Camera_SetCameraY(CP_Math_LerpFloat(_position.y, Camera_bound_position->y - half_height, Camera_lerp_amount));
@@ -48,6 +53,8 @@ void Camera_Update(const float dt)
 			}
 		}
 	}
+
+	Camera_Shake_Update(dt);
 }
 
 void Camera_SetCameraX(const float x)
@@ -103,4 +110,21 @@ void Camera_SetVerticalLimit(const CP_Vector limit)
 void Camera_SetHorizontalLimit(const CP_Vector limit)
 {
 	Camera_horizontal_limit = limit;
+}
+
+void Camera_Shake(const float amount)
+{
+	Camera_screenshake_amount = amount;
+}
+
+void Camera_Shake_Update(const float dt)
+{
+	if (Camera_screenshake_amount > 0.1f) {
+		Camera_screenshake_amount = CP_Math_LerpFloat(Camera_screenshake_amount, 0.0f, CP_System_GetDt() * Camera_screenshake_dampening);
+	}
+	else {
+		Camera_screenshake_amount = 0.0f;
+	};
+	Camera_screenshake_offset = (CP_Vector){ CP_Random_RangeFloat(-5.0f * Camera_screenshake_amount, 5.0f * Camera_screenshake_amount),
+											CP_Random_RangeFloat(-5.0f * Camera_screenshake_amount, 5.0f * Camera_screenshake_amount) };
 }

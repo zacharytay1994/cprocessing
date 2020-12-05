@@ -52,6 +52,7 @@ void Particle_Update(const float dt)
 				sprite->_scale = 1.0f;
 				Sprite_Reset(Particle_particles[i]._sprite);
 			}
+			//Sprite_RenderSprite(dt, Particle_particles[i]._sprite);
 		}
 	}
 }
