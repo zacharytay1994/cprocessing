@@ -3,6 +3,7 @@
 #include "CProcessing/inc/cprocessing.h"
 
 extern CP_Vector GameGUI_gui_bean_pos;
+extern CP_Vector GameGUI_gui_potion_pos;
 
 void GameGUI_Init();
 void GameGUI_Render(const float dt);

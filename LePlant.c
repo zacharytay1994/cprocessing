@@ -13,6 +13,7 @@
 
 #define LEPLANT_MAX_BEANS 100
 #define LEPLANT_BEAN_SIZE 100.0f
+#define LEPLANT_POTION_SIZE2 100.0f
 
 struct LePlant_Bean {
 	int _id;
@@ -22,8 +23,14 @@ struct LePlant_Bean {
 	float _rotation;
 };
 
-int Plant_id[100];
-int Potion_id[100];
+struct LePlant_Potion {
+	int _id;
+	int _fly;
+	int _active;
+};
+
+int Plant_id[100] = { 0 };
+LP_Potion Potion_id[100];
 int plant_id = 0, potion_id = 0;
 int bean_mr, smokey_mr, potion_mr;
 int temp, temp2;
@@ -94,7 +101,7 @@ void LePlant_Update(const float dt)
 
 						plant_pos.y += 5.0f;
 						temp2 = Sprite_AddSpriteRepeatAuto(plant_pos, LEPLANT_POTION_SIZE, LEPLANT_POTION_SIZE, potion_mr);
-						Potion_id[potion_id] = temp2;
+						Potion_id[potion_id] = (LP_Potion){ temp2, 0, 1 };
 						potion_id += 1;
 						//Sprite_OptOut(temp2, 0);
 						Sprite_SetPosition(Plant_id[i], cp_vector_reset);
@@ -126,12 +133,15 @@ void LePlant_Update(const float dt)
 		}
 	}
 	LePlant_UpdateBeans(dt);
+	LePlant_UpdatePotions(dt);
 }
 
 void LePlant_Render(const float dt)
 {
 	for (int i = 0; i < potion_id; ++i) {
-		Sprite_RenderSprite(dt, Potion_id[i]);
+		if (Potion_id[i]._active) {
+			Sprite_RenderSprite(dt, Potion_id[i]._id);
+		}
 	}
 	for (int i = 0; i < plant_id; ++i) {
 		Sprite_RenderSprite(dt, Plant_id[i]);
@@ -170,6 +180,24 @@ void LePlant_UpdateBeans(const float dt)
 			}
 			LePlant_beans[i]._position = CP_Vector_Add(LePlant_beans[i]._position, CP_Vector_Scale(CP_Vector_Normalize(vector), LePlant_bean_fly_speed*dt));
 			LePlant_beans[i]._rotation += LePlant_bean_rotation_speed * dt;
+		}
+	}
+}
+
+void LePlant_UpdatePotions(const float dt)
+{
+	Sprite* sprite;
+	for (int i = 0; i < potion_id; ++i) {
+		sprite = Sprite_GetSprite(Potion_id[i]._id);
+		if (Potion_id[i]._fly && Potion_id[i]._active) {
+			CP_Vector vector = CP_Vector_Subtract(Camera_ScreenToWorld(GameGUI_gui_potion_pos.x, GameGUI_gui_potion_pos.y), sprite->_position);
+			if (CP_Vector_Length(vector) < 50.0f) {
+				/*LePlant_beans[i]._active = 0;
+				GameGUI_SetBean(GameGUI_GetBean() + 1);*/
+				Potion_id[i]._active = 0;
+			}
+			sprite->_position = CP_Vector_Add(sprite->_position, CP_Vector_Scale(CP_Vector_Normalize(vector), LePlant_bean_fly_speed * dt));
+			//sprite->_rotation += LePlant_bean_rotation_speed * dt;
 		}
 	}
 }
@@ -229,6 +257,31 @@ void LePlant_CheckBeanWithPlayerPosition(const CP_Vector position, const float w
 				// there is collision
 				LePlant_beans[i]._fly = 1;
 			}
+		}
+	}
+}
+
+void LePlant_CheckPotionWithPlayerPosition(const CP_Vector position, const float w, const float h)
+{
+	float left_b;
+	float right_b;
+	float up_b;
+	float bottom_b;
+	float left_p = position.x - w / 2.0f;
+	float right_p = position.x + w / 2.0f;
+	float up_p = position.y - h / 2.0f;
+	float bottom_p = position.y + h / 2.0f;
+	Sprite* sprite;
+	for (int i = 0; i < potion_id; ++i) {
+		sprite = Sprite_GetSprite(Potion_id[i]._id);
+		// check for bean hit box
+		left_b = sprite->_position.x - LEPLANT_POTION_SIZE2 * 0.5f;
+		right_b = sprite->_position.x + LEPLANT_POTION_SIZE2 * 0.5f;
+		up_b = sprite->_position.y - LEPLANT_POTION_SIZE2 * 0.5f;
+		bottom_b = sprite->_position.y + LEPLANT_POTION_SIZE2 * 0.5f;
+		if (!(left_p > right_b || right_p < left_b || up_p > bottom_b || bottom_p < up_b)) {
+			// there is collision
+			Potion_id[i]._fly = 1;
 		}
 	}
 }

@@ -139,10 +139,10 @@ void TestBed_Init()
 	Inventory_Item_Set_Image("Speed Up", "demo_test.png");
 	Inventory_Item_Set_Description("Speed Up", "Increases speed temporarily");
 
-	Inventory_Item_Create("Add Health Flower");
-	Inventory_Item_Set_Image("Add Health Flower", "Assets/Items/AddHealthFlower.png");
-	Inventory_Item_Set_Description("Add Health Flower", "Increases health by 1");
-	Inventory_Add_Item_Name("Add Health Flower");
+	Inventory_Item_Create("Health Potion");
+	Inventory_Item_Set_Image("Health Potion", "./Photos/Potions-11.png");
+	Inventory_Item_Set_Description("Health Potion", "Increases health by 1");
+	Inventory_Add_Item_Name("Health Potion");
 
 	Inventory_Item_Create("Add MaxHealth Flower");
 	Inventory_Item_Set_Image("Add MaxHealth Flower", "Assets/Items/AddMaxHealthFlower.png");
@@ -298,6 +298,7 @@ void TestBed_Update(const float dt)
 	GameGUI_Render(dt); 
 	TestBed_CheckPlayerOnZomb(dt);
 	LePlant_CheckBeanWithPlayerPosition(Player_GetPosition(0), 50.0f, 50.0f);
+	LePlant_CheckPotionWithPlayerPosition(Player_GetPosition(0), 50.0f, 50.0f);
 }
 
 void TestBed_Exit()

@@ -609,6 +609,8 @@ void Player_Add_Health(int x)
 	{
 		Player_health = Player_max_health;
 	}
+	GameGUI_SetHealthScale((float)Player_health / (float)Player_max_health);
+	GameGUI_SetRedHitRatio(255.0f);
 }
 
 void Player_Lose_Health(int x)

@@ -32,6 +32,7 @@ int GameGUI_bean_count = 0;
 char GameGUI_text[GAMEGUI_TEXT_SIZE];
 
 CP_Vector GameGUI_gui_bean_pos;
+CP_Vector GameGUI_gui_potion_pos;
 
 void GameGUI_Init()
 {
@@ -55,6 +56,7 @@ void GameGUI_Init()
 	GameGUI_player_health_offset = (CP_Vector){ -0.05f*GameGUI_screen_width,-0.15f*GameGUI_screen_height };
 
 	GameGUI_gui_bean_pos = (CP_Vector){ GameGUI_screen_width * 0.04f, GameGUI_screen_height * 0.13f };
+	GameGUI_gui_potion_pos = (CP_Vector){ GameGUI_screen_width * 0.12f, GameGUI_screen_height * 0.12f };
 }
 
 void GameGUI_Render(const float dt)

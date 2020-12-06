@@ -121,6 +121,7 @@ void Inventory_Render()
 {
 	if (inventory_is_visible)
 	{
+		CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
 		CP_Settings_Fill(BROWN);
 		CP_Graphics_DrawRect(inventory_position.x, inventory_position.y, inventory_width, inventory_height);
 
@@ -152,7 +153,7 @@ void Inventory_Render()
 			}
 
 			CP_Settings_Fill(TRANSLUCENT_WHITE);
-			CP_Graphics_DrawRect(CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY() - 28, longeststring * 18 + 10, 30 * (float)(1 + !!(strcmp(hover_display_desc, "No description"))));
+			CP_Graphics_DrawRect(CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY() - 28, longeststring * 18 + 10, 40 * (float)(1 + !!(strcmp(hover_display_desc, "No description"))));
 
 			CP_Settings_Fill(BLACK);
 			CP_Settings_TextSize(40);
@@ -368,7 +369,7 @@ void Inventory_Item_Use_Name(char* name)
 		Inventory_Add_Item_Name("trash");
 		Inventory_Add_Item_Name("trash");
 	}
-	else if (!strcmp(name, "Add Health Flower"))
+	else if (!strcmp(name, "Health Potion"))
 	{
 		Player_Add_Health(1);
 		Inventory_Item_Remove_Name(name);

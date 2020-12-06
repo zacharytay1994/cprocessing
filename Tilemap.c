@@ -46,8 +46,8 @@ void Tilemap_Initialize()
 	CP_Image_GetPixelData(tilemap_ground_normal_map, (unsigned char*)tilemap_ground_normal_map_data);
 	CP_Image_GetPixelData(tilesheets[tilemap_active_tilesheet]._images[0], (unsigned char*)tilemap_tile_data);
 	CP_Image_GetPixelData(tilemap_ground, (unsigned char*)tilemap_og_data);
-	tilemap_test_light = LightStage_AddLight(CP_Vector_Set(0.0f,0.0f), 500.0f, 1000.0f, -1.0f, 0, 100);
-	LightStage_SetPosition(tilemap_test_light, (CP_Vector) { 1400.0f, 0.0f });
+	tilemap_test_light = LightStage_AddLight(CP_Vector_Set(0.0f,0.0f), 800.0f, 800.0f, -1.0f, 0, 100);
+	//LightStage_SetPosition(tilemap_test_light, (CP_Vector) { 1400.0f, 0.0f });
 
 	tilemap_highlight_cursor = CP_Image_Load("./Sprites/cursor.png");
 	tilemap_highlight_position = (CP_Vector){ 0.0f, 0.0f };
