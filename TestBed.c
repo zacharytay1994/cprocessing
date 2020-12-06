@@ -12,6 +12,7 @@
 #include "Enemy.h"
 #include "LightStage.h"
 #include "LePlant.h"
+#include "GameGUI.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,6 +29,9 @@ float cam_y = 0.0f;
 
 int tilemap;
 
+float TestBed_window_width;
+float TestBed_window_height;
+float TestBed_testbed_icon_size = 0.02f;
 // temp
 CP_Image TestBed_house;
 //CP_Image TestBed_house_modified;
@@ -39,8 +43,8 @@ CP_Vector house_position;
 //CP_Vector house_top_left_pos;
 int House_health;
 int House_max_health = 10;
-float House_heart_offset_x = 50.0f;
-float House_heart_offset_y = 100.0f;
+float House_heart_offset_x = 0.25f;
+float House_heart_offset_y = 0.05f;
 float House_heart_spacing = 60.0f;
 
 TB_Zombie tb_zombies[TESTBED_ZOMBIES_MAX];
@@ -81,7 +85,9 @@ int souls_money = 0;
 void TestBed_Init()
 {
 	printf("Switched to testbed.\n");
-
+	TestBed_window_width = (float)CP_System_GetWindowWidth();
+	TestBed_window_height = (float)CP_System_GetWindowHeight(); 
+	TestBed_testbed_icon_size *= TestBed_window_width;
 	// temp
 	TestBed_house = CP_Image_Load("./Sprites/house.png");
 	/*TestBed_house_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house));
@@ -173,6 +179,8 @@ void TestBed_Init()
 	LightStage_Initialize();
 	LePlant_Init();
 	LePlant_BindTilemap(tilemap);
+	GameGUI_Init();
+	CP_Font_Set(CP_Font_Load("Assets/Fonts/zrnic rg.ttf"));
 }
 
 void TestBed_Update(const float dt)
@@ -194,7 +202,7 @@ void TestBed_Update(const float dt)
 	//Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
 	Player_Render();
 	for (int j = 0; j < House_health; j++) {
-		CP_Image_Draw(TestBed_house, House_heart_offset_x + j * House_heart_spacing, House_heart_offset_y, 45.0f, 45.0f, 255);
+		CP_Image_Draw(TestBed_house, House_heart_offset_x*TestBed_window_width + j * House_heart_spacing, House_heart_offset_y*TestBed_window_height, TestBed_testbed_icon_size, TestBed_testbed_icon_size, 255);
 	}
 	Player_Update(dt);
 	GUI_Update(dt);
@@ -276,6 +284,7 @@ void TestBed_Update(const float dt)
 	LightStage_Update(dt);
 	LePlant_Update(dt);
 	Tilemap_HighlightMouseTile(tilemap);
+	GameGUI_Render(dt);
 }
 
 void TestBed_Exit()
@@ -305,9 +314,10 @@ void DayNightManager(float dt)
 
 		// Display if DAY
 		sprintf_s(wave_status, 127, "(DAY) time left: %.0f", interval_counter);
-		CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
+		/*CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
 		CP_Settings_TextSize(50.f);
-		CP_Font_DrawText(wave_status, 1150, 50);
+		CP_Font_DrawText(wave_status, 1150, 50);*/
+		GameGUI_DrawText((CP_Color) { 255, 255, 255, 255 }, wave_status, 0.98f, 0.02f, 0.03f, CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_TOP);
 	}
 	else	// not interval, spawning enemy waves
 	{
@@ -323,14 +333,16 @@ void DayNightManager(float dt)
 
 		// Display if NIGHT
 		sprintf_s(wave_status, 127, "(NIGHT) time left: %.0f", wave_timer);
-		CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
-		CP_Font_DrawText(wave_status, 1150, 50);
+		/*CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
+		CP_Font_DrawText(wave_status, 1150, 50);*/
+		GameGUI_DrawText((CP_Color) { 255, 100, 100, 255 }, wave_status, 0.98f, 0.02f, 0.03f, CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_TOP);
 
 		if (wave_count % 10 == 0 && wave_count != 0)
 		{
 			sprintf_s(wave_status, 127, "WARNING!");
-			CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
-			CP_Font_DrawText(wave_status, 1150, 150);
+			/*CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
+			CP_Font_DrawText(wave_status, 1150, 150);*/
+			GameGUI_DrawText((CP_Color) { 255, 100, 100, 255 }, wave_status, 0.98f, 0.02f, 0.03f, CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_TOP);
 		}
 	}
 
@@ -339,15 +351,16 @@ void DayNightManager(float dt)
 	sprintf_s(curr_Timer, 127, "Time: %.0f", timer);
 	CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
 	CP_Font_DrawText(curr_Timer, 20, 170);
-
+	
 	sprintf_s(money_display, 127, "Souls: %d", souls_money);
 	CP_Settings_Fill((CP_Color) { 175, 205, 255, 255 });
 	CP_Font_DrawText(money_display, 20, 230);
 
 	// Simple wave count (nothing much)
 	sprintf_s(wave_display, 127, "WAVE %d", wave_count);
-	CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
-	CP_Font_DrawText(wave_display, 1150, 100);
+	/*CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
+	CP_Font_DrawText(wave_display, 1150, 100);*/
+	GameGUI_DrawText((CP_Color) { 255, 255, 255, 255 }, wave_display, 0.98f, 0.07f, 0.03f, CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_TOP);
 }
 
 void TestBed_SpawnZombie()

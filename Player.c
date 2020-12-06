@@ -3,6 +3,7 @@
 #include "Inventory.h"
 #include "Particles.h"
 #include "LightStage.h"
+#include "GameGUI.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -137,6 +138,9 @@ void Player_AddPlayer(const CP_Vector pos, const float mass, const float bwidth,
 
 void Player_Update(const float dt)
 {
+	if (CP_Input_KeyDown(KEY_J)) {
+		Player_Lose_Health(1);
+	}
 	if (!Player_initialized && CP_Input_KeyReleased(KEY_I)) {
 		// initialize player at the center of the screen
 		CP_Vector position = CP_Vector_Set(200.0f, -800.0f);
@@ -170,14 +174,14 @@ void Player_Update(const float dt)
 	Player_Input(dt);
 
 	// temp render player ui
-	int j = 0;
+	/*int j = 0;
 	for (j = 0; j < Player_health; j++) {
 		CP_Image_Draw(Player_heart, Player_heart_offset_x + j * Player_heart_spacing, Player_heart_offset_y, 60.0f, 60.0f, 255);
 	}
 	for (j; j < Player_max_health; j++)
 	{
 		CP_Image_Draw(Player_blackheart, Player_heart_offset_x + j * Player_heart_spacing, Player_heart_offset_y, 60.0f, 60.0f, 255);
-	}
+	}*/
 	Player_WeaponUpdate(dt);
 }
 
@@ -614,6 +618,10 @@ void Player_Lose_Health(int x)
 	{
 		Player_health = 0;
 	}
+	// set healthscale on gui
+	GameGUI_SetHealthScale((float)Player_health / (float)Player_max_health);
+	// shake screen
+	Camera_Shake(5.0f);
 }
 
 void Player_Add_MaxHealth(int x)

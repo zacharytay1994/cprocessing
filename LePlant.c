@@ -54,8 +54,8 @@ void LePlant_Update(const float dt)
 			{
 				Sprite* sprite = Sprite_GetSprite(Plant_id[i]);
 				CP_Vector plant_pos = Sprite_GetPosition(Plant_id[i]);
-				float left = plant_pos.x - 100.0f * LEPLANT_PLANT_SCALE;
-				float right = plant_pos.x + 100.0f * LEPLANT_PLANT_SCALE;
+				float left = plant_pos.x - 45.0f;
+				float right = plant_pos.x + 45.0f;
 				float up = plant_pos.y - 100.0f * LEPLANT_PLANT_SCALE;
 				float down = plant_pos.y + 150.0f * LEPLANT_PLANT_SCALE;
 				if (!(mouse.x < left || mouse.x > right || mouse.y < up || mouse.y > down))
@@ -74,7 +74,7 @@ void LePlant_Update(const float dt)
 						temp2 = Sprite_AddSpriteRepeatAuto(plant_pos, 250.0f, 250.0f, potion_mr);
 						Potion_id[potion_id] = temp2;
 						potion_id += 1;
-						Sprite_OptOut(temp2, 0);
+						//Sprite_OptOut(temp2, 0);
 
 						Sprite_SetPosition(Plant_id[i], cp_vector_reset);
 
@@ -107,6 +107,9 @@ void LePlant_Update(const float dt)
 
 void LePlant_Render(const float dt)
 {
+	for (int i = 0; i < potion_id; ++i) {
+		Sprite_RenderSprite(dt, Potion_id[i]);
+	}
 	for (int i = 0; i < plant_id; ++i) {
 		Sprite_RenderSprite(dt, Plant_id[i]);
 	}
