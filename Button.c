@@ -592,6 +592,11 @@ char Button_Active_Set(int id, char x)
 	return x;
 }
 
+void Button_Escape()
+{
+	CP_Settings_TextAlignment(CP_TEXT_ALIGN_H_LEFT, CP_TEXT_ALIGN_V_MIDDLE);
+}
+
 /*!
 @brief Initializes the button class
 *//*________________________________________________________________________
