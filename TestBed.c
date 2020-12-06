@@ -34,13 +34,13 @@ float TestBed_window_height;
 float TestBed_testbed_icon_size = 0.02f;
 // temp
 CP_Image TestBed_house;
-//CP_Image TestBed_house_modified;
-//CP_Image TestBed_house_normal_map;
-//void* TestBed_house_data;
-//void* TestBed_house_modified_data;
-//void* TestBed_house_normal_data;
+CP_Image TestBed_house_modified;
+CP_Image TestBed_house_normal_map;
+void* TestBed_house_data;
+void* TestBed_house_modified_data;
+void* TestBed_house_normal_data;
 CP_Vector house_position;
-//CP_Vector house_top_left_pos;
+CP_Vector house_top_left_pos;
 int House_health;
 int House_max_health = 10;
 float House_heart_offset_x = 0.25f;
@@ -82,6 +82,10 @@ double spawndelay = 2;
 int biggus = 0;
 int souls_money = 0;
 
+float TestBed_player_invuln_timer = 1.0f;
+float TestBed_player_invuln_timer_counter = 1.0f;
+int TestBed_player_invuln = 0;
+
 void TestBed_Init()
 {
 	printf("Switched to testbed.\n");
@@ -90,7 +94,7 @@ void TestBed_Init()
 	TestBed_testbed_icon_size *= TestBed_window_width;
 	// temp
 	TestBed_house = CP_Image_Load("./Sprites/house.png");
-	/*TestBed_house_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house));
+	TestBed_house_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house));
 	CP_Image_GetPixelData(TestBed_house, TestBed_house_data);
 
 	TestBed_house_modified = CP_Image_CreateFromData(160, 160, TestBed_house_data);
@@ -99,10 +103,10 @@ void TestBed_Init()
 
 	TestBed_house_normal_map = CP_Image_Load("./Sprites/house_normal.png");
 	TestBed_house_normal_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house_normal_map));
-	CP_Image_GetPixelData(TestBed_house_normal_map, TestBed_house_normal_data);*/
+	CP_Image_GetPixelData(TestBed_house_normal_map, TestBed_house_normal_data);
 
 	house_position = (CP_Vector){ 1000.0f,1045.0f };
-	//house_top_left_pos = CP_Vector_Subtract(house_position, (CP_Vector) { 300.0f, 300.0f });
+	house_top_left_pos = CP_Vector_Subtract(house_position, (CP_Vector) { 300.0f, 300.0f });
 	House_health = House_max_health;
 	// temp zombie
 	tb_zombie_spawn_position = (CP_Vector){ 3300.0f,1150.0f };
@@ -192,12 +196,14 @@ void TestBed_Update(const float dt)
 	// render house in the middle
 	CP_Vector TestBed_house_position = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), house_position);
 	//CP_Vector mouse_pos = (CP_Vector){ (float)CP_Input_GetMouseX(), (float)CP_Input_GetMouseY() };
-	/*LightStage_ApplyNormalMap(TestBed_house_modified_data, TestBed_house_normal_data, TestBed_house_data, house_top_left_pos,
-		300.0f, 300.0f, 160, 160, &mouse_pos, 1);
-	CP_Image_UpdatePixelData(TestBed_house_modified, TestBed_house_modified_data);*/
+	CP_Vector* pos = LightStage_GetLightPositionsArray();
+	int pos_size = LightStage_GetLightPositionsSize();
+	LightStage_ApplyNormalMap(TestBed_house_modified_data, TestBed_house_normal_data, TestBed_house_data, house_top_left_pos,
+		300.0f, 300.0f, 160, 160, pos, pos_size);
+	CP_Image_UpdatePixelData(TestBed_house_modified, TestBed_house_modified_data);
 	//// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
-	CP_Image_Draw(TestBed_house, TestBed_house_position.x, TestBed_house_position.y, 300.0f, 300.0f, 255);
+	CP_Image_Draw(TestBed_house_modified, TestBed_house_position.x, TestBed_house_position.y, 300.0f, 300.0f, 255);
 	UpdateEnemy(dt);
 	//Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
 	Player_Render();
@@ -228,7 +234,7 @@ void TestBed_Update(const float dt)
 		}
 		if (spawndelay <= 0.0)	// delay between each enemy spawn
 		{
-			CreateEnemy(10.f,
+			CreateEnemy(2.f,
 				(CP_Vector){ 2300.0f,1150.0f },
 				(CP_Vector){200.f,200.f},
 				100.f, 3);	//spawn type 3 enemy(toothpaste guy)
@@ -284,7 +290,8 @@ void TestBed_Update(const float dt)
 	LightStage_Update(dt);
 	LePlant_Update(dt);
 	Tilemap_HighlightMouseTile(tilemap);
-	GameGUI_Render(dt);
+	GameGUI_Render(dt); 
+	TestBed_CheckPlayerOnZomb(dt);
 }
 
 void TestBed_Exit()
@@ -477,6 +484,31 @@ void TestBed_CheckBombOnZomb()
 					}
 				}
 			}
+		}
+	}
+}
+
+void TestBed_CheckPlayerOnZomb(const float dt)
+{
+	if (!TestBed_player_invuln) {
+		CP_Vector pos = Player_GetPosition(0);
+		for (int j = 0; j < ENEMY_MAX_ENEMIES; ++j) {
+			if (enemy_list[j]._initialized && enemy_list[j].isAlive) {
+				if (CheckEnemyCollision(pos.x + 30.0f, pos.y + 30.0f,
+					pos.x - 30.0f, pos.y - 30.0f, j)) {
+					Player_Lose_Health(1);
+					TestBed_player_invuln = 1;
+				}
+			}
+		}
+	}
+	else {
+		if (TestBed_player_invuln_timer_counter > 0.0f) {
+			TestBed_player_invuln_timer_counter -= dt;
+		}
+		else {
+			TestBed_player_invuln = 0;
+			TestBed_player_invuln_timer_counter = TestBed_player_invuln_timer;
 		}
 	}
 }

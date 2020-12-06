@@ -620,8 +620,9 @@ void Player_Lose_Health(int x)
 	}
 	// set healthscale on gui
 	GameGUI_SetHealthScale((float)Player_health / (float)Player_max_health);
+	GameGUI_SetRedHitRatio(255.0f);
 	// shake screen
-	Camera_Shake(5.0f);
+	Camera_Shake(6.0f);
 }
 
 void Player_Add_MaxHealth(int x)

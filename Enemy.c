@@ -77,7 +77,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		path_id = enemy_one;
 		new_enemy.ene_dmg = 1;
 		
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 30.f };
 		break;
 	}
@@ -88,7 +88,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		new_enemy.enem_Size.x = size.x * 2.5f;
 		new_enemy.enem_Size.y = size.y * 2.5f;
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
 
 		break;
 	}
@@ -103,7 +103,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		enem_sprite_frames = 8;
 		enem_sprite_animate_speed = 50;
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
 
 		break;
 	}
@@ -118,7 +118,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		enem_sprite_frames = 6;
 		enem_sprite_animate_speed = 5;
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
 
 		break;
 	}
@@ -146,7 +146,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		enem_sprite_row = 1;
 		enem_sprite_frames = 1;
 		enem_sprite_animate_speed = 1;
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 30.f };
 		break;
 	}
