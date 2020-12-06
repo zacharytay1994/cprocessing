@@ -12,6 +12,7 @@ _*/
 #include <stdio.h>
 #include <stdlib.h>
 
+int Button_temp_bool = 0;
 /*!
 @brief Initializes a button with default settings
 @return the ID of the button
@@ -370,19 +371,34 @@ void Button_Mouse_Collision_Check_All()
 _*/
 char Button_Mouse_Collision_Check(int id)
 {
-	if (CP_Input_GetMouseWorldX() > button_list[scene_id][id].Position.x
-		&& CP_Input_GetMouseWorldX() < button_list[scene_id][id].Position.x + button_list[scene_id][id].Size.x
-		&& CP_Input_GetMouseWorldY() > button_list[scene_id][id].Position.y
-		&& CP_Input_GetMouseWorldY() < button_list[scene_id][id].Position.y + button_list[scene_id][id].Size.y)
-	{
-		button_list[scene_id][id].Hover = 1;
-		return 1;
+	if (!Button_temp_bool) {
+		if (CP_Input_GetMouseWorldX() > button_list[scene_id][id].Position.x
+			&& CP_Input_GetMouseWorldX() < button_list[scene_id][id].Position.x + button_list[scene_id][id].Size.x
+			&& CP_Input_GetMouseWorldY() > button_list[scene_id][id].Position.y
+			&& CP_Input_GetMouseWorldY() < button_list[scene_id][id].Position.y + button_list[scene_id][id].Size.y)
+		{
+			button_list[scene_id][id].Hover = 1;
+			return 1;
+		}
+		else
+		{
+			button_list[scene_id][id].Hover = 0;
+		}
 	}
-	else
-	{
-		button_list[scene_id][id].Hover = 0;
+	else {
+		if (CP_Input_GetMouseWorldX() > button_list[scene_id][id].Position.x - button_list[scene_id][id].Size.x/2.0f
+			&& CP_Input_GetMouseWorldX() < button_list[scene_id][id].Position.x + button_list[scene_id][id].Size.x/2.0f
+			&& CP_Input_GetMouseWorldY() > button_list[scene_id][id].Position.y
+			&& CP_Input_GetMouseWorldY() < button_list[scene_id][id].Position.y + button_list[scene_id][id].Size.y)
+		{
+			button_list[scene_id][id].Hover = 1;
+			return 1;
+		}
+		else
+		{
+			button_list[scene_id][id].Hover = 0;
+		}
 	}
-
 	return 0;
 }
 
@@ -537,6 +553,11 @@ void Button_Render(int id)
 	CP_Settings_Fill(button_list[scene_id][id].Text_Color);
 	CP_Settings_TextSize(button_list[scene_id][id].Text_Size);
 	CP_Font_DrawText(button_list[scene_id][id].Text, button_list[scene_id][id].Text_Position.x, button_list[scene_id][id].Text_Position.y);
+}
+
+void Button_SetTempBool(int b)
+{
+	Button_temp_bool = b;
 }
 
 /*!

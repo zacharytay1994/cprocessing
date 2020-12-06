@@ -127,3 +127,10 @@ void Camera_Shake_Update(const float dt)
 	Camera_screenshake_offset = (CP_Vector){ CP_Random_RangeFloat(-5.0f * Camera_screenshake_amount, 5.0f * Camera_screenshake_amount),
 											CP_Random_RangeFloat(-5.0f * Camera_screenshake_amount, 5.0f * Camera_screenshake_amount) };
 }
+
+void Camera_Reset()
+{
+	_position = CP_Vector_Set(0.0f, 0.0f);
+	_inverse_position = CP_Vector_Set(0.0f, 0.0f);
+	Camera_bound = 0;
+}

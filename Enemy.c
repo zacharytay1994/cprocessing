@@ -12,6 +12,8 @@ int enemy_four;
 int enemy_five;
 int enemyhp_Sprite;
 
+CP_Sound Enemy_death_sound;
+
 //float HP_maxSpriteSize;
 
 // Enemy Stuff - 
@@ -56,6 +58,7 @@ void Enemy_Initialize()
 	for (int i = 0; i < 127; ++i) {
 		enemy_list[i]._initialized = 0;
 	}
+	Enemy_death_sound = CP_Sound_Load("./Assets/Notes/a.wav");
 }
 
 void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int enemy_type)
@@ -344,6 +347,7 @@ int GetEnemyMoney(int id)
 void SetEnemyDie(int id)
 {
 	enemy_list[id].isAlive = 0;
+	CP_Sound_Play(Enemy_death_sound);
 }
 
 void EnemyTakeDamage(int id, int dmg)

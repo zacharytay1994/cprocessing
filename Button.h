@@ -67,3 +67,4 @@ int Button_Initialize(CP_Vector position, CP_Vector size, CP_Vector text_positio
 
 
 void Button_Render(int id);
+void Button_SetTempBool(int b);

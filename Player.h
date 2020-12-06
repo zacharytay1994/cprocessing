@@ -97,6 +97,7 @@ void Player_Add_Health(int x);
 void Player_Lose_Health(int x);
 void Player_Add_MaxHealth(int x);
 void Player_Lose_MaxHealth(int x);
+int  Player_GetHealth();
 
 // POWERUP CODE
 float speed_multiplier;

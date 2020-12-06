@@ -333,6 +333,7 @@ void Tilemap_Free()
 	}
 	free(tilemap_tile_data_array);
 	free(tilemap_image_array);
+	normal_initialized = 0;
 }
 
 void Tilemap_GeneratePhyObjs(const int id)

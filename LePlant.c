@@ -54,6 +54,9 @@ float LePlant_bean_rotation_speed = 2000.0f;
 char* LePlant_potions[10] = { "Speed Potion", "Damage Potion", "Health Potion" };
 int LePlant_potions_upper = 2;
 
+CP_Sound LePlant_pickup;
+CP_Sound LePlant_destroy;
+
 void LePlant_Init()
 {
 	//bean_mr = Sprite_AddSpriteF((CP_Vector) { 0.0f, 0.0f }, 300.0f, 300.0f, "./Photos/Plants_PEXEL_02.png", 4, 3, 12, 0.8f, 1);
@@ -65,6 +68,8 @@ void LePlant_Init()
 
 	LePlant_bean_image = CP_Image_Load("./Photos/Plants-02.png");
 	//Particle_Initialize();
+	LePlant_pickup = CP_Sound_Load("./Assets/Piano/a.wav");
+	LePlant_destroy = CP_Sound_Load("./Assets/Notes/b.wav");
 }
 
 void LePlant_Update(const float dt)
@@ -126,6 +131,7 @@ void LePlant_Update(const float dt)
 						potion_id += 1;
 						//Sprite_OptOut(temp2, 0);
 						Sprite_SetPosition(Plant_id[i], cp_vector_reset);
+						CP_Sound_Play(LePlant_destroy);
 					}
 				}
 			}
@@ -280,6 +286,7 @@ void LePlant_CheckBeanWithPlayerPosition(const CP_Vector position, const float w
 			if (!(left_p > right_b || right_p < left_b || up_p > bottom_b || bottom_p < up_b)) {
 				// there is collision
 				LePlant_beans[i]._fly = 1;
+				CP_Sound_Play(LePlant_pickup);
 			}
 		}
 	}
@@ -307,6 +314,7 @@ void LePlant_CheckPotionWithPlayerPosition(const CP_Vector position, const float
 			// there is collision
 			Potion_id[i]._fly = 1;
 			Inventory_Add_Item_Name(LePlant_potions[Potion_id[i]._type]);
+			CP_Sound_Play(LePlant_pickup);
 		}
 	}
 }

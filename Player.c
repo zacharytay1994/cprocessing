@@ -60,6 +60,10 @@ float Player_weapon_charge_bar_increment = 0.1f;
 
 int Player_weapon_damage = 1;
 
+CP_Sound TestBed_fire;
+CP_Sound Player_injured;
+CP_Sound Player_jump;
+
 void Player_Initialize()
 {
 	Player_projectile_arc_resource = CP_Image_Load("./Sprites/ground.png");
@@ -104,6 +108,11 @@ void Player_Initialize()
 	Player_SetCameraFocus(0);
 	Player_projectiles_init = 1;
 	Player_projectiles_resource = Sprite_AddSprite(CP_Vector_Set(-1000,-1000), 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 1);
+
+	TestBed_fire = CP_Sound_Load("./Assets/Clap.wav");
+	Player_injured = CP_Sound_Load("./Assets/Piano/b.wav");
+	Player_jump = CP_Sound_Load("./Assets/Piano/f.wav");
+
 	Player_initialized = 1;
 }
 
@@ -249,6 +258,7 @@ void Player_Input(const float dt)
 		if (CP_Input_KeyDown(Player_players[i]._up) || CP_Input_KeyDown(KEY_W)) {
 			if (Player_players[i]._grounded && shape->_velocity.y > -PLAYER_MAX_VVELOCITY) {
 				PhyObj_ApplyImpulse(shape, CP_Vector_Set(0.0f, -PLAYER_APPLIED_VVELOCITY));
+				CP_Sound_Play(Player_jump);
 			}
 		}
 		if (!some_input) {
@@ -508,6 +518,7 @@ void Player_SpawnProjectile(const float dt)
 			if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
 				Player_projectiles[Player_projectiles_size++] = (Player_Projectile){ Player_projectiles_resource, 0, direction,
 				LightStage_AddLight(spawn_position, 100.0f, 1600.0f, -1.0f, 0, 100) };
+				CP_Sound_Play(TestBed_fire);
 			}
 		}
 		else {
@@ -517,6 +528,7 @@ void Player_SpawnProjectile(const float dt)
 					Sprite_AddSpriteRepeatAuto(spawn_position, 50.0f, 50.0f, Player_projectiles_resource), 0, direction,
 					LightStage_AddLight(spawn_position, 100.0f, 600.0f, -1.0f, 0, 150) };
 				Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5, 0);
+				CP_Sound_Play(TestBed_fire);
 			}
 		}
 		Camera_Shake(5.0f);
@@ -629,6 +641,7 @@ void Player_Lose_Health(int x)
 	GameGUI_SetRedHitRatio(255.0f);
 	// shake screen
 	Camera_Shake(6.0f);
+	CP_Sound_Play(Player_injured);
 }
 
 void Player_Add_MaxHealth(int x)
@@ -648,6 +661,11 @@ void Player_Lose_MaxHealth(int x)
 	{
 		Player_health = Player_max_health;
 	}
+}
+
+int Player_GetHealth()
+{
+	return Player_health;
 }
 
 void Player_Add_Powerup(int x, float duration)

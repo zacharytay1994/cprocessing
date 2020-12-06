@@ -23,3 +23,5 @@ void Camera_SetHorizontalLimit(const CP_Vector limit);
 
 void Camera_Shake(const float amount);
 void Camera_Shake_Update(const float dt);
+
+void Camera_Reset();

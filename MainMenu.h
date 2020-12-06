@@ -31,6 +31,8 @@ CP_Color Menu_Button_Text_Alpha;
 char* Menu_Button_Words;
 char  Menu_Button_Visible;
 
+CP_Sound background_music;
+CP_Sound MainMenu_jump;
 
 CP			Menu_Button_Pos;
 CP			Menu_Button_Box_Size;

@@ -13,6 +13,7 @@
 #include "LightStage.h"
 #include "LePlant.h"
 #include "GameGUI.h"
+#include "Scene.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -95,6 +96,9 @@ int h_fire = 0;
 int v_fire = 0;
 float h_delay = 1.0f;
 float v_delay = 1.0f;
+
+int TB_gameover = 0;
+CP_Image TB_gameover_image;
 
 typedef struct TB_Missiles {
 	CP_Vector _position;
@@ -179,7 +183,7 @@ void TestBed_Init()
 	Inventory_Add_Item_Name("Radioactive Thorns");*/
 
 	BGM = CP_Sound_LoadMusic("Assets/Music/ShortLoopHalf.wav");
-	//CP_Sound_PlayMusic(BGM);
+	CP_Sound_PlayMusic(BGM);
 
 	Enemy_Initialize(); // Initialize enemy sprites and values- (RAY)
 	Particle_Initialize();
@@ -215,6 +219,8 @@ void TestBed_Init()
 		missiles[i] = (TB_Missiles){ CP_Vector_Set(0.0f,0.0f), 0, -1 };
 	}
 	missile_image = CP_Image_Load("./Sprites/shuriken.png");
+	Button_SetTempBool(0);
+	TB_gameover_image = CP_Image_Load("./Sprites/light_overlay.png");
 }
 
 void TestBed_Update(const float dt)
@@ -330,6 +336,24 @@ void TestBed_Update(const float dt)
 	TestBed_RandomRainCrates(dt);
 	TestBed_DrawLineToPlayer(dt); 
 	TestBed_UpdateRenderMissiles(dt);
+
+	if (Player_GetHealth() <= 0) {
+		TB_gameover = 1;
+	}
+	if (TB_gameover) {
+		CP_Vector tb_pos = (CP_Vector){ (float)CP_System_GetWindowWidth() / 2.0f, (float)CP_System_GetWindowHeight() / 2.0f };
+		//tb_pos = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), tb_pos);
+		CP_Image_Draw(TB_gameover_image, tb_pos.x, tb_pos.y,
+			(float)CP_System_GetWindowWidth(), (float)CP_System_GetWindowHeight(), 200);
+		CP_Color tb_white = (CP_Color){ 255,255,255,255 };
+		GameGUI_DrawText(tb_white, "GAME OVER!", 0.5f, 0.5f, 0.2f,
+			CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+		GameGUI_DrawText(tb_white, "- Press Enter To Main Menu -", 0.5f, 0.8f, 0.1f,
+			CP_TEXT_ALIGN_H_CENTER, CP_TEXT_ALIGN_V_MIDDLE);
+		if (CP_Input_KeyTriggered(KEY_ENTER)) {
+			Scene_ChangeScene(3);
+		}
+	}
 }
 
 void TestBed_Exit()
@@ -340,6 +364,7 @@ void TestBed_Exit()
 	PB_Exit();
 	LightStage_Exit();
 	LePlant_Exit();
+	Camera_Reset();
 }
 
 void WaveUpdate(float dt)
@@ -649,6 +674,9 @@ void TestBed_UpdateZombies(const float dt)
 			SetEnemyHP(i, 0.f);
 
 			House_health -= GetEnemyDMG(i);
+			if (House_health <= 0) {
+				TB_gameover = 1;
+			}
 				
 		}
 	}

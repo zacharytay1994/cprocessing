@@ -10,6 +10,7 @@ _*/
 #include "GameGUI.h"
 #include <string.h>
 
+CP_Sound Inventory_click_sound;
 /*!
 @brief Initializes the Inventory class
 *//*________________________________________________________________________
@@ -44,6 +45,7 @@ void Inventory_Init()
 		}
 	}
 	inventory_is_visible = 0;
+	Inventory_click_sound = CP_Sound_Load("./Assets/Notes/f.wav");
 	//is_dragging = NULL;
 	return;
 }
@@ -370,6 +372,7 @@ void Inventory_Item_Use_Name(char* name)
 		Player_Add_Powerup(1, 10);
 		Inventory_Item_Remove_Name(name);
 		GameGUI_SetPotion(GameGUI_GetPotion() - 1);
+		CP_Sound_Play(Inventory_click_sound);
 	}
 	else if (!strcmp(name, "Damage Potion"))
 	{
@@ -378,12 +381,14 @@ void Inventory_Item_Use_Name(char* name)
 		/*Inventory_Add_Item_Name("trash");
 		Inventory_Add_Item_Name("trash");*/
 		GameGUI_SetPotion(GameGUI_GetPotion() - 1);
+		CP_Sound_Play(Inventory_click_sound);
 	}
 	else if (!strcmp(name, "Health Potion"))
 	{
 		Player_Add_Health(1);
 		Inventory_Item_Remove_Name(name);
 		GameGUI_SetPotion(GameGUI_GetPotion() - 1);
+		CP_Sound_Play(Inventory_click_sound);
 	}
 	else if (!strcmp(name, "Add MaxHealth Flower"))
 	{

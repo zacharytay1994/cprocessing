@@ -13,9 +13,13 @@ _*/
 #include "MainMenu.h"
 #include "Scene.h"
 #include "Sprite.h"
+#include "Camera.h"
+
+int MainMenu_sound_bool = 0;
 
 void MainMenu_Initialize()
 {
+	Camera_Reset();
 	PI = 3.149f;
 
 	window_width	= (float)CP_System_GetWindowWidth();
@@ -121,7 +125,9 @@ void MainMenu_Initialize()
 	menu_font = CP_Font_Load("Assets/Fonts/zrnic rg.ttf");
 	CP_Font_Set(menu_font);
 
-
+	background_music = CP_Sound_LoadMusic("Assets/Music/ShortLoopHalf.wav");
+	MainMenu_jump = CP_Sound_LoadMusic("Assets/Cowbell.wav");
+	CP_Sound_PlayMusic(background_music);
 
 	Menu_P_Jump_Width	= 180.0f;
 	Menu_P_Jump_Height	= 180.0f;
@@ -131,6 +137,7 @@ void MainMenu_Initialize()
 	Menu_P_Jump_Check = window_width_div5;
 	Menu_P_Jump_Id = Sprite_AddSprite(Menu_P_Jump_Pos, Menu_P_Jump_Width, Menu_P_Jump_Height , "./Sprites/p_run_01.png", 2, 3, 6, 10, 0);
 	
+	Button_SetTempBool(1);
 	return;
 }
 
@@ -193,9 +200,12 @@ void MainMenu_Update(const float dt)
 			Sprite_SetFlip(Menu_P_Jump_Id, 0);
 			Menu_P_Jump_Pos.x -= Menu_P_Jump_Pos_Speed;
 		}
+		if (MainMenu_sound_bool) { MainMenu_sound_bool = 0; }
 	}
 	else
 	{
+		if (!MainMenu_sound_bool) { CP_Sound_Play(MainMenu_jump); MainMenu_sound_bool = 1; }
+		
 		Menu_P_Jump_Get_Pos.x = Menu_P_Jump_Check;
 	}
 	
