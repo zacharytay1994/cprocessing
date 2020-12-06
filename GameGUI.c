@@ -24,10 +24,14 @@ CP_Image GameGUI_red_overlay;
 float GameGUI_red_overlay_ratio = 0.0f; 
 float Game_GUI_red_overlay_decrement = 1000.0f;
 
+CP_Image GameGUI_green_overlay;
+float GameGUI_green_overlay_ratio = 0.0f;
+float Game_GUI_green_overlay_decrement = 1000.0f;
+
 CP_Image GameGUI_potion_icon;
 CP_Image GameGUI_bean_icon;
 
-int GameGUI_potion_count = 0;
+int GameGUI_potion_count = 3;
 int GameGUI_bean_count = 0;
 char GameGUI_text[GAMEGUI_TEXT_SIZE];
 
@@ -47,6 +51,7 @@ void GameGUI_Init()
 	GameGUI_player_health_bar = CP_Image_Load("./Sprites/health_bar.png");
 	GameGUI_player_health_bar2 = CP_Image_Load("./Sprites/health_bar2.png");
 	GameGUI_red_overlay = CP_Image_Load("./Sprites/on_hit_overlay.png");
+	GameGUI_green_overlay = CP_Image_Load("./Sprites/on_heal_overlay.png");
 	GameGUI_potion_icon = CP_Image_Load("./Photos/potions-11.png");
 	GameGUI_bean_icon = CP_Image_Load("./Photos/Plants-02.png");
 	GameGUI_player_healthicon_position = (CP_Vector){ 0.2f,0.2f };
@@ -62,6 +67,7 @@ void GameGUI_Init()
 void GameGUI_Render(const float dt)
 {
 	GameGUI_RenderHitOverlay(dt);
+	GameGUI_RenderHealOverlay(dt);
 	// calculate bar scale and position
 	float x_offset = ((GameGUI_player_health_size.x * GameGUI_screen_width * (1.0f - health_ratio)) / 2.0f);
 	float x_offset_2 = ((GameGUI_player_health_size.x * GameGUI_screen_width * (1.0f - health_ratio_lerp)) / 2.0f);
@@ -120,6 +126,22 @@ void GameGUI_RenderHitOverlay(const float dt)
 void GameGUI_SetRedHitRatio(const float value)
 {
 	GameGUI_red_overlay_ratio = value;
+}
+
+void GameGUI_RenderHealOverlay(const float dt)
+{
+	// decrease green overlay ratio
+	if (GameGUI_green_overlay_ratio > 0.0f) {
+		GameGUI_green_overlay_ratio -= Game_GUI_green_overlay_decrement * dt;
+	}
+	CP_Settings_BlendMode(CP_BLEND_ADD);
+	CP_Image_Draw(GameGUI_green_overlay, GameGUI_screen_half_width, GameGUI_screen_half_height, GameGUI_screen_width, GameGUI_screen_height, (int)GameGUI_green_overlay_ratio);
+	CP_Settings_BlendMode(CP_BLEND_ALPHA);
+}
+
+void GameGUI_SetRedHealRatio(const float value)
+{
+	GameGUI_green_overlay_ratio = value;
 }
 
 int GameGUI_GetBean()

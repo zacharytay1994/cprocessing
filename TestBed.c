@@ -134,22 +134,22 @@ void TestBed_Init()
 	Player_Initialize();
 	PB_Initialize();
 	Inventory_Init();
-	Inventory_Item_Create("Speed Up");
-	Inventory_Add_Item_Name("Speed Up");
-	Inventory_Item_Set_Image("Speed Up", "demo_test.png");
-	Inventory_Item_Set_Description("Speed Up", "Increases speed temporarily");
+	Inventory_Item_Create("Speed Potion");
+	Inventory_Add_Item_Name("Speed Potion");
+	Inventory_Item_Set_Image("Speed Potion", "./Photos/speed_potion.png");
+	Inventory_Item_Set_Description("Speed Potion", "Increases speed temporarily!");
 
 	Inventory_Item_Create("Health Potion");
-	Inventory_Item_Set_Image("Health Potion", "./Photos/Potions-11.png");
-	Inventory_Item_Set_Description("Health Potion", "Increases health by 1");
+	Inventory_Item_Set_Image("Health Potion", "./Photos/health_potion.png");
+	Inventory_Item_Set_Description("Health Potion", "Increases health by 1!");
 	Inventory_Add_Item_Name("Health Potion");
 
-	Inventory_Item_Create("Add MaxHealth Flower");
-	Inventory_Item_Set_Image("Add MaxHealth Flower", "Assets/Items/AddMaxHealthFlower.png");
-	Inventory_Item_Set_Description("Add MaxHealth Flower", "Increases maximum health by 1");
-	Inventory_Add_Item_Name("Add MaxHealth Flower");
+	Inventory_Item_Create("Damage Potion");
+	Inventory_Item_Set_Image("Damage Potion", "./Photos/damage_potion.png");
+	Inventory_Item_Set_Description("Damage Potion", "Increases weapon damage by 1!");
+	Inventory_Add_Item_Name("Damage Potion");
 
-	Inventory_Item_Create("Thorns");
+	/*Inventory_Item_Create("Thorns");
 	Inventory_Item_Set_Image("Thorns", "Assets/Items/Thorns.png");
 	Inventory_Item_Set_Description("Thorns", "Lose 1 health");
 	Inventory_Add_Item_Name("Thorns");
@@ -157,10 +157,10 @@ void TestBed_Init()
 	Inventory_Item_Create("Radioactive Thorns");
 	Inventory_Item_Set_Image("Radioactive Thorns", "Assets/Items/RadioThorns.png");
 	Inventory_Item_Set_Description("Radioactive Thorns", "Lose 1 maximum health");
-	Inventory_Add_Item_Name("Radioactive Thorns");
+	Inventory_Add_Item_Name("Radioactive Thorns");*/
 
 	BGM = CP_Sound_LoadMusic("Assets/Music/ShortLoopHalf.wav");
-	CP_Sound_PlayMusic(BGM);
+	//CP_Sound_PlayMusic(BGM);
 
 	Enemy_Initialize(); // Initialize enemy sprites and values- (RAY)
 	Particle_Initialize();
@@ -412,7 +412,7 @@ void DayNightManager(float dt)
 			sprintf_s(wave_status, 127, "WARNING!");
 			/*CP_Settings_Fill((CP_Color) { 255, 100, 100, 255 });
 			CP_Font_DrawText(wave_status, 1150, 150);*/
-			GameGUI_DrawText((CP_Color) { 255, 100, 100, 255 }, wave_status, 0.98f, 0.02f, 0.03f, CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_TOP);
+			GameGUI_DrawText((CP_Color) { 255, 100, 100, 255 }, wave_status, 0.98f, 0.12f, 0.03f, CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_TOP);
 		}
 	}
 
@@ -420,11 +420,12 @@ void DayNightManager(float dt)
 	timer += dt;
 	sprintf_s(curr_Timer, 127, "Time: %.0f", timer);
 	CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
-	CP_Font_DrawText(curr_Timer, wind_Width/15, wind_Height/5.5f);
+	//CP_Font_DrawText(curr_Timer, wind_Width/15, wind_Height/5.5f);
+	GameGUI_DrawText((CP_Color) { 255, 255, 255, 255 }, curr_Timer, 0.75f, 0.02f, 0.03f, CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_TOP);
 
-	sprintf_s(money_display, 127, "Souls: %d", souls_money);
+	/*sprintf_s(money_display, 127, "Souls: %d", souls_money);
 	CP_Settings_Fill((CP_Color) { 175, 205, 255, 255 });
-	CP_Font_DrawText(money_display, wind_Width / 15, wind_Height / 4);
+	CP_Font_DrawText(money_display, wind_Width / 15, wind_Height / 4);*/
 
 	// Simple wave count (nothing much)
 	sprintf_s(wave_display, 127, "WAVE %d", wave_count);

@@ -13,7 +13,9 @@ void GameGUI_DrawText(CP_Color colour, const char* text, const float x, const fl
 void GameGUI_SetHealthScale(const float scale);
 
 void GameGUI_RenderHitOverlay(const float dt);
-void GameGUI_SetRedHitRatio(const float value);
+void GameGUI_SetRedHitRatio(const float value); 
+void GameGUI_RenderHealOverlay(const float dt);
+void GameGUI_SetRedHealRatio(const float value);
 
 int GameGUI_GetBean();
 int GameGUI_GetPotion();

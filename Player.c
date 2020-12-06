@@ -58,6 +58,8 @@ float Player_weapon_charge_timer = 0.0f;
 int	  Player_weapon_charge_min_bar = 6;
 float Player_weapon_charge_bar_increment = 0.1f;
 
+int Player_weapon_damage = 1;
+
 void Player_Initialize()
 {
 	Player_projectile_arc_resource = CP_Image_Load("./Sprites/ground.png");
@@ -528,7 +530,7 @@ void Player_SpawnProjectile(const float dt)
 void Player_ProjectileUpdate(const float dt)
 {
 	// check for spawning
-	if (CP_Input_MouseClicked()) {
+	if (CP_Input_MouseClicked() && !Inventory_Visible()) {
 		Player_projectile_fire = 1;
 	}
 	//CP_Vector position = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
@@ -610,7 +612,7 @@ void Player_Add_Health(int x)
 		Player_health = Player_max_health;
 	}
 	GameGUI_SetHealthScale((float)Player_health / (float)Player_max_health);
-	GameGUI_SetRedHitRatio(255.0f);
+	GameGUI_SetRedHealRatio(150.0f);
 }
 
 void Player_Lose_Health(int x)
@@ -660,6 +662,9 @@ void Player_Add_Powerup(int x, float duration)
 				{
 					speed_multiplier = 5.0f;
 					break;
+				}
+				case 2: {
+					Player_weapon_damage += 1;
 				}
 			}
 		}

@@ -12,8 +12,8 @@ _*/
 #include "Button.h"
 #include "Player.h"
 
-#define				BROWN	CP_Color_Create(150, 75, 0, 255)
-#define			DARK_BROWN	CP_Color_Create(125, 50, 0, 255)
+#define				BROWN	CP_Color_Create(150, 75, 0, 150)
+#define			DARK_BROWN	CP_Color_Create(125, 50, 0, 150)
 #define				BLUE	CP_Color_Create(0, 0, 255, 255)
 #define				BLACK	CP_Color_Create(0, 0, 0, 255)
 #define	TRANSLUCENT_WHITE	CP_Color_Create(255, 255, 255, 200)
@@ -48,6 +48,7 @@ int Inventory_Add_Item_ID(int id);
 int Inventory_Add_Item_Name(char* name);
 void Inventory_Update();
 void Inventory_Render();
+int Inventory_Visible();
 
 struct inventory_item Inventory_Stock_Get_Struct_By_Name(char* name);
 struct inventory_item Inventory_Stock_Get_Struct_By_ID(int id);

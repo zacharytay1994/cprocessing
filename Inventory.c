@@ -7,6 +7,7 @@
 *//*__________________________________________________________________________
 _*/
 #include "Inventory.h"
+#include "GameGUI.h"
 #include <string.h>
 
 /*!
@@ -153,18 +154,23 @@ void Inventory_Render()
 			}
 
 			CP_Settings_Fill(TRANSLUCENT_WHITE);
-			CP_Graphics_DrawRect(CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY() - 28, longeststring * 18 + 10, 40 * (float)(1 + !!(strcmp(hover_display_desc, "No description"))));
+			CP_Graphics_DrawRect(CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY() + 32, longeststring * 18 + 10, 40 * (float)(1 + !!(strcmp(hover_display_desc, "No description"))));
 
 			CP_Settings_Fill(BLACK);
 			CP_Settings_TextSize(40);
-			CP_Font_DrawText(hover_display, CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY());
+			CP_Font_DrawText(hover_display, CP_Input_GetMouseWorldX() + 10, CP_Input_GetMouseWorldY() + 52);
 			if (strlen(hover_display_desc) > 0 && strcmp(hover_display_desc, "No description"))
 			{
 				CP_Settings_TextSize(35);
-				CP_Font_DrawText(hover_display_desc, CP_Input_GetMouseWorldX(), CP_Input_GetMouseWorldY() + 30);
+				CP_Font_DrawText(hover_display_desc, CP_Input_GetMouseWorldX() + 10, CP_Input_GetMouseWorldY() + 82);
 			}
 		}
 	}
+}
+
+int Inventory_Visible()
+{
+	return inventory_is_visible;
 }
 
 ///////// Inventory Stock
@@ -358,21 +364,26 @@ int Inventory_Item_Remove_ID(int id)
 _*/
 void Inventory_Item_Use_Name(char* name)
 {
-	if (!strcmp(name, "Speed Up"))
+	if (!strcmp(name, "Speed Potion"))
 	{
 		//Inventory_Add_Item_Name("poop");
 		Player_Add_Powerup(1, 10);
 		Inventory_Item_Remove_Name(name);
+		GameGUI_SetPotion(GameGUI_GetPotion() - 1);
 	}
-	else if (!strcmp(name, "trash"))
+	else if (!strcmp(name, "Damage Potion"))
 	{
-		Inventory_Add_Item_Name("trash");
-		Inventory_Add_Item_Name("trash");
+		Player_Add_Powerup(2, 10);
+		Inventory_Item_Remove_Name(name);
+		/*Inventory_Add_Item_Name("trash");
+		Inventory_Add_Item_Name("trash");*/
+		GameGUI_SetPotion(GameGUI_GetPotion() - 1);
 	}
 	else if (!strcmp(name, "Health Potion"))
 	{
 		Player_Add_Health(1);
 		Inventory_Item_Remove_Name(name);
+		GameGUI_SetPotion(GameGUI_GetPotion() - 1);
 	}
 	else if (!strcmp(name, "Add MaxHealth Flower"))
 	{

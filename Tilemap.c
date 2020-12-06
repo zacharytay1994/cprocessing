@@ -218,7 +218,7 @@ void Tilemap_HighlightMouseTile(const int id)
 		mouse.y = tilemaps[id]._tile_height * tilemap_highlight_position.y + ((float)tilemaps[id]._tile_height / 2.0f);
 		mouse = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), mouse);
 		CP_Image_Draw(tilemap_highlight_cursor, mouse.x,
-			mouse.y, (float)tilemaps[id]._tile_width, (float)tilemaps[id]._tile_width, 150);
+			mouse.y, (float)tilemaps[id]._tile_width, (float)tilemaps[id]._tile_width, 20);
 	}
 }
 

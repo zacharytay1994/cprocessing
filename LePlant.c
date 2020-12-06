@@ -7,6 +7,7 @@
 #include "LePlant.h"
 #include "Tilemap.h"
 #include "GameGUI.h"
+#include "Inventory.h"
 
 #define LEPLANT_PLANT_SCALE 0.5f
 #define LEPLANT_POTION_SIZE 150
@@ -27,12 +28,14 @@ struct LePlant_Potion {
 	int _id;
 	int _fly;
 	int _active;
+	int _type;
 };
 
 int Plant_id[100] = { 0 };
 LP_Potion Potion_id[100];
 int plant_id = 0, potion_id = 0;
-int bean_mr, smokey_mr, potion_mr;
+int bean_mr, smokey_mr;
+int	potion_mr_spd, potion_mr_health, potion_mr_damage;
 int temp, temp2;
 int bool_check = 1;
 int smoke_check = 1;
@@ -48,12 +51,17 @@ CP_Image LePlant_bean_image;
 float LePlant_bean_fly_speed = 1500.0f;
 float LePlant_bean_rotation_speed = 2000.0f;
 
+char* LePlant_potions[10] = { "Speed Potion", "Damage Potion", "Health Potion" };
+int LePlant_potions_upper = 2;
+
 void LePlant_Init()
 {
 	//bean_mr = Sprite_AddSpriteF((CP_Vector) { 0.0f, 0.0f }, 300.0f, 300.0f, "./Photos/Plants_PEXEL_02.png", 4, 3, 12, 0.8f, 1);
 	bean_mr = Sprite_AddSpriteF((CP_Vector) { 0.0f, 0.0f }, 300.0f, 300.0f, "./Photos/edited_plant.png", 3, 4, 12, 0.8f, 1);
 	smokey_mr = Sprite_AddSpriteF((CP_Vector) { 0.0f, 0.0f }, 300.0f, 300.0f, "./Photos/Smoke-02.png", 1, 3, 3, 0.2f, 1);
-	potion_mr = Sprite_AddSpriteF((CP_Vector) { 0.0f, 0.0f }, 250.0f, 250.0f, "./Photos/Potions-11-sprite.png", 2, 3, 6, 5.0f, 1);
+	potion_mr_spd = Sprite_AddSpriteF((CP_Vector) { 0.0f, 0.0f }, 250.0f, 250.0f, "./Photos/speed_potion_s.png", 2, 3, 6, 5.0f, 1);
+	potion_mr_health = Sprite_AddSpriteF((CP_Vector) { 0.0f, 0.0f }, 250.0f, 250.0f, "./Photos/health_potion_s.png", 2, 3, 6, 5.0f, 1);
+	potion_mr_damage = Sprite_AddSpriteF((CP_Vector) { 0.0f, 0.0f }, 250.0f, 250.0f, "./Photos/damage_potion_s.png", 2, 3, 6, 5.0f, 1);
 
 	LePlant_bean_image = CP_Image_Load("./Photos/Plants-02.png");
 	//Particle_Initialize();
@@ -94,14 +102,27 @@ void LePlant_Update(const float dt)
 					{
 
 						Sprite_SetAlpha(Plant_id[i], 0.0f);
-						Particle_EmitOut(PT_Bean, plant_pos, 100.0f, 200.0f, -10.0f,
-							-10.0f, 20.0f, -20.0f, 3.0f,
-							1.0f, 0.0f, 0.0f, 0.04f,
-							0.02f, 225.0, 20, 2, 0);
+						Particle_EmitOut(PT_Bean, plant_pos, 150.0f, 50.0f,
+							-10.0f, -10.0f, 20.0f, -20.0f, 
+							1.5f, 0.5f, 100.0f, 10.0f,
+							-0.08f, -0.8f, 225.0, 20,
+							2, 0);
 
 						plant_pos.y += 5.0f;
-						temp2 = Sprite_AddSpriteRepeatAuto(plant_pos, LEPLANT_POTION_SIZE, LEPLANT_POTION_SIZE, potion_mr);
-						Potion_id[potion_id] = (LP_Potion){ temp2, 0, 1 };
+						int r = CP_Random_RangeInt(0, LePlant_potions_upper);
+						switch (r) {
+						case 0:
+							temp2 = Sprite_AddSpriteRepeatAuto(plant_pos, LEPLANT_POTION_SIZE, LEPLANT_POTION_SIZE, potion_mr_spd);
+							break;
+						case 1:
+							temp2 = Sprite_AddSpriteRepeatAuto(plant_pos, LEPLANT_POTION_SIZE, LEPLANT_POTION_SIZE, potion_mr_damage);
+							break;
+						case 2:
+							temp2 = Sprite_AddSpriteRepeatAuto(plant_pos, LEPLANT_POTION_SIZE, LEPLANT_POTION_SIZE, potion_mr_health);
+							break;
+						}
+						
+						Potion_id[potion_id] = (LP_Potion){ temp2, 0, 1, r };
 						potion_id += 1;
 						//Sprite_OptOut(temp2, 0);
 						Sprite_SetPosition(Plant_id[i], cp_vector_reset);
@@ -195,6 +216,7 @@ void LePlant_UpdatePotions(const float dt)
 				/*LePlant_beans[i]._active = 0;
 				GameGUI_SetBean(GameGUI_GetBean() + 1);*/
 				Potion_id[i]._active = 0;
+				GameGUI_SetPotion(GameGUI_GetPotion() + 1);
 			}
 			sprite->_position = CP_Vector_Add(sprite->_position, CP_Vector_Scale(CP_Vector_Normalize(vector), LePlant_bean_fly_speed * dt));
 			//sprite->_rotation += LePlant_bean_rotation_speed * dt;
@@ -282,6 +304,7 @@ void LePlant_CheckPotionWithPlayerPosition(const CP_Vector position, const float
 		if (!(left_p > right_b || right_p < left_b || up_p > bottom_b || bottom_p < up_b)) {
 			// there is collision
 			Potion_id[i]._fly = 1;
+			Inventory_Add_Item_Name(LePlant_potions[Potion_id[i]._type]);
 		}
 	}
 }
