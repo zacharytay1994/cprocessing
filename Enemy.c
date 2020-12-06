@@ -1,4 +1,6 @@
 #include "Enemy.h"
+#include "LePlant.h"
+#include "Particles.h"
 #include <stdio.h>
 
 
@@ -285,6 +287,11 @@ void SetEnemyHP(int id, float newHP)
 	if (enemy_list[id].health <= 0)
 	{
 		SetEnemyDie(enemy_list[id].ene_id);
+		LePlant_AddBean(enemy_list[id].position);
+		Particle_EmitOut(PT_Droplets, enemy_list[id].position, 200.0f, 300.0f,
+			-60.0f, -60.0f, 250.0f, -250.0f,
+			1.8f, 1.3f, -50.0f, -80.0f, 0.04f,
+			0.02f, 120.0f, 10, 15, 1);
 	}
 }
 

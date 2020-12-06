@@ -45,4 +45,3 @@ void SetEnemyDie(int id);
 void EnemyTakeDamage(int id, int dmg);
 
 void Enemy_Initialize();
-

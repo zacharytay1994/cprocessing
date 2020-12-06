@@ -280,7 +280,7 @@ void TestBed_Update(const float dt)
 
 	if (CP_Input_KeyReleased(KEY_J)) {
 		CP_Vector world_coords = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
-		Particle_EmitOut(PT_Dust, world_coords, 30.0f, 20.0f, 30.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5, 5);
+		Particle_EmitOut(PT_Dust, world_coords, 30.0f, 20.0f, 30.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5, 5, 0);
 	}
 	if (CP_Input_KeyReleased(KEY_K)) {
 		//Particle_Reset(particle_hold);
@@ -292,6 +292,7 @@ void TestBed_Update(const float dt)
 	Tilemap_HighlightMouseTile(tilemap);
 	GameGUI_Render(dt); 
 	TestBed_CheckPlayerOnZomb(dt);
+	LePlant_CheckBeanWithPlayerPosition(Player_GetPosition(0), 50.0f, 50.0f);
 }
 
 void TestBed_Exit()
@@ -368,6 +369,11 @@ void DayNightManager(float dt)
 	/*CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
 	CP_Font_DrawText(wave_display, 1150, 100);*/
 	GameGUI_DrawText((CP_Color) { 255, 255, 255, 255 }, wave_display, 0.98f, 0.07f, 0.03f, CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_TOP);
+}
+
+void TestBed_SpawnBean(const CP_Vector position)
+{
+
 }
 
 void TestBed_SpawnZombie()
@@ -480,7 +486,7 @@ void TestBed_CheckBombOnZomb()
 						Player_SetProjectileDead(i, 1);
 						LightStage_DeactivateLight(Player_GetProjectileLight(i));
 						LightStage_AddLight(projectile_position, 300.0f, 1600.0f, 200.0f, 0, 100);
-						Particle_EmitOut(PT_Star, projectile_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+						Particle_EmitOut(PT_Star, projectile_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5, 0);
 					}
 				}
 			}

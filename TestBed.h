@@ -24,3 +24,5 @@ void TestBed_CheckPlayerOnZomb(const float dt);
 
 // Enemy/Wave functions(RAY)
 void DayNightManager(float dt);
+
+void TestBed_SpawnBean(const CP_Vector position);

@@ -4,6 +4,7 @@
 
 #define MAX_PARTICLE_TYPES 50
 #define MAX_PARTICLES 500
+#define PARTICLE_GRAVITY 200.0f
 
 int Particle_types[MAX_PARTICLE_TYPES] = { 0 };
 int Particle_types_size = 0;
@@ -16,6 +17,7 @@ void Particle_Initialize()
 	Particle_AddParticleType("./Sprites/part_smoke.png", 2, 3, 6, 3);
 	Particle_AddParticleType("./Sprites/effect1.png", 2, 3, 6, 3);
 	Particle_AddParticleType("./Photos/Smoke-02.png", 4, 2, 8, 1);
+	Particle_AddParticleType("./Sprites/droplets.png", 2, 2, 4, 4);
 
 	// initialize particle pool
 	for (int i = 0; i < MAX_PARTICLES; ++i) {
@@ -53,6 +55,10 @@ void Particle_Update(const float dt)
 				Sprite_Reset(Particle_particles[i]._sprite);
 			}
 			//Sprite_RenderSprite(dt, Particle_particles[i]._sprite);
+			// apply gravity
+			if (Particle_particles[i]._data._gravity) {
+				Particle_particles[i]._data._position.y += PARTICLE_GRAVITY * dt;
+			}
 		}
 	}
 }
@@ -102,7 +108,7 @@ void Particle_EmitOut(const ParticleType type, const CP_Vector position,
 	const float upperLifetime, const float lowerLifetime,
 	const float upperAlphaChange, const float lowerAlphaChange,
 	const float upperScaleChange, const float lowerScaleChange,
-	const float alpha, const int fps, const int number)
+	const float alpha, const int fps, const int number, const int gravity)
 {
 	ParticleData particle_data;
 	for (int i = 0; i < number; ++i) {
@@ -122,6 +128,7 @@ void Particle_EmitOut(const ParticleType type, const CP_Vector position,
 		float random_scale_change = CP_Random_RangeFloat(lowerScaleChange , upperScaleChange);
 		particle_data._scale_change = random_scale_change;
 		particle_data._fps = fps;
+		particle_data._gravity = gravity;
 		Particle_InitParticle(type, particle_data, alpha);
 	}
 }

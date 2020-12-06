@@ -221,7 +221,7 @@ void Player_Input(const float dt)
 			}
 			else {
 				CP_Vector temp_pos = CP_Vector_Add(Player_players[i]._position, (CP_Vector) { 0.0f, 30.0f });
-				Particle_EmitOut(PT_Dust, temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5, 5);
+				Particle_EmitOut(PT_Dust, temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5, 5, 0);
 				Player_dust_timer = PLAYER_DUST_TIMER;
 			}
 		}
@@ -239,7 +239,7 @@ void Player_Input(const float dt)
 			}
 			else {
 				CP_Vector temp_pos = CP_Vector_Add(Player_players[i]._position, (CP_Vector) { 0.0f, 30.0f });
-				Particle_EmitOut(PT_Dust, temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5, 5);
+				Particle_EmitOut(PT_Dust, temp_pos, 30.0f, 30.0f, 50.0f, -30.0f, 50.0f, -50.0f, 0.5f, 0.2f, -50.0f, -80.0f, 0.2f, 0.1f, 50.0f, 5, 5, 0);
 				Player_dust_timer = PLAYER_DUST_TIMER;
 			}
 		}
@@ -499,7 +499,7 @@ void Player_SpawnProjectile(const float dt)
 	if (Player_projectile_fire) {
 		if (!Player_projectiles_init) {
 			Player_projectiles_resource = Sprite_AddSprite(spawn_position, 50.0f, 50.0f, "./Sprites/projectile1.png", 2, 3, 6, 20, 1);
-			Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+			Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5, 0);
 			LightStage_AddLight(spawn_position, 500.0f, 1000.0f, 600.0f, 0, 100);
 			Player_projectiles_init = 1;
 			if (Player_projectiles_size < PLAYER_MAX_PROJECTILES) {
@@ -513,7 +513,7 @@ void Player_SpawnProjectile(const float dt)
 				Player_projectiles[Player_projectiles_size++] = (Player_Projectile){
 					Sprite_AddSpriteRepeatAuto(spawn_position, 50.0f, 50.0f, Player_projectiles_resource), 0, direction,
 					LightStage_AddLight(spawn_position, 100.0f, 600.0f, -1.0f, 0, 150) };
-				Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+				Particle_EmitOut(PT_Star, spawn_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5, 0);
 			}
 		}
 		Camera_Shake(5.0f);
@@ -547,7 +547,7 @@ void Player_ProjectileUpdate(const float dt)
 			Player_projectiles[i]._dead = 1;
 			LightStage_DeactivateLight(Player_projectiles[i]._light_id);
 			LightStage_AddLight(new_pos, 300.0f, 200.0f, 200.0f, 0, 100);
-			Particle_EmitOut(PT_Star, pos, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5);
+			Particle_EmitOut(PT_Star, pos, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5, 0);
 		}
 	}
 }
