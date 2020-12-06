@@ -357,7 +357,7 @@ int Inventory_Item_Remove_ID(int id)
 _*/
 void Inventory_Item_Use_Name(char* name)
 {
-	if (!strcmp(name, "poop"))
+	if (!strcmp(name, "Speed Up"))
 	{
 		//Inventory_Add_Item_Name("poop");
 		Player_Add_Powerup(1, 10);

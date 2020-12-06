@@ -9,7 +9,8 @@ typedef enum ParticleType {
 	//PT_Nothing,
 	PT_Dust,
 	PT_Star,
-	PT_Bean
+	PT_Bean,
+	PT_Droplets
 } ParticleType;
 
 typedef enum ParticleSystemType {
@@ -31,6 +32,7 @@ typedef struct ParticleData {
 	float		_alpha_change;
 	float		_scale_change;
 	int			_fps;
+	int			_gravity;
 } ParticleData;
 
 typedef struct Particle {
@@ -55,4 +57,5 @@ void Particle_EmitOut(const ParticleType type, const CP_Vector position,
 	const float upperLifetime, const float lowerLifetime,
 	const float upperAlphaChange, const float lowerAlphaChange, 
 	const float upperScaleChange, const float lowerScaleChange,
-	const float alpha, const int fps, const int number);
+	const float alpha, const int fps, const int number,
+	const int gravity);

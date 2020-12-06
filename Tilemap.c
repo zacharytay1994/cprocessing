@@ -2,8 +2,11 @@
 #include "PhyObj.h"
 #include "Sprite.h"
 #include "Camera.h"
+#include "LightStage.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <math.h>
 
 Tilemap tilemaps[MAX_TILEMAPS] = { 0 };
 int tilemaps_size = 0;
@@ -13,11 +16,41 @@ int tilesheets_size = 0;
 int tilemap_active_tilesheet = 0;
 int tilemap_active_tilesheet_cell = 0;
 
+CP_Image tilemap_ground_normal_map;
+void* tilemap_ground_normal_map_data;
+int tilemap_tile_x = 40, tilemap_tile_y = 40;
+void* tilemap_tile_data;
+CP_Vector tilemap_test_light_position;
+int tilemap_test_light;
+float tilemap_ambient = 1.0f;
+CP_Image tilemap_ground;
+void* tilemap_og_data;
+void** tilemap_tile_data_array;
+CP_Image* tilemap_image_array;
+int normal_initialized = 0;
+int normal_count = 0;
+
+CP_Image tilemap_highlight_cursor;
+CP_Vector tilemap_highlight_position;
 
 void Tilemap_Initialize()
 {
 	// loading tilesheets
 	Tilemap_SetActiveTileSheet(Tilemap_LoadTileSheet("./Sprites/ground.png", 1, 1, 1));
+	tilemap_ground_normal_map = CP_Image_Load("./Sprites/ground_normal_map.png");
+	tilemap_ground = CP_Image_Load("./Sprites/ground.png");
+	printf("%d\n", CP_Image_GetPixelBufferSize(tilemap_ground_normal_map));
+	tilemap_ground_normal_map_data = malloc(CP_Image_GetPixelBufferSize(tilemap_ground_normal_map));
+	tilemap_tile_data = malloc(CP_Image_GetPixelBufferSize(tilemap_ground_normal_map));
+	tilemap_og_data = malloc(CP_Image_GetPixelBufferSize(tilemap_ground_normal_map));
+	CP_Image_GetPixelData(tilemap_ground_normal_map, (unsigned char*)tilemap_ground_normal_map_data);
+	CP_Image_GetPixelData(tilesheets[tilemap_active_tilesheet]._images[0], (unsigned char*)tilemap_tile_data);
+	CP_Image_GetPixelData(tilemap_ground, (unsigned char*)tilemap_og_data);
+	tilemap_test_light = LightStage_AddLight(CP_Vector_Set(0.0f,0.0f), 500.0f, 1000.0f, -1.0f, 0, 100);
+	LightStage_SetPosition(tilemap_test_light, (CP_Vector) { 1400.0f, 0.0f });
+
+	tilemap_highlight_cursor = CP_Image_Load("./Sprites/cursor.png");
+	tilemap_highlight_position = (CP_Vector){ 0.0f, 0.0f };
 }
 
 void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
@@ -32,9 +65,6 @@ void Tilemap_Debug_Render(const int id, const CP_Matrix cam)
 
 	int tile_width = tilemaps[id]._tile_width;
 	int tile_height = tilemaps[id]._tile_height;
-
-	/*int offset_x = tilemaps[id]._offset_x;
-	int offset_y = tilemaps[id]._offset_y;*/
 
 	float screen_width = (float)CP_System_GetWindowWidth();
 	float screen_height = (float)CP_System_GetWindowHeight();
@@ -100,15 +130,15 @@ int Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int widt
 		tilemap._offset_x = offsetx;
 		tilemap._offset_y = offsety;
 
-		// initialize array of tiles
-		int size = width * height;
-		tilemap._tiles = malloc((unsigned long long)size * sizeof(int));
-		for (int i = 0; i < size; i++) {
-			tilemap._tiles[i] = -1;
-		}
-		tilemaps[tilemaps_size] = tilemap;
-		tilemaps_size++;
-		return tilemaps_size - 1;
+// initialize array of tiles
+int size = width * height;
+tilemap._tiles = malloc((unsigned long long)size * sizeof(int));
+for (int i = 0; i < size; i++) {
+	tilemap._tiles[i] = -1;
+}
+tilemaps[tilemaps_size] = tilemap;
+tilemaps_size++;
+return tilemaps_size - 1;
 	}
 	return -1;
 }
@@ -116,7 +146,7 @@ int Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int widt
 int Tilemap_LoadTileSheet(const char* path, const int row, const int col, const int frames)
 {
 	if (tilesheets_size < MAX_TILESHEETS) {
-		tilesheets[tilesheets_size] = (Tilemap_TileSheet) { tilesheets_size,frames,{0} };
+		tilesheets[tilesheets_size] = (Tilemap_TileSheet){ tilesheets_size,frames,{0} };
 	}
 	else {
 		printf("Tilemap_LoadTileSheet :: Amount of tilesheets exceeded!");
@@ -178,6 +208,41 @@ void Tilemap_SetTileToBrush(const int id, const int x, const int y)
 	}
 }
 
+void Tilemap_HighlightMouseTile(const int id)
+{
+	if (id < tilemaps_size) {
+		CP_Vector mouse = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+		//mouse = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), mouse);
+		tilemap_highlight_position = Tilemap_WorldToGrid(id, mouse.x, mouse.y);
+		mouse.x = tilemaps[id]._tile_width * tilemap_highlight_position.x + ((float)tilemaps[id]._tile_width / 2.0f);
+		mouse.y = tilemaps[id]._tile_height * tilemap_highlight_position.y + ((float)tilemaps[id]._tile_height / 2.0f);
+		mouse = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), mouse);
+		CP_Image_Draw(tilemap_highlight_cursor, mouse.x,
+			mouse.y, (float)tilemaps[id]._tile_width, (float)tilemaps[id]._tile_width, 150);
+	}
+}
+
+int Tilemap_GetValidGroundTiles(const int id, CP_Vector* container)
+{
+	int i = 0;
+	if (id < tilemaps_size) {
+		for (int y = tilemaps[id]._height - 1; y >= 0; y--) {
+			for (int x = 0; x < tilemaps[id]._width; x++) {
+				// check if cell is empty
+				if (tilemaps[id]._tiles[y * tilemaps[id]._width + x] == -1) {
+					// bottom has thing
+					if (y + 1 < tilemaps[id]._height) {
+						if (tilemaps[id]._tiles[(y + 1) * tilemaps[id]._width + x] != -1) {
+							container[i++] = (CP_Vector){ (float)x,(float)y };
+						}
+					}
+				}
+			}
+		}
+	}
+	return i;
+}
+
 CP_Vector Tilemap_WorldToGrid(const int id, const float x, const float y)
 {
 	if (id < tilemaps_size && x >= 0.0f && y >= 0.0f) {
@@ -198,6 +263,7 @@ void Tilemap_Render(const int id, const CP_Matrix cam)
 	float half_offset_x = (float)tilemaps[id]._offset_x / 2.0f;
 	float half_offset_y = (float)tilemaps[id]._offset_y / 2.0f;
 	CP_Vector tile_position = CP_Vector_Set(-1.0f, -1.0f);
+	int count = 0;
 	if (id < tilemaps_size) {
 		for (int y = tilemaps[id]._height-1; y >= 0; y--) {
 			for (int x = 0; x < tilemaps[id]._width; x++) {
@@ -205,11 +271,49 @@ void Tilemap_Render(const int id, const CP_Matrix cam)
 				if ((tile = tilemaps[id]._tiles[y * tilemaps[id]._width + x]) != -1) {
 					tile_position.x = (float)(x * tilemaps[id]._tile_width) + half_tile_width;
 					tile_position.y = (float)(y * tilemaps[id]._tile_height) + half_tile_height;
-					tile_position = CP_Vector_MatrixMultiply(cam, tile_position);
-					CP_Image_DrawAdvanced(tilesheets[tilemap_active_tilesheet]._images[tile], tile_position.x - half_offset_x, tile_position.y - half_offset_y,
-						(float)tilemaps[id]._tile_width + twice_offset_x, (float)tilemaps[id]._tile_height + twice_offset_y, 255, 0.0f);
+					if (CP_Input_KeyDown(KEY_P)) {
+						printf("TILEMAPX: %f, TILEMAPY: %f\n", tile_position.x, tile_position.y);
+					}
+					if (normal_initialized) {
+						CP_Vector* pos = LightStage_GetLightPositionsArray();
+						int pos_size = LightStage_GetLightPositionsSize();
+						LightStage_ApplyNormalMap(tilemap_tile_data_array[count], tilemap_ground_normal_map_data,
+							tilemap_og_data, tile_position, (float)tilemaps[id]._tile_width, (float)tilemaps[id]._tile_height,
+							10.0f,10.0f,pos, pos_size);
+						CP_Image_UpdatePixelData(tilemap_image_array[count], (unsigned char*)(tilemap_tile_data_array[count]));
+						tile_position = CP_Vector_MatrixMultiply(cam, tile_position);
+						if (CP_Input_KeyDown(KEY_L)) {
+							printf("--------------------------------------- %d Start Entry ---------------------------------------\n", count);
+							for (int i = 0; i < 100; ++i) {
+								printf("R:%-4d,G:%-4d,B:%-4d,A:%-4d |", ((unsigned char*)(tilemap_tile_data_array[count]))[i * 4],
+									((unsigned char*)(tilemap_tile_data_array[count]))[i * 4 + 1],
+									((unsigned char*)(tilemap_tile_data_array[count]))[i * 4 + 2],
+									((unsigned char*)(tilemap_tile_data_array[count]))[i * 4 + 3]);
+								if (i % 10 == 0) {
+									printf("\n");
+								}
+							}
+							printf("\n");
+						}
+						CP_Image_DrawAdvanced(tilemap_image_array[count], tile_position.x - half_offset_x, tile_position.y - half_offset_y,
+							(float)tilemaps[id]._tile_width + twice_offset_x, (float)tilemaps[id]._tile_height + twice_offset_y, 255, 0.0f);
+					}
+					++count;
 				}
 			}
+		}
+	}
+	// initialize normal data
+	if (!normal_initialized) {
+		tilemap_tile_data_array = malloc(count * sizeof(void*));
+		tilemap_image_array = (CP_Image*)malloc(count * sizeof(CP_Image));
+		normal_count = count;
+		if (tilemap_tile_data_array && tilemap_image_array) {
+			for (int i = 0; i < count; ++i) {
+				tilemap_tile_data_array[i] = malloc(400);
+				tilemap_image_array[i] = CP_Image_CreateFromData(10,10, tilemap_og_data);
+			}
+			normal_initialized = 1;
 		}
 	}
 }
@@ -221,6 +325,14 @@ void Tilemap_Free()
 			free(tilemaps[i]._tiles); // ??
 		}
 	}
+	free(tilemap_ground_normal_map_data);
+	free(tilemap_tile_data);
+	free(tilemap_og_data);
+	for (int i = 0; i < normal_count; ++i) {
+		free(tilemap_tile_data_array[i]);
+	}
+	free(tilemap_tile_data_array);
+	free(tilemap_image_array);
 }
 
 void Tilemap_GeneratePhyObjs(const int id)

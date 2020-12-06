@@ -1,4 +1,5 @@
 #include "ParallaxBackground.h"
+#include "LightStage.h"
 
 CP_Image BG_Pic_PurpleSky_1, BG_Pic_PurpleSky_2, BG_Pic_Mountain_1, BG_Pic_Mountain_2, BG_Pic_Sun, BG_Pic_DarkPurpleSky, BG_Pic_Cloud_1, BG_Pic_Cloud_2, BG_Pic_PurpleOrangeSky, BG_Pic_OrangeYellowSky;
 float t1_x, t2_x, t3_x, t4_x, t5_x, t5_xx, t6_x, t7_x, t8_x, t9_x, t10_x;
@@ -9,6 +10,8 @@ float BG_Alpha_Background1 = 0.0f;
 float BG_Alpha_Background2 = 255.0f;
 
 int BG_sun_set = 1;
+
+float BG_light_ambient = 0.0f;
 
 void PB_Initialize()
 {
@@ -90,26 +93,33 @@ void PB_Update(const float dt)
 
 		if (BG_sun_set) {
 			if (BG_Alpha_Background <= 0.0f) {
+				// dark purple sky increase
 				BG_Alpha_Background1 += 25.0f * CP_System_GetDt();
 				if (BG_Alpha_Background1 > 255.0f) {
 					BG_sun_set = 0;
 				}
 			}
 			else {
+				// purple sky decrease
 				BG_Alpha_Background -= 10.0f * CP_System_GetDt();
 			}
+			BG_light_ambient = (BG_Alpha_Background1 - BG_Alpha_Background + 255.0f) / 2.0f;
 		}
 		else {
 			if (BG_Alpha_Background1 > 0.0f) {
+				// dark purple sky decrease
 				BG_Alpha_Background1 -= 25.0f * CP_System_GetDt();
 			}
 			else {
+				// purple sky increase
 				BG_Alpha_Background += 10.0f * CP_System_GetDt();
 				if (BG_Alpha_Background > 255.0f) {
 					BG_sun_set = 1;
 				}
 			}
+			BG_light_ambient = (BG_Alpha_Background1 - BG_Alpha_Background + 255.0f) / 2.0f;
 		}
+		LightStage_SetAmbient((int)BG_light_ambient - 100);
 
 		t1_x += 125.0f * CP_System_GetDt();
 		CP_Image_Draw(BG_Pic_PurpleSky_1, t1_x, BG_WindowHeight / 2.0f, BG_WindowWidth, BG_WindowHeight, (int)BG_Alpha_Background);

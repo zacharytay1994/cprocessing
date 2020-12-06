@@ -197,9 +197,12 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
     <ClCompile Include="Camera.c" />
     <ClCompile Include="Credits.c" />
     <ClCompile Include="Demo.c" />
+    <ClCompile Include="GameGUI.c" />
     <ClCompile Include="GUI.c" />
     <ClCompile Include="Enemy.c" />
     <ClCompile Include="Inventory.c" />
+    <ClCompile Include="LePlant.c" />
+    <ClCompile Include="LightStage.c" />
     <ClCompile Include="MainMenu.c" />
     <ClCompile Include="ParallaxBackground.c" />
     <ClCompile Include="Particles.c" />
@@ -222,10 +225,13 @@ xcopy "$(ProjectDir)Assets\*" "$(OutDir)Assets\" /s /r /y /q</Command>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Credits.h" />
     <ClInclude Include="Demo.h" />
+    <ClInclude Include="GameGUI.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Inventory.h" />
+    <ClInclude Include="LePlant.h" />
+    <ClInclude Include="LightStage.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="ParallaxBackground.h" />
     <ClInclude Include="Particles.h" />

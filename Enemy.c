@@ -1,4 +1,6 @@
 #include "Enemy.h"
+#include "LePlant.h"
+#include "Particles.h"
 #include <stdio.h>
 
 
@@ -7,6 +9,7 @@ int enemy_one;
 int enemy_two;
 int enemy_three;
 int enemy_four;
+int enemy_five;
 int enemyhp_Sprite;
 
 //float HP_maxSpriteSize;
@@ -36,6 +39,12 @@ void Enemy_Initialize()
 		(CP_Vector) { -100, -100 }, 
 		200.0f, 200.0f, 
 		"./Sprites/slime1.png",
+		2, 3, 6, 5, 0);
+
+	enemy_five = Sprite_AddSprite(
+		(CP_Vector) { -100, -100 }, 
+		200.0f, 200.0f, 
+		"./Sprites/slime2.png",
 		2, 3, 6, 5, 0);
 
 	enemyhp_Sprite = Sprite_AddSprite(
@@ -69,6 +78,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 	new_enemy.speed = speed;
 	new_enemy.enem_Size = size;
 	new_enemy.ene_Type = enemy_type;
+	new_enemy.money_amount = 0;
 
 	switch (enemy_type)
 	{
@@ -77,7 +87,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		path_id = enemy_one;
 		new_enemy.ene_dmg = 1;
 		
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 30.f };
 		break;
 	}
@@ -88,7 +98,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		new_enemy.enem_Size.x = size.x * 2.5f;
 		new_enemy.enem_Size.y = size.y * 2.5f;
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
 
 		break;
 	}
@@ -103,33 +113,52 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		enem_sprite_frames = 8;
 		enem_sprite_animate_speed = 50;
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
 
 		break;
 	}
 	case 3:	// toothpaste
 	{
 		path_id = enemy_four;
-		new_enemy.ene_dmg = 3;
+		new_enemy.ene_dmg = 1;
 		new_enemy.enem_Size.x = -size.x;
 		new_enemy.enem_Size.y = size.y;
+		new_enemy.money_amount = 10;
 		enem_sprite_col = 2;
 		enem_sprite_row = 3;
 		enem_sprite_frames = 6;
 		enem_sprite_animate_speed = 5;
+		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
+
+		break;
+	}
+
+	case 4:	// strawberry jam
+	{
+		path_id = enemy_five;
+		new_enemy.ene_dmg = 2;
+		new_enemy.enem_Size.x = -size.x;
+		new_enemy.enem_Size.y = size.y;
+		new_enemy.money_amount = 50;
+		enem_sprite_col = 2;
+		enem_sprite_row = 3;
+		enem_sprite_frames = 6;
+		enem_sprite_animate_speed = 3;
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 50.f };
 		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
 
 		break;
 	}
 
-	case 4:	// COLD-GATE
+	case 5:	// COLD-GATE
 	{
 		path_id = enemy_four;
 		new_enemy.ene_dmg = 3;
 		new_enemy.enem_Size.x = -size.x * 7;
 		new_enemy.enem_Size.y = size.y * 7;
 		new_enemy.position.y -= 400;
+		new_enemy.money_amount = 1000;
 		enem_sprite_col = 2;
 		enem_sprite_row = 3;
 		enem_sprite_frames = 2;
@@ -146,7 +175,7 @@ void CreateEnemy(float hp, CP_Vector position, CP_Vector size, float speed, int 
 		enem_sprite_row = 1;
 		enem_sprite_frames = 1;
 		enem_sprite_animate_speed = 1;
-		new_enemy.enem_HitboxScale = (CP_Vector){ 1,1 };
+		new_enemy.enem_HitboxScale = (CP_Vector){ 1,50.0f };
 		new_enemy.HPsprite_position = (CP_Vector){ new_enemy.position.x, new_enemy.position.y - 30.f };
 		break;
 	}
@@ -285,6 +314,11 @@ void SetEnemyHP(int id, float newHP)
 	if (enemy_list[id].health <= 0)
 	{
 		SetEnemyDie(enemy_list[id].ene_id);
+		LePlant_AddBean(enemy_list[id].position);
+		Particle_EmitOut(PT_Droplets, enemy_list[id].position, 200.0f, 300.0f,
+			-60.0f, -60.0f, 250.0f, -250.0f,
+			1.8f, 1.3f, -50.0f, -80.0f, 0.04f,
+			0.02f, 120.0f, 10, 15, 1);
 	}
 }
 
@@ -299,6 +333,12 @@ int GetEnemyDMG(int id)
 {
 	int dmg = enemy_list[id].ene_dmg;
 	return dmg;
+}
+
+int GetEnemyMoney(int id)
+{
+	int cashCough = enemy_list[id].money_amount;
+	return cashCough;
 }
 
 void SetEnemyDie(int id)

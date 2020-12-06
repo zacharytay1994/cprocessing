@@ -5,27 +5,27 @@
 #include "Particles.h"
 
 
-int Plant_id [100];
-int Potion_id[100];
-int plant_id = 0 , potion_id =0;
-int bean_mr, smokey_mr, potion_mr;
-int temp, temp2;
-int bool_check = 1;
-int smoke_check = 1;
+//int Plant_id [100];
+//int Potion_id[100];
+//int plant_id = 0 , potion_id =0;
+//int bean_mr, smokey_mr, potion_mr;
+//int temp, temp2;
+//int bool_check = 1;
+//int smoke_check = 1;
 
 
 void TestScene2_Init()
 {
-	bean_mr = Sprite_AddSpriteF((CP_Vector){0.0f,0.0f}, 300.0f, 300.0f, "./Photos/Plants_PEXEL_02.png", 4, 3, 12, 0.8f, 1);
-	smokey_mr = Sprite_AddSpriteF((CP_Vector) {0.0f, 0.0f}, 300.0f, 300.0f, "./Photos/Smoke-02.png", 1, 3, 3, 0.2f, 1);
-	potion_mr = Sprite_AddSpriteF((CP_Vector) {0.0f, 0.0f}, 250.0f, 250.0f, "./Photos/Potions-11.png", 1, 1, 1, 0.2f, 1);
-	
-	Particle_Initialize();
+	//bean_mr = Sprite_AddSpriteF((CP_Vector){0.0f,0.0f}, 300.0f, 300.0f, "./Photos/Plants_PEXEL_02.png", 4, 3, 12, 0.8f, 1);
+	//smokey_mr = Sprite_AddSpriteF((CP_Vector) {0.0f, 0.0f}, 300.0f, 300.0f, "./Photos/Smoke-02.png", 1, 3, 3, 0.2f, 1);
+	//potion_mr = Sprite_AddSpriteF((CP_Vector) {0.0f, 0.0f}, 250.0f, 250.0f, "./Photos/Potions-11.png", 1, 1, 1, 0.2f, 1);
+	//
+	//Particle_Initialize();
 }
 
 void TestScene2_Update(const float dt)
 {
-	Particle_Update(dt);
+	/*Particle_Update(dt);
 	float MouseX = CP_Input_GetMouseX();
 	float MouseY = CP_Input_GetMouseY();
 
@@ -86,7 +86,7 @@ void TestScene2_Update(const float dt)
 			Sprite_OptOut(temp, 0);
 			Sprite_SetRepeat(temp, 0);
 		}
-	}
+	}*/
 }
 	
 

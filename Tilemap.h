@@ -46,6 +46,8 @@ int			Tilemap_AddTilemap(const int tileWidth, const int tileHeight, const int wi
 int			Tilemap_GetTile(const int id, const int x, const int y);
 void		Tilemap_SetTile(const int id, const int x, const int y, const int tile);
 void		Tilemap_SetTileToBrush(const int id, const int x, const int y);
+void		Tilemap_HighlightMouseTile(const int id);
+int			Tilemap_GetValidGroundTiles(const int id, CP_Vector* container);
 
 /*____________________________________________________________________________________________________________________________________*/
 // TILESHEET FUNCTIONS

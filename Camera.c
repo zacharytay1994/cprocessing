@@ -33,7 +33,6 @@ void Camera_Initialize()
 void Camera_Update(const float dt)
 {
 	// update camera transform
-	//_transform = CP_Matrix_Multiply(CP_Matrix_Rotate(_rotation), CP_Matrix_Translate(_position));
 	float half_width = (float)CP_System_GetWindowWidth() / 2.0f;
 	float half_height = (float)CP_System_GetWindowHeight() / 2.0f;
 
