@@ -109,7 +109,7 @@ void LePlant_Update(const float dt)
 							2, 0);
 
 						plant_pos.y += 5.0f;
-						int r = CP_Random_RangeInt(0, LePlant_potions_upper);
+						int r = 2; //CP_Random_RangeInt(0, LePlant_potions_upper);
 						switch (r) {
 						case 0:
 							temp2 = Sprite_AddSpriteRepeatAuto(plant_pos, LEPLANT_POTION_SIZE, LEPLANT_POTION_SIZE, potion_mr_spd);
@@ -133,6 +133,7 @@ void LePlant_Update(const float dt)
 		else
 		{
 			if (LePlant_ValidTile((int)grid.x, (int)grid.y) && GameGUI_GetBean() > 0) {
+				cp_vector.y += 5.0f;
 				temp = Sprite_AddSpriteRepeatAuto(cp_vector, 300.0f * LEPLANT_PLANT_SCALE, 300.0f * LEPLANT_PLANT_SCALE, bean_mr);
 				Plant_id[plant_id] = temp;
 				plant_id += 1;
@@ -144,6 +145,7 @@ void LePlant_Update(const float dt)
 		if (bool_check == 0)
 		{
 			if (LePlant_ValidTile((int)grid.x, (int)grid.y) && GameGUI_GetBean() > 0) {
+				cp_vector.y += 5.0f;
 				temp = Sprite_AddSpriteRepeatAuto(cp_vector, 300.0f * LEPLANT_PLANT_SCALE, 300.0f * LEPLANT_PLANT_SCALE, bean_mr);
 				Plant_id[plant_id] = temp;
 				plant_id += 1;

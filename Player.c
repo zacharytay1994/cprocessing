@@ -551,7 +551,7 @@ void Player_ProjectileUpdate(const float dt)
 			LightStage_DeactivateLight(Player_projectiles[i]._light_id);
 			LightStage_AddLight(new_pos, 300.0f, 200.0f, 200.0f, 0, 100);
 			Particle_EmitOut(PT_Star, pos, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5, 0);
-			PhyObj_ApplyGlobalImpulse(new_pos, 50.0f);
+			PhyObj_ApplyGlobalImpulse(new_pos, 10.0f, 1000.0f);
 		}
 	}
 }

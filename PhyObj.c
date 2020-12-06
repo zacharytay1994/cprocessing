@@ -49,7 +49,7 @@ void PhyObj_Initialize()
 	PhyObj_manifolds_max_size = INITIAL_SIZE;
 	PhyObj_manifolds_size = 0;
 
-	PhyObj_circle_image = CP_Image_Load("./circle.png");
+	PhyObj_circle_image = CP_Image_Load("./Sprites/crate_circle.png");
 	PhyObj_square_image = CP_Image_Load("./Sprites/crate.png");
 }
 
@@ -172,7 +172,7 @@ void PhyObj_DrawCircles()
 	for (int i = 0; i < PhyObj_bounding_circles_size; i++) {
 		if (PhyObj_bounding_circles[i].super._visible) {
 			CP_Vector cam_position = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), PhyObj_bounding_circles[i].super._position);
-			CP_Image_DrawAdvanced(PhyObj_circle_image, cam_position.x, cam_position.y, PhyObj_bounding_circles[i]._radius * 2.0f, PhyObj_bounding_circles[i]._radius * 2.0f, 255, PhyObj_bounding_circles[i].super._rotation);
+			CP_Image_DrawAdvanced(PhyObj_circle_image, cam_position.x, cam_position.y, PhyObj_bounding_circles[i]._radius * 2.0f, PhyObj_bounding_circles[i]._radius * 2.0f, 150, PhyObj_bounding_circles[i].super._rotation);
 		}
 	}
 }
@@ -182,7 +182,7 @@ void PhyObj_DrawOBoxes()
 	for (int i = 0; i < PhyObj_bounding_obox_size; i++) {
 		if (PhyObj_bounding_obox[i].super._visible) {
 			CP_Vector cam_position = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), PhyObj_bounding_obox[i].super._position);
-			CP_Image_DrawAdvanced(PhyObj_square_image, cam_position.x, cam_position.y, PhyObj_bounding_obox[i]._horizontal_extent * 2.0f, PhyObj_bounding_obox[i]._vertical_extent * 2.0f, 255, PhyObj_bounding_obox[i].super._rotation);
+			CP_Image_DrawAdvanced(PhyObj_square_image, cam_position.x, cam_position.y, PhyObj_bounding_obox[i]._horizontal_extent * 2.0f, PhyObj_bounding_obox[i]._vertical_extent * 2.0f, 150, PhyObj_bounding_obox[i].super._rotation);
 		}
 	}
 }
@@ -326,13 +326,16 @@ void PhyObj_WarmStarting()
 	}
 }
 
-void PhyObj_ApplyGlobalImpulse(const CP_Vector position, const float strength)
+void PhyObj_ApplyGlobalImpulse(const CP_Vector position, const float strength, const float range)
 {
 	CP_Vector direction;
+	float ratio;
 	for (int i = 0; i < PhyObj_bounding_shapes_size; ++i) {
 		if (!PhyObj_bounding_shapes[i]->_ignore_global_impulse) {
 			direction = CP_Vector_Subtract(PhyObj_bounding_shapes[i]->_position, position);
-			PhyObj_ApplyImpulse(PhyObj_bounding_shapes[i], CP_Vector_Scale(direction, strength));
+			ratio = CP_Vector_Length(direction);
+			if (ratio < range) { ratio = range - ratio; }
+			PhyObj_ApplyImpulse(PhyObj_bounding_shapes[i], CP_Vector_Scale(CP_Vector_Normalize(direction), strength*ratio));
 		}
 	}
 }

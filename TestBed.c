@@ -86,6 +86,25 @@ float TestBed_player_invuln_timer = 1.0f;
 float TestBed_player_invuln_timer_counter = 1.0f;
 int TestBed_player_invuln = 0;
 
+float TestBed_crate_timer = 5.0f;
+float TestBed_crate_timer_counter = 0.0f;
+
+CP_Color h_color;
+CP_Color v_color;
+int h_fire = 0;
+int v_fire = 0;
+float h_delay = 1.0f;
+float v_delay = 1.0f;
+
+typedef struct TB_Missiles {
+	CP_Vector _position;
+	int _alive;
+	int _type;
+	float _rotation;
+} TB_Missiles;
+TB_Missiles missiles[50] = { 0 };
+CP_Image missile_image;
+
 void TestBed_Init()
 {
 	printf("Switched to testbed.\n");
@@ -189,6 +208,13 @@ void TestBed_Init()
 	LePlant_BindTilemap(tilemap);
 	GameGUI_Init();
 	CP_Font_Set(CP_Font_Load("Assets/Fonts/zrnic rg.ttf"));
+
+	h_color = (CP_Color){ 0,255,0,100 };
+	v_color = (CP_Color){ 0,255,0,100 };
+	for (int i = 0; i < 50; ++i) {
+		missiles[i] = (TB_Missiles){ CP_Vector_Set(0.0f,0.0f), 0, -1 };
+	}
+	missile_image = CP_Image_Load("./Sprites/shuriken.png");
 }
 
 void TestBed_Update(const float dt)
@@ -208,6 +234,7 @@ void TestBed_Update(const float dt)
 	//// RENDERS
 	Tilemap_Render(tilemap, Camera_GetCameraTransform());
 	CP_Image_Draw(TestBed_house_modified, TestBed_house_position.x, TestBed_house_position.y, 300.0f, 300.0f, 255);
+	PhyObj_Render();
 	UpdateEnemy(dt);
 	//Tilemap_Debug_Render(tilemap, Camera_GetCameraTransform());
 	Player_Render();
@@ -300,11 +327,9 @@ void TestBed_Update(const float dt)
 	LePlant_CheckBeanWithPlayerPosition(Player_GetPosition(0), 50.0f, 50.0f);
 	LePlant_CheckPotionWithPlayerPosition(Player_GetPosition(0), 50.0f, 50.0f);
 
-	if (CP_Input_MouseReleased(1)) {
-		CP_Vector temp_pos = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
-		PhyObjOBoundingBox* b = PhyObj_AddOBox(temp_pos.x, temp_pos.y, 10, 50.0f, 50.0f, 0.5f);
-		b->super._visible = 1;
-	}
+	TestBed_RandomRainCrates(dt);
+	TestBed_DrawLineToPlayer(dt); 
+	TestBed_UpdateRenderMissiles(dt);
 }
 
 void TestBed_Exit()
@@ -440,6 +465,136 @@ void DayNightManager(float dt)
 	GameGUI_DrawText((CP_Color) { 255, 255, 255, 255 }, wave_display, 0.98f, 0.07f, 0.03f, CP_TEXT_ALIGN_H_RIGHT, CP_TEXT_ALIGN_V_TOP);
 }
 
+void TestBed_RandomRainCrates(const float dt)
+{
+	if (TestBed_crate_timer_counter < 0.0f) {
+		TestBed_crate_timer_counter = TestBed_crate_timer;
+		int r = CP_Random_RangeInt(0, 1);
+		float x = CP_Random_RangeFloat(440.0f, 2250.0f);
+		if (r == 0) {
+			PhyObjOBoundingBox* b = PhyObj_AddOBox(x, 400.0f, 10.0f, 50.0f, 50.0f, 0.5f);
+			b->super._visible = 1;
+		}
+		else {
+			PhyObjBoundingCircle* c = PhyObj_AddCircle(x, 400.0f, 10.0f, 50.0f, 0.5f);
+			c->super._visible = 1;
+		}
+	}
+	else {
+		TestBed_crate_timer_counter -= dt;
+	}
+}
+
+void TestBed_DrawLineToPlayer(const float dt)
+{
+	CP_Vector position1;
+	CP_Vector position2;
+	// draw lines
+	CP_Settings_Stroke(h_color);
+	position1.x = Player_GetPosition(0).x+(float)CP_System_GetWindowWidth();
+	position1.y = Player_GetPosition(0).y;
+	position2.x = Player_GetPosition(0).x;
+	position2.y = Player_GetPosition(0).y;
+	position1 = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), position1);
+	position2 = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), position2);
+	CP_Graphics_DrawLine(position1.x,position1.y+8.0f,position2.x,position2.y+8.0f);
+	CP_Settings_Stroke(v_color);
+	position1.x = Player_GetPosition(0).x;
+	position1.y = Player_GetPosition(0).y - (float)CP_System_GetWindowHeight();
+	position2.x = Player_GetPosition(0).x;
+	position2.y = Player_GetPosition(0).y;
+	position1 = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), position1);
+	position2 = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), position2);
+	CP_Graphics_DrawLine(position1.x, position1.y, position2.x, position2.y);
+	CP_Settings_Stroke((CP_Color) { 0, 0, 0, 255 });
+
+	// logic
+	int r = CP_Random_RangeInt(0, 100);
+	if (r < 2) {
+		if (!h_fire) {
+			h_color = (CP_Color){ 255,0,0,100 };
+			h_fire = 1;
+		}
+	}
+	else if (r > 98) {
+		if (!v_fire) {
+			v_color = (CP_Color){ 255,0,0,100 };
+			v_fire = 1;
+		}
+	}
+	if (h_fire) {
+		if (h_delay < 0.0f) {
+			// fire projectile
+			TestBed_AddMissile((CP_Vector) { Player_GetPosition(0).x+(float)CP_System_GetWindowWidth(), Player_GetPosition(0).y }, 1);
+			h_delay = 1.0f;
+			h_fire = 0; 
+			h_color = (CP_Color){ 0,255,0,100 };
+		}
+		else {
+			h_delay -= dt;
+		}
+	}
+	if (v_fire) {
+		if (v_delay < 0.0f) {
+			// fire projectile
+			TestBed_AddMissile((CP_Vector) { Player_GetPosition(0).x, Player_GetPosition(0).y-(float)CP_System_GetWindowHeight()}, 0);
+			v_delay = 1.0f;
+			v_fire = 0;
+			v_color = (CP_Color){ 0,255,0,100 };
+		}
+		else {
+			v_delay -= dt;
+		}
+	}
+}
+
+void TestBed_AddMissile(const CP_Vector position, const int type)
+{
+	for (int i = 0; i < 50; ++i) {
+		if (!missiles[i]._alive) {
+			missiles[i]._alive = 1;
+			missiles[i]._position = position;
+			missiles[i]._type = type;
+			missiles[i]._rotation = 0.0f;
+			return;
+		}
+	}
+}
+
+void TestBed_UpdateRenderMissiles(const float dt)
+{
+	CP_Vector temp_position;
+	float ml, mr, mt, mb;
+	float pl = Player_GetPosition(0).x - 30.0f;
+	float pr = Player_GetPosition(0).x + 30.0f;
+	float pt = Player_GetPosition(0).y - 30.0f;
+	float pb = Player_GetPosition(0).y + 30.0f;
+	for (int i = 0; i < 50; ++i) {
+		if (missiles[i]._alive) {
+			if (missiles[i]._type) {
+				missiles[i]._position.x -= 500.0f * dt;
+				if (missiles[i]._position.x < -100.0f) { missiles[i]._alive = 0; }
+			}
+			else {
+				missiles[i]._position.y += 500.0f * dt;
+				if (missiles[i]._position.y > 1500.0f) { missiles[i]._alive = 0; }
+			}
+			missiles[i]._rotation += 3000.0f * dt;
+			temp_position = CP_Vector_MatrixMultiply(Camera_GetCameraTransform(), missiles[i]._position);
+			CP_Image_DrawAdvanced(missile_image, temp_position.x, temp_position.y, 50.0f, 50.0f, 255, missiles[i]._rotation);
+			// check for collision with player
+			ml = missiles[i]._position.x - 15.0f;
+			mr = missiles[i]._position.x + 15.0f;
+			mt = missiles[i]._position.y - 15.0f;
+			mb = missiles[i]._position.y + 15.0f;
+			if (!(pl > mr || pr < ml || pt > mb || pb < mt)) {
+				missiles[i]._alive = 0;
+				Player_Lose_Health(1);
+			}
+		}
+	}
+}
+
 void TestBed_SpawnBean(const CP_Vector position)
 {
 
@@ -550,6 +705,7 @@ void TestBed_CheckBombOnZomb()
 						LightStage_DeactivateLight(Player_GetProjectileLight(i));
 						LightStage_AddLight(projectile_position, 300.0f, 1600.0f, 200.0f, 0, 100);
 						Particle_EmitOut(PT_Star, projectile_position, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5, 0);
+						PhyObj_ApplyGlobalImpulse(projectile_position, 10.0f, 1000.0f);
 					}
 				}
 			}

@@ -118,7 +118,7 @@ void	PhyObj_UpdatePosition(const float dt);
 void	PhyObj_UpdateRotation(const float dt);
 void	PhyObj_GlobalAcceleration();
 void	PhyObj_WarmStarting();
-void	PhyObj_ApplyGlobalImpulse(const CP_Vector position, const float strength);
+void	PhyObj_ApplyGlobalImpulse(const CP_Vector position, const float strength, const float range);
 /*____________________________________________________________________________________________________________________________________*/
 // PRIMITIVE TESTS
 /*____________________________________________________________________________________________________________________________________*/
