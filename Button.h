@@ -52,10 +52,13 @@ char Button_Text_Set(int id, char* new_text);
 char Button_Color_Set(int id, int r, int g, int b, int a);
 char Button_Image_Set(int id, char* img);
 char Button_Image_Set_Override(int id, char* img);
-int Button_GetID_By_Name(char* text);
+int  Button_GetID_By_Name(char* text);
 char Button_SceneID_Set(int id);
 void Button_SpecialEffects_Set(int id,char x);
 char Button_Active_Set(int id, char x);
+
+void Button_Escape();
+
 
 void Button_Class_Init();
 
