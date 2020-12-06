@@ -22,4 +22,5 @@ void TestBed_UpdateZombies(const float dt);
 void TestBed_CheckBombOnZomb();
 
 // Enemy/Wave functions(RAY)
+void WaveUpdate(float dt);
 void DayNightManager(float dt);

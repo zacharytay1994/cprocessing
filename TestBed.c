@@ -202,55 +202,7 @@ void TestBed_Update(const float dt)
 	// Enemy Functions - (RAY)
 	DayNightManager(dt);
 
-	if(is_interval == 0) // if not day time, spawn enemies
-	{
-		// if 10th wave and no boss spawn yet
-		if (wave_count % 10 == 0 && wave_count != 0 && biggus == 0)
-		{
-			// 30% of wave duration left(cloes to end of wave)
-			if (wave_timer <= (wave_duration / 10 * 3))
-			{
-				// spawn miniboss
-				CreateEnemy(30.f,
-				(CP_Vector){ 2300.0f,1150.0f },
-				(CP_Vector){200.f,200.f},
-				30.f, 5);	
-
-				biggus = 1;
-			}
-		}
-		if (spawndelay <= 0.0)	// delay between each enemy spawn
-		{
-			if(wave_count >= 5)
-			{
-				int rand_Type = CP_Random_RangeInt(0, 10);
-				if(rand_Type > 3)
-				{
-					CreateEnemy(1.f,
-						(CP_Vector){ 2300.0f,1150.0f },
-						(CP_Vector){200.f,200.f},
-						100.f, 3);	//spawn type 3 enemy(toothpaste guy)
-				}
-				else
-				{
-					CreateEnemy(3.f,
-						(CP_Vector){ 2300.0f,1150.0f },
-						(CP_Vector){200.f,200.f},
-						60.f, 4);	//spawn type 3 enemy(strawberryJam guy)
-				}
-			}
-			else
-			{
-				CreateEnemy(1.f,
-						(CP_Vector){ 2300.0f,1150.0f },
-						(CP_Vector){200.f,200.f},
-						100.f, 3);	//spawn type 3 enemy(toothpaste guy)
-			}
-
-			spawndelay = CP_Random_RangeFloat(3.f/((float)wave_count*0.5f),7.f/ ((float)wave_count * 0.5f));
-		}
-		spawndelay -= dt;
-	}
+	WaveUpdate(dt);
 
 	/*Camera_SetCameraX(cam_x);
 	Camera_SetCameraY(cam_y);*/
@@ -304,6 +256,62 @@ void TestBed_Exit()
 	Tilemap_Free();
 	PB_Exit();
 	LightStage_Exit();
+}
+
+void WaveUpdate(float dt)
+{
+	if(is_interval == 0) // if not day time, spawn enemies
+	{
+		// if 10th wave and no boss spawn yet
+		if (wave_count % 10 == 0 && wave_count != 0 && biggus == 0)
+		{
+			// 30% of wave duration left(cloes to end of wave)
+			if (wave_timer <= (wave_duration / 10 * 3))
+			{
+
+				// spawn miniboss
+				CreateEnemy(30.f,
+				(CP_Vector){ 2300.0f,1150.0f },
+				(CP_Vector){200.f,200.f},
+				30.f, 5);	
+
+				biggus = 1;
+			}
+		}
+		if (spawndelay <= 0.0)	// delay between each enemy spawn
+		{
+			if(wave_count >= 5)
+			{
+				int rand_Type = CP_Random_RangeInt(0, 10);
+				// chance of tougher enemies increase with every wave
+				if(rand_Type <= 3 + (wave_count * 0.025f))
+				{
+					CreateEnemy(3.f,
+						(CP_Vector){ 2300.0f,1150.0f },
+						(CP_Vector){200.f,200.f},
+						60.f, 4);	//spawn type 3 enemy(strawberryJam guy)
+				}
+				else
+				{
+					CreateEnemy(1.f,
+						(CP_Vector){ 2300.0f,1150.0f },
+						(CP_Vector){200.f,200.f},
+						100.f, 3);	//spawn type 3 enemy(toothpaste guy)
+
+				}
+			}
+			else
+			{
+				CreateEnemy(1.f,
+						(CP_Vector){ 2300.0f,1150.0f },
+						(CP_Vector){200.f,200.f},
+						100.f, 3);	//spawn type 3 enemy(toothpaste guy)
+			}
+
+			spawndelay = CP_Random_RangeFloat(3.f/((float)wave_count*0.5f),7.f/ ((float)wave_count * 0.5f));
+		}
+		spawndelay -= dt;
+	}
 }
 
 void DayNightManager(float dt)
