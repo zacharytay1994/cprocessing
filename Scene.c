@@ -34,7 +34,7 @@ void Scene_Update()
 	}
 
 	// SCENE RENDERS
-	//PhyObj_Render();
+	PhyObj_Render();
 	Sprite_Render(CP_System_GetDt());
 }
 

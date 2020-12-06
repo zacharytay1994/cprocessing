@@ -299,6 +299,12 @@ void TestBed_Update(const float dt)
 	TestBed_CheckPlayerOnZomb(dt);
 	LePlant_CheckBeanWithPlayerPosition(Player_GetPosition(0), 50.0f, 50.0f);
 	LePlant_CheckPotionWithPlayerPosition(Player_GetPosition(0), 50.0f, 50.0f);
+
+	if (CP_Input_MouseReleased(1)) {
+		CP_Vector temp_pos = Camera_ScreenToWorld(CP_Input_GetMouseX(), CP_Input_GetMouseY());
+		PhyObjOBoundingBox* b = PhyObj_AddOBox(temp_pos.x, temp_pos.y, 10, 50.0f, 50.0f, 0.5f);
+		b->super._visible = 1;
+	}
 }
 
 void TestBed_Exit()

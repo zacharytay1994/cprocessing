@@ -6,7 +6,7 @@
 
 #define PLAYER_MAX_PLAYERS			2		// max number of players in scene
 
-#define PLAYER1_MASS				10.0f	// lighter mass means less effect on other physics objects
+#define PLAYER1_MASS				2.0f	// lighter mass means less effect on other physics objects
 #define PLAYER1_BOUNDING_WIDTH		45.0f	// width of bounding box
 #define PLAYER1_BOUNDING_HEIGHT		110.0f	// height of bounding box
 #define PLAYER1_SPRITE_WIDTH		120.0f	// width of sprite
@@ -14,9 +14,9 @@
 #define PLAYER1_FRICTION			0.0f	// increase in friction prohibits vertical movement when touching a vertical surface
 
 #define PLAYER_MAX_HVELOCITY		150.0f	// maximum velocity after which the player will no longer be able to exert velocity onto itself
-#define PLAYER_MAX_VVELOCITY		600.0f	// maximum velocity vertical ...
+#define PLAYER_MAX_VVELOCITY		120.0f	// maximum velocity vertical ...
 #define PLAYER_APPLIED_HVELOCITY	3000.0f	// velocity applied for horizontal movement
-#define PLAYER_APPLIED_VVELOCITY	6300.0f	// impulse applied for vertical movement
+#define PLAYER_APPLIED_VVELOCITY	1260.0f	// impulse applied for vertical movement
 
 #define PLAYER_DECCELERATION		900.0f	// horizontal decceleration applied
 #define PLAYER_DECCELERATION_THRES	20.0f

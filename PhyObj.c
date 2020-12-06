@@ -50,7 +50,7 @@ void PhyObj_Initialize()
 	PhyObj_manifolds_size = 0;
 
 	PhyObj_circle_image = CP_Image_Load("./circle.png");
-	PhyObj_square_image = CP_Image_Load("./square.png");
+	PhyObj_square_image = CP_Image_Load("./Sprites/crate.png");
 }
 
 PhyObjBoundingCircle* PhyObj_AddCircle(const float x, const float y, const float m, const float r, const float f)
@@ -322,6 +322,17 @@ void PhyObj_WarmStarting()
 		}
 		else {
 			PhyObj_bounding_shapes[i]->_accumulated_impulse = CP_Vector_Set(0.0f, 0.0f);
+		}
+	}
+}
+
+void PhyObj_ApplyGlobalImpulse(const CP_Vector position, const float strength)
+{
+	CP_Vector direction;
+	for (int i = 0; i < PhyObj_bounding_shapes_size; ++i) {
+		if (!PhyObj_bounding_shapes[i]->_ignore_global_impulse) {
+			direction = CP_Vector_Subtract(PhyObj_bounding_shapes[i]->_position, position);
+			PhyObj_ApplyImpulse(PhyObj_bounding_shapes[i], CP_Vector_Scale(direction, strength));
 		}
 	}
 }

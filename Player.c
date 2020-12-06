@@ -133,7 +133,8 @@ void Player_AddPlayer(const CP_Vector pos, const float mass, const float bwidth,
 		};
 		Sprite_SetVisible(Player_players[Player_players_size]._sprite_run, 0);
 		Sprite_SetVisible(Player_players[Player_players_size]._sprite_jump, 0);
-		Sprite_SetRepeat(Player_players[Player_players_size]._sprite_jump, 0);
+		Sprite_SetRepeat(Player_players[Player_players_size]._sprite_jump, 0); 
+		PhyObj_GetShape(Player_players[Player_players_size]._box)->_ignore_global_impulse = 1;
 		++Player_players_size;
 	}
 }
@@ -550,6 +551,7 @@ void Player_ProjectileUpdate(const float dt)
 			LightStage_DeactivateLight(Player_projectiles[i]._light_id);
 			LightStage_AddLight(new_pos, 300.0f, 200.0f, 200.0f, 0, 100);
 			Particle_EmitOut(PT_Star, pos, 50.0f, 100.0f, -30.0f, -30.0f, 150.0f, -150.0f, 0.8f, 0.3f, -50.0f, -80.0f, 0.04f, 0.02f, 120.0f, 10, 5, 0);
+			PhyObj_ApplyGlobalImpulse(new_pos, 50.0f);
 		}
 	}
 }

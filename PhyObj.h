@@ -33,6 +33,7 @@ typedef struct PhyObjBoundingShape {
 	int			_grounded;
 	int			_num_contacts;
 	int			_visible;
+	int			_ignore_global_impulse;
 } PhyObjBoundingShape;
 
 typedef struct PhyObjBoundingCircle {
@@ -117,7 +118,7 @@ void	PhyObj_UpdatePosition(const float dt);
 void	PhyObj_UpdateRotation(const float dt);
 void	PhyObj_GlobalAcceleration();
 void	PhyObj_WarmStarting();
-
+void	PhyObj_ApplyGlobalImpulse(const CP_Vector position, const float strength);
 /*____________________________________________________________________________________________________________________________________*/
 // PRIMITIVE TESTS
 /*____________________________________________________________________________________________________________________________________*/
