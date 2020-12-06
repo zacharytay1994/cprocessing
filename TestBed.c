@@ -95,6 +95,9 @@ void TestBed_Init()
 	// temp
 	TestBed_house = CP_Image_Load("./Sprites/house.png");
 	TestBed_house_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house));
+	wind_Width = (float)CP_System_GetWindowWidth();
+	wind_Height = (float)CP_System_GetWindowHeight();
+	TestBed_house_data = malloc(CP_Image_GetPixelBufferSize(TestBed_house));
 	CP_Image_GetPixelData(TestBed_house, TestBed_house_data);
 
 	TestBed_house_modified = CP_Image_CreateFromData(160, 160, TestBed_house_data);
@@ -131,9 +134,10 @@ void TestBed_Init()
 	Player_Initialize();
 	PB_Initialize();
 	Inventory_Init();
-	Inventory_Item_Create("poop");
-	Inventory_Add_Item_Name("poop");
-	Inventory_Item_Set_Image("poop", "demo_test.png");
+	Inventory_Item_Create("Speed Up");
+	Inventory_Add_Item_Name("Speed Up");
+	Inventory_Item_Set_Image("Speed Up", "demo_test.png");
+	Inventory_Item_Set_Description("Speed Up", "Increases speed temporarily");
 
 	Inventory_Item_Create("Add Health Flower");
 	Inventory_Item_Set_Image("Add Health Flower", "Assets/Items/AddHealthFlower.png");
@@ -216,33 +220,34 @@ void TestBed_Update(const float dt)
 	// Enemy Functions - (RAY)
 	DayNightManager(dt);
 
-	if(is_interval == 0) // if not day time, spawn enemies
-	{
-		if (wave_count % 10 == 0 && wave_count != 0 && biggus == 0)
-		{
-			// if wave 10 and 30% of wave duration left(cloes to end of wave)
-			if (wave_timer <= (wave_duration / 10 * 3))
-			{
-				// spawn miniboss
-				CreateEnemy(50.f,
-				(CP_Vector){ 2300.0f,1150.0f },
-				(CP_Vector){200.f,200.f},
-				50.f, 4);	
+	// if(is_interval == 0) // if not day time, spawn enemies
+	// {
+	// 	if (wave_count % 10 == 0 && wave_count != 0 && biggus == 0)
+	// 	{
+	// 		// if wave 10 and 30% of wave duration left(cloes to end of wave)
+	// 		if (wave_timer <= (wave_duration / 10 * 3))
+	// 		{
+	// 			// spawn miniboss
+	// 			CreateEnemy(50.f,
+	// 			(CP_Vector){ 2300.0f,1150.0f },
+	// 			(CP_Vector){200.f,200.f},
+	// 			50.f, 4);	
 
-				biggus = 1;
-			}
-		}
-		if (spawndelay <= 0.0)	// delay between each enemy spawn
-		{
-			CreateEnemy(2.f,
-				(CP_Vector){ 2300.0f,1150.0f },
-				(CP_Vector){200.f,200.f},
-				100.f, 3);	//spawn type 3 enemy(toothpaste guy)
+	// 			biggus = 1;
+	// 		}
+	// 	}
+	// 	if (spawndelay <= 0.0)	// delay between each enemy spawn
+	// 	{
+	// 		CreateEnemy(2.f,
+	// 			(CP_Vector){ 2300.0f,1150.0f },
+	// 			(CP_Vector){200.f,200.f},
+	// 			100.f, 3);	//spawn type 3 enemy(toothpaste guy)
 
-			spawndelay = CP_Random_RangeFloat(3.f/((float)wave_count*0.5f),7.f/ ((float)wave_count * 0.5f));
-		}
-		spawndelay -= dt;
-	}
+	// 		spawndelay = CP_Random_RangeFloat(3.f/((float)wave_count*0.5f),7.f/ ((float)wave_count * 0.5f));
+	// 	}
+	// 	spawndelay -= dt;
+	// }
+	WaveUpdate(dt);
 
 	/*Camera_SetCameraX(cam_x);
 	Camera_SetCameraY(cam_y);*/
@@ -305,6 +310,62 @@ void TestBed_Exit()
 	LePlant_Exit();
 }
 
+void WaveUpdate(float dt)
+{
+	if(is_interval == 0) // if not day time, spawn enemies
+	{
+		// if 10th wave and no boss spawn yet
+		if (wave_count % 10 == 0 && wave_count != 0 && biggus == 0)
+		{
+			// 30% of wave duration left(cloes to end of wave)
+			if (wave_timer <= (wave_duration / 10 * 3))
+			{
+
+				// spawn miniboss
+				CreateEnemy(30.f,
+				(CP_Vector){ 2300.0f,1150.0f },
+				(CP_Vector){200.f,200.f},
+				30.f, 5);	
+
+				biggus = 1;
+			}
+		}
+		if (spawndelay <= 0.0)	// delay between each enemy spawn
+		{
+			if(wave_count >= 5)
+			{
+				int rand_Type = CP_Random_RangeInt(0, 10);
+				// chance of tougher enemies increase with every wave
+				if(rand_Type <= 3 + (wave_count * 0.025f))
+				{
+					CreateEnemy(3.f,
+						(CP_Vector){ 2300.0f,1150.0f },
+						(CP_Vector){200.f,200.f},
+						60.f, 4);	//spawn type 3 enemy(strawberryJam guy)
+				}
+				else
+				{
+					CreateEnemy(1.f,
+						(CP_Vector){ 2300.0f,1150.0f },
+						(CP_Vector){200.f,200.f},
+						100.f, 3);	//spawn type 3 enemy(toothpaste guy)
+
+				}
+			}
+			else
+			{
+				CreateEnemy(1.f,
+						(CP_Vector){ 2300.0f,1150.0f },
+						(CP_Vector){200.f,200.f},
+						100.f, 3);	//spawn type 3 enemy(toothpaste guy)
+			}
+
+			spawndelay = CP_Random_RangeFloat(3.f/((float)wave_count*0.5f),7.f/ ((float)wave_count * 0.5f));
+		}
+		spawndelay -= dt;
+	}
+}
+
 void DayNightManager(float dt)
 {
 	// if DAY time
@@ -358,11 +419,11 @@ void DayNightManager(float dt)
 	timer += dt;
 	sprintf_s(curr_Timer, 127, "Time: %.0f", timer);
 	CP_Settings_Fill((CP_Color) { 255, 255, 255, 255 });
-	CP_Font_DrawText(curr_Timer, 20, 170);
-	
+	CP_Font_DrawText(curr_Timer, wind_Width/15, wind_Height/5.5f);
+
 	sprintf_s(money_display, 127, "Souls: %d", souls_money);
 	CP_Settings_Fill((CP_Color) { 175, 205, 255, 255 });
-	CP_Font_DrawText(money_display, 20, 230);
+	CP_Font_DrawText(money_display, wind_Width / 15, wind_Height / 4);
 
 	// Simple wave count (nothing much)
 	sprintf_s(wave_display, 127, "WAVE %d", wave_count);
@@ -424,16 +485,8 @@ void TestBed_UpdateZombies(const float dt)
 			//SetEnemySpeed(i, 0.f);
 			SetEnemyHP(i, 0.f);
 
-			if (enemy_list[i].ene_Type == 3)
-			{
-				House_health -= 1;
-				souls_money += 30;
-			}
-			else
-			{
-				House_health -= 3;
-				souls_money += 1000;
-			}
+			House_health -= GetEnemyDMG(i);
+				
 		}
 	}
 }
@@ -482,6 +535,8 @@ void TestBed_CheckBombOnZomb()
 					CP_Vector projectile_position = Sprite_GetPosition(Player_GetProjectileID(i));
 					if (CheckEnemyCollision(projectile_position.x + 25.0f, projectile_position.y + 25.0f,
 						projectile_position.x - 25.0f, projectile_position.y - 25.0f, j)) {
+						if (GetEnemyHP(j) <= 1)
+							souls_money += GetEnemyMoney(j);
 						EnemyTakeDamage(j, 1);
 						Player_SetProjectileDead(i, 1);
 						LightStage_DeactivateLight(Player_GetProjectileLight(i));

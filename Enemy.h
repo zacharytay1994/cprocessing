@@ -20,6 +20,7 @@ typedef struct Enemy
 	int			ene_Type;	// 0 - VitaminC, 1 - NoOxygen, 2 - Late4Class
 	int			ene_dmg;
 	const char* sprite_path;
+	int			money_amount;
 	char		isAlive;
 	int			_initialized;
 }Enemy;
@@ -41,6 +42,7 @@ void SetEnemySpeed(int id, float newSpeed);
 void SetEnemyHP(int id, float newHP);
 float GetEnemyHP(int id);
 int GetEnemyDMG(int id);
+int GetEnemyMoney(int id);
 void SetEnemyDie(int id);
 void EnemyTakeDamage(int id, int dmg);
 
