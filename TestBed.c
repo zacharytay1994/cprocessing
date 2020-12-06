@@ -123,9 +123,10 @@ void TestBed_Init()
 	Player_Initialize();
 	PB_Initialize();
 	Inventory_Init();
-	Inventory_Item_Create("poop");
-	Inventory_Add_Item_Name("poop");
-	Inventory_Item_Set_Image("poop", "demo_test.png");
+	Inventory_Item_Create("Speed Up");
+	Inventory_Add_Item_Name("Speed Up");
+	Inventory_Item_Set_Image("Speed Up", "demo_test.png");
+	Inventory_Item_Set_Description("Speed Up", "Increases speed temporarily");
 
 	Inventory_Item_Create("Add Health Flower");
 	Inventory_Item_Set_Image("Add Health Flower", "Assets/Items/AddHealthFlower.png");
