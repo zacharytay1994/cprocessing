@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	Scene.c
+// author:	Zachary
+// email:	z.tay@digipen.edu
+//
+// brief:	Scene transition using function pointer to handle game state
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "Scene.h"
 #include "PhyObj.h"
 #include "Sprite.h"

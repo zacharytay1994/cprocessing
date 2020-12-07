@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	Particles.c
+// author:	Zachary
+// email:	z.tay@digipen.edu
+//
+// brief:	Particle system with simple emissions
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "Particles.h"
 
 #include <stdio.h>

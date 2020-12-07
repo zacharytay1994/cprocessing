@@ -1,3 +1,17 @@
+//---------------------------------------------------------
+// file:	Tilemap.c
+// author:	Zachary
+//
+// email:	z.tay@digipen.edu
+//
+// brief:	Handles loading, saving, and creating of tilemaps
+//
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "Tilemap.h"
 #include "PhyObj.h"
 #include "Sprite.h"

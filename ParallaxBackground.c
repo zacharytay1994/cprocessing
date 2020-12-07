@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	ParallaxBackground.c
+// author:	Jia Min
+// email:	j.jiamin@digipen.edu
+//
+// brief:	Renders parallax background with for the scene
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "ParallaxBackground.h"
 #include "LightStage.h"
 

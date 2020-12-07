@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	GameGUI.c
+// author:	Zachary Tay
+// email:	z.tay@digipen.edu
+//
+// brief:	Basic GUI functionality
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "GameGUI.h"
 #include <stdio.h>
 

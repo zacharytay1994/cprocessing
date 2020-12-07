@@ -1,3 +1,16 @@
+//---------------------------------------------------------
+// file:	LePlant.c
+// author:	Jia Min / Zachary
+// email:	j.jiamin@digipen.edu
+//
+// brief:	Plant logic for farming
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
+
 #include <stdio.h>
 #include "TestScene2.h"
 #include "CProcessing/inc/cprocessing.h"

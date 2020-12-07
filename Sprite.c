@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	Sprite.c
+// author:	Zachary
+// email:	z.tay@digipen.edu
+//
+// brief:	Sprite class for animation and control
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "Sprite.h"
 #include "Camera.h"
 #include <stdio.h>
@@ -197,10 +209,12 @@ CP_Image Sprite_GenerateSubImage(const float u0, const float v0, const float u1,
 		for (int x = 0; x < sub_width; x++) {
 			int buffer_x = (x_start + x) * 4;
 			int buffer_y = (y_start + y);
-			sub_buffer[(y * sub_width + x) * 4] = buffer[buffer_y * (pixel_width * 4) + buffer_x];			// r
-			sub_buffer[(y * sub_width + x) * 4 + 1] = buffer[buffer_y * (pixel_width * 4) + buffer_x + 1];	// g
-			sub_buffer[(y * sub_width + x) * 4 + 2] = buffer[buffer_y * (pixel_width * 4) + buffer_x + 2];	// b
-			sub_buffer[(y * sub_width + x) * 4 + 3] = buffer[buffer_y * (pixel_width * 4) + buffer_x + 3];	// a
+			if (buffer && sub_buffer) {
+				sub_buffer[(y * sub_width + x) * 4] = buffer[buffer_y * (pixel_width * 4) + buffer_x];			// r
+				sub_buffer[(y * sub_width + x) * 4 + 1] = buffer[buffer_y * (pixel_width * 4) + buffer_x + 1];	// g
+				sub_buffer[(y * sub_width + x) * 4 + 2] = buffer[buffer_y * (pixel_width * 4) + buffer_x + 2];	// b
+				sub_buffer[(y * sub_width + x) * 4 + 3] = buffer[buffer_y * (pixel_width * 4) + buffer_x + 3];	// a
+			}
 		}
 	}
 	CP_Image image = CP_Image_CreateFromData(sub_width, sub_height, sub_buffer);

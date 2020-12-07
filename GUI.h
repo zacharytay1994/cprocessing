@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	GUI.h
+// author:	Zachary Tay
+// email:	z.tay@digipen.edu
+//
+// brief:	Nested containers for easy menu creation
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #pragma once
 
 #include "CProcessing/inc/cprocessing.h"

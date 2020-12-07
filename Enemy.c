@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	Enemy.c
+// author:	Ray
+// email:	z.tay@digipen.edu
+//
+// brief:	Camera functions mainly to move the camera
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "Enemy.h"
 #include "LePlant.h"
 #include "Particles.h"

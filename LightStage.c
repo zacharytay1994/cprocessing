@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	LightStage.c
+// author:	Zachary
+// email:	z.tay@digipen.edu
+//
+// brief:	Lighting for the world
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "LightStage.h"
 #include "Camera.h"
 #include <math.h>
@@ -14,7 +26,7 @@ typedef struct Vec3 {
 } Vec3;
 
 float	Vec3_Dot(Vec3 lhs, Vec3 rhs) { return (lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z); }
-float	Vec3_Mag(Vec3 vec) { return (float)sqrt((vec.x * vec.x) + (vec.y * vec.y) + (vec.z * vec.z)); }
+float	Vec3_Mag(Vec3 vec) { return (float)sqrt(((double)vec.x * (double)vec.x) + ((double)vec.y * (double)vec.y) + ((double)vec.z * (double)vec.z)); }
 Vec3	Vec3_Normalize(Vec3 vec) {
 	float mag = Vec3_Mag(vec);
 	return (Vec3) { vec.x / mag, vec.y / mag, vec.z / mag };

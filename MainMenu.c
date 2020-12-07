@@ -209,7 +209,7 @@ void MainMenu_Update(const float dt)
 		Menu_P_Jump_Get_Pos.x = Menu_P_Jump_Check;
 	}
 	
-	float val = (float)sin((Menu_P_Jump_Get_Pos.x - window_width_div5) / (window_width_div5 * 3.0f) * PI * 3.0f);
+	float val = (float)sin(((double)Menu_P_Jump_Get_Pos.x - (double)window_width_div5) / ((double)window_width_div5 * 3.0) * (double)PI * 3.0);
 
 	if (val > 0.0f)
 	{

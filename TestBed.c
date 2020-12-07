@@ -1,3 +1,14 @@
+//---------------------------------------------------------
+// file:	TestBed.c
+// author:	Jia Min, Noel, Ray, Zachary
+//
+// brief:	Main scene where the action happens
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "TestBed.h"
 
 #include "PhyObj.h"

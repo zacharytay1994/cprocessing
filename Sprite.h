@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	Sprite.h
+// author:	Zachary
+// email:	z.tay@digipen.edu
+//
+// brief:	Sprite class for animation and control
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #pragma once
 
 #include "CProcessing/inc/cprocessing.h"

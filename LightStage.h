@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	LightStage.c
+// author:	Zachary
+// email:	z.tay@digipen.edu
+//
+// brief:	Lighting for the world
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #pragma once
 
 #include "CProcessing/inc/cprocessing.h"
