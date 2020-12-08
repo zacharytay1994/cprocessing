@@ -21,6 +21,7 @@
 #include "MainMenu.h"
 #include "SplashScreen.h"
 #include "Credits.h"
+#include "HowToPlay.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +33,7 @@ int test_bed;
 int main_menu;
 int test_scene_3;
 int credits_scene;
+int howtoplay_scene;
 
 // use CP_Engine_SetNextGameState to specify this function as the initialization function
 // this function will be called once at the beginning of the program
@@ -51,7 +53,8 @@ void game_init(void)
 	splash_screen = Scene_AddScene(SplashScreen_Init, SplashScreen_Update, SplashScreen_Exit);
 	test_scene_3 = Scene_AddScene(TestScene3_Init, TestScene3_Update, TestScene3_Exit);
 	credits_scene = Scene_AddScene(Credits_Init, Credits_Update, Credits_Exit);
-	Scene_ChangeScene(splash_screen);// splash_screen);
+	howtoplay_scene = Scene_AddScene(HowToPlay_Init, HowToPlay_Update, HowToPlay_Exit);
+	Scene_ChangeScene(howtoplay_scene);// splash_screen);
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the update function

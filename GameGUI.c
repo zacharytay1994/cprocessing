@@ -117,6 +117,11 @@ void GameGUI_DrawText(CP_Color colour, const char* text, const float x, const fl
 	CP_Font_DrawText(text, x*GameGUI_screen_width, y*GameGUI_screen_height);
 }
 
+void GameGUI_DrawImage(CP_Image image, const float x, const float y, const float size_x, const float size_y, const int alpha)
+{
+	CP_Image_Draw(image, GameGUI_screen_width * x, GameGUI_screen_height * y, GameGUI_screen_width * size_x, GameGUI_screen_height * size_y, alpha);
+}
+
 void GameGUI_SetHealthScale(const float scale)
 {
 	health_ratio = scale;
