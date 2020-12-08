@@ -54,7 +54,7 @@ void game_init(void)
 	test_scene_3 = Scene_AddScene(TestScene3_Init, TestScene3_Update, TestScene3_Exit);
 	credits_scene = Scene_AddScene(Credits_Init, Credits_Update, Credits_Exit);
 	howtoplay_scene = Scene_AddScene(HowToPlay_Init, HowToPlay_Update, HowToPlay_Exit);
-	Scene_ChangeScene(howtoplay_scene);// splash_screen);
+	Scene_ChangeScene(main_menu);// splash_screen);
 }
 
 // use CP_Engine_SetNextGameState to specify this function as the update function

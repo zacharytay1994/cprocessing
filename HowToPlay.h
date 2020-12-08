@@ -1,3 +1,15 @@
+//---------------------------------------------------------
+// file:	HowToPlay.h
+// author:	Jia Min / Zachary
+// email:	j.jiamin@digipen.edu / z.tay@digipen.edu
+//
+// brief:	How to!
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #pragma once
 
 #include "CProcessing/inc/cprocessing.h"
@@ -10,7 +22,7 @@ typedef enum HowToPlayImageType {
 	HTP_Right,
 	HTP_LeftMouse,
 	HTP_RightMouse,
-	HTP_Escape
+	HTP_Down
 } HTP_Image;
 
 void HowToPlay_Init();

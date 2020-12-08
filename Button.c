@@ -462,13 +462,14 @@ void Button_Mouse_Collision_Click_ById(int id)
 				}
 				case 1:		// Survey
 				{
-					#ifdef _WIN32 
+					/*#ifdef _WIN32 
 						system("start https://forms.gle/wiLHNBcqdAMYVNKY9");
 					#elif __APPLE__ 
 						system("open https://forms.gle/wiLHNBcqdAMYVNKY9");
 					#elif __linux__ 
 						system("xdg-open https://forms.gle/wiLHNBcqdAMYVNKY9");
-					#endif
+					#endif*/
+					Scene_ChangeScene(7);
 					break;
 				}
 				case 2:		// Credits

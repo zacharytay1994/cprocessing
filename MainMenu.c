@@ -81,7 +81,7 @@ void MainMenu_Initialize()
 		Menu_Button_Words,
 		Menu_Button_Visible
 	);
-	Button_Text_Set(button_survey, "Survey");
+	Button_Text_Set(button_survey, "How To!");
 	Button_Translate(button_survey, window_width_div5, 0); 
 	Button_Text_Translate(button_survey, window_width_div5, 0);
 	Button_Color_Set(button_survey, 195, 154, 107, 255);

@@ -1,9 +1,21 @@
+//---------------------------------------------------------
+// file:	HowToPlay.c
+// author:	Jia Min / Zachary
+// email:	j.jiamin@digipen.edu / z.tay@digipen.edu
+//
+// brief:	How to!
+//
+// documentation link:
+// https://inside.digipen.edu/main/GSDP:GAM100/CProcessing
+//
+// Copyright  2020 DigiPen, All rights reserved.
+//---------------------------------------------------------
 #include "HowToPlay.h"
 #include "GameGUI.h"
 #include "Sprite.h"
 #include "Scene.h"
 
-#define HOWTOPLAY_MAX_IMAGES 6
+#define HOWTOPLAY_MAX_IMAGES 8
 
 #define HTP_X_KEYBOARD 0.5f
 #define HTP_Y_KEYBOARD 0.5f
@@ -30,15 +42,20 @@
 #define HTP_WIDTH_RIGHT 1.0f
 #define HTP_HEIGHT_RIGHT 1.0f
 
-#define HTP_X_LEFTMOUSE 0.7f
-#define HTP_Y_LEFTMOUSE 0.4f
-#define HTP_WIDTH_LEFTMOUSE 0.5f
-#define HTP_HEIGHT_LEFTMOUSE 0.5f
+#define HTP_X_LEFTMOUSE 0.5f
+#define HTP_Y_LEFTMOUSE 0.5f
+#define HTP_WIDTH_LEFTMOUSE 1.0f
+#define HTP_HEIGHT_LEFTMOUSE 1.0f
 
 #define HTP_X_RIGHTMOUSE 0.5f
 #define HTP_Y_RIGHTMOUSE 0.5f
 #define HTP_WIDTH_RIGHTMOUSE 1.0f
 #define HTP_HEIGHT_RIGHTMOUSE 1.0f
+
+#define HTP_X_DOWN 0.5f
+#define HTP_Y_DOWN 0.5f
+#define HTP_WIDTH_DOWN 1.0f
+#define HTP_HEIGHT_DOWN 1.0f
 
 typedef struct HowToPlayImage {
 	int			_image;
@@ -67,23 +84,23 @@ void HowToPlay_Init()
 	// loading images
 	HowToPlay_AddImage(Sprite_AddSprite((CP_Vector) { HTP_window_width*HTP_X_KEYBOARD, HTP_window_height
 	*HTP_Y_KEYBOARD}, HTP_window_width*HTP_WIDTH_KEYBOARD, HTP_window_height*HTP_HEIGHT_KEYBOARD, "./Assets/HowToPlay/howtoplay_keyboard.jpg",
-		2, 1, 2, 2, 1), 5.0f, 1.0f);
+		2, 1, 2, 2, 1), 2.0f, 2.0f);
 	HowToPlay_AddImage(Sprite_AddSprite((CP_Vector) {
 		HTP_window_width* HTP_X_TAB, HTP_window_height*HTP_Y_TAB },
 		HTP_window_width* HTP_WIDTH_TAB, HTP_window_height* HTP_HEIGHT_TAB, "./Assets/HowToPlay/howtoplay_tab.png",
-		2, 3, 6, 10, 1), 5.0f, 1.0f);
+		2, 1, 2, 2, 1), 2.0f, 2.0f);
 	HowToPlay_AddImage(Sprite_AddSprite((CP_Vector) {
 		HTP_window_width* HTP_X_UP, HTP_window_height*HTP_Y_UP },
-		HTP_window_width* HTP_WIDTH_UP, HTP_window_height* HTP_HEIGHT_UP, "./Assets/HowToPlay/howtoplay_up.png",
-		2, 1, 2, 2, 1), 5.0f, 1.0f);
+		HTP_window_width* HTP_WIDTH_UP, HTP_window_height* HTP_HEIGHT_UP, "./Assets/HowToPlay/howtoplay_up.jpg",
+		2, 5, 8, 10, 1), 2.0f, 2.0f);
 	HowToPlay_AddImage(Sprite_AddSprite((CP_Vector) {
 		HTP_window_width* HTP_X_LEFT, HTP_window_height*HTP_Y_LEFT },
 		HTP_window_width* HTP_WIDTH_LEFT, HTP_window_height* HTP_HEIGHT_LEFT, "./Assets/HowToPlay/howtoplay_left.png",
-		2, 1, 2, 2, 1), 5.0f, 1.0f);
+		1, 1, 1, 1, 1), 2.0f, 2.0f);
 	HowToPlay_AddImage(Sprite_AddSprite((CP_Vector) {
 		HTP_window_width* HTP_X_RIGHT, HTP_window_height*HTP_Y_RIGHT },
 		HTP_window_width* HTP_WIDTH_RIGHT, HTP_window_height* HTP_HEIGHT_RIGHT, "./Assets/HowToPlay/howtoplay_right.png",
-		2, 1, 2, 2, 1), 5.0f, 1.0f);
+		1, 1, 1, 1, 1), 2.0f, 2.0f);
 	HowToPlay_AddImage(Sprite_AddSprite((CP_Vector) {
 		HTP_window_width* HTP_X_LEFTMOUSE, HTP_window_height*HTP_Y_LEFTMOUSE },
 		HTP_window_width* HTP_WIDTH_LEFTMOUSE, HTP_window_height* HTP_HEIGHT_LEFTMOUSE, "./Assets/HowToPlay/howtoplay_leftmouse.jpg",
@@ -91,7 +108,11 @@ void HowToPlay_Init()
 	HowToPlay_AddImage(Sprite_AddSprite((CP_Vector) {
 		HTP_window_width* HTP_X_RIGHTMOUSE, HTP_window_height*HTP_Y_RIGHTMOUSE }, 
 		HTP_window_width* HTP_WIDTH_RIGHTMOUSE, HTP_window_height* HTP_HEIGHT_RIGHTMOUSE, "./Assets/HowToPlay/howtoplay_rightmouse.png",
-		2, 1, 2, 2, 1), 5.0f, 1.0f);
+		2, 1, 2, 2, 1), 2.0f, 2.0f);
+	HowToPlay_AddImage(Sprite_AddSprite((CP_Vector) {
+		HTP_window_width* HTP_X_DOWN, HTP_window_height* HTP_Y_DOWN },
+		HTP_window_width* HTP_WIDTH_DOWN, HTP_window_height* HTP_HEIGHT_DOWN, "./Assets/HowToPlay/howtoplay_down.png",
+		1, 1, 1, 1, 1), 2.0f, 2.0f);
 	HowToPlay_SetKeyVisible(HTP_Keyboard, 1);
 }
 
@@ -106,6 +127,7 @@ void HowToPlay_Update(const float dt)
 	HowToPlay_SetKeyVisible(HTP_Tab, CP_Input_KeyDown(KEY_TAB));
 	HowToPlay_SetKeyVisible(HTP_LeftMouse, CP_Input_MouseDown(0));
 	HowToPlay_SetKeyVisible(HTP_RightMouse, CP_Input_MouseDown(1));
+	HowToPlay_SetKeyVisible(HTP_Down, CP_Input_KeyDown(KEY_DOWN) || CP_Input_KeyDown(KEY_S));
 	HowToPlay_ImageUpdate(dt);
 	if (CP_Input_KeyDown(KEY_ESCAPE)) {
 		Scene_ChangeScene(3);
@@ -119,7 +141,7 @@ void HowToPlay_Exit()
 void HowToPlay_AddImage(const int img, const float fadeIn, const float fadeOut)
 {
 	if (HowToPlay_images_size < HOWTOPLAY_MAX_IMAGES) {
-		HowToPlay_images[HowToPlay_images_size++] = (HowToPlayImage){ img, 0, 255.0f, fadeIn,fadeOut };
+		HowToPlay_images[HowToPlay_images_size++] = (HowToPlayImage){ img, 0, 0.0f, fadeIn,fadeOut };
 	}
 }
 
